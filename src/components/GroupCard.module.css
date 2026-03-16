@@ -1,0 +1,267 @@
+.card {
+  /* scroll-snap-align removed — HomeScreen no longer uses snap */
+  border-radius: var(--radius-card);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 12px;
+  cursor: pointer;
+  height: 72vh;
+  max-height: 580px;
+  min-height: 460px;
+  flex-shrink: 0;
+  border: 0.5px solid rgba(255, 255, 255, 0.05);
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+.card:hover {
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2), 0 8px 32px rgba(0, 0, 0, 0.6);
+  border-color: rgba(34, 197, 94, 0.15);
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.96) 0%,
+    rgba(0, 0, 0, 0.65) 32%,
+    rgba(0, 0, 0, 0.2) 60%,
+    transparent 100%
+  );
+}
+.shareBtn {
+  position: absolute;
+  top: 14px;
+  right: 52px;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.7);
+  transition: background var(--transition);
+}
+.shareBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+.favBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  border: 0.5px solid rgba(239, 68, 68, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  color: rgba(239, 68, 68, 0.5);
+  transition: all var(--transition);
+}
+.favBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--color-danger);
+  transform: scale(1.1);
+}
+.favBtnActive {
+  color: var(--color-danger);
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.top {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 90px; /* reserva espaço para shareBtn (30px) + favBtn (30px) + gaps */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 4; /* acima dos botões para garantir clicabilidade do badge */
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 7px;
+  padding: 5px 10px;
+  backdrop-filter: blur(12px);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.badgeGold {
+  background: rgba(212, 175, 55, 0.18);
+  border: 0.5px solid rgba(212, 175, 55, 0.45);
+  color: var(--color-gold);
+}
+.badgeGreen {
+  background: rgba(34, 197, 94, 0.15);
+  border: 0.5px solid rgba(34, 197, 94, 0.4);
+  color: var(--color-brand);
+}
+.badgeSilver {
+  background: rgba(200, 200, 200, 0.12);
+  border: 0.5px solid rgba(200, 200, 200, 0.3);
+  color: var(--color-silver);
+}
+.badgeEmpty {
+  opacity: 0;
+  pointer-events: none;
+  width: 10px;
+}
+.distBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 7px;
+  padding: 5px 10px;
+  backdrop-filter: blur(10px);
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+.bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 18px 16px 16px;
+  z-index: 2;
+}
+.teamChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  margin-bottom: 9px;
+  backdrop-filter: blur(8px);
+}
+.bfgDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fff 45%, #000 45%);
+  flex-shrink: 0;
+}
+.teamName {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+}
+.regionTag {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-brand);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px;
+  color: #fff;
+  letter-spacing: 1.5px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.statsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.stat strong {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+}
+.star {
+  color: var(--color-gold);
+  font-size: 11px;
+}
+.meetPoint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 8px;
+}
+.meetPoint strong {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
+}
+.occWrap {
+  margin-bottom: 12px;
+}
+.occLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.38);
+  font-weight: 500;
+}
+.occLabels strong {
+  font-weight: 700;
+}
+.occBar {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.occFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.6s ease;
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.btnOutline {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+.btnSolid {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+}

@@ -1,0 +1,121 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px 10px;
+  flex-shrink: 0;
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logoName {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+}
+.logoName em {
+  font-style: normal;
+  color: var(--color-brand);
+}
+.actions {
+  display: flex;
+  gap: 8px;
+}
+.iconBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: var(--color-silver);
+  transition: background var(--transition);
+}
+.iconBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+.notifDot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  background: var(--color-brand);
+  border-radius: 50%;
+  border: 1.5px solid var(--color-bg);
+}
+
+/* ─── Search bar expandida ───────────────────────────────────────────────── */
+.searchBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  animation: searchExpand 0.18s ease;
+}
+@keyframes searchExpand {
+  from { opacity: 0; transform: scaleX(0.92); }
+  to   { opacity: 1; transform: scaleX(1); }
+}
+.searchIcon {
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+.searchInput {
+  flex: 1;
+  height: 36px;
+  padding: 0 12px 0 4px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 0.5px solid var(--color-border-2);
+  border-radius: 10px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  -webkit-appearance: none;
+}
+.searchInput:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
+}
+.searchInput::placeholder {
+  color: var(--color-text-tertiary);
+}
+/* Remove o X nativo do input type=search */
+.searchInput::-webkit-search-cancel-button { display: none; }
+.searchCancelBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brand);
+  white-space: nowrap;
+  padding: 4px 2px;
+  transition: opacity var(--transition);
+  flex-shrink: 0;
+}
+.searchCancelBtn:hover { opacity: 0.75; }
+
+/* ─── Badge numérico no sininho ──────────────────────────────────────────── */
+.notifBadge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--color-brand);
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-bg);
+  line-height: 1;
+}

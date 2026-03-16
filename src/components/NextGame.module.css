@@ -1,0 +1,222 @@
+.card {
+  margin-bottom: 12px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+  min-height: 200px;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.28) 100%);
+}
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+}
+.label {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-brand);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  flex-shrink: 0;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.matchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+.shield {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+.teamName {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.vs {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 2px;
+}
+.date {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+.stadium {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-align: center;
+}
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 4px 9px;
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  font-size: 10px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+.cta {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.07);
+  color: var(--color-brand);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.cta:hover {
+  background: rgba(34, 197, 94, 0.14);
+}
+/* ─── Adicionar ao NextGame.module.css existente ─────────────────────────── */
+
+/* Logo real do time */
+.shieldWrap {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.teamLogo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+/* ─── Skeleton ────────────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.skelBase {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.05) 25%,
+    rgba(255,255,255,0.10) 50%,
+    rgba(255,255,255,0.05) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+.skeleton {
+  border-radius: var(--radius-card);
+  background: var(--color-surface-1);
+  border: 0.5px solid var(--color-border);
+  padding: 18px 16px;
+  margin: 0 0 12px;
+  min-height: 180px;
+}
+.skelLabel {
+  composes: skelBase;
+  height: 12px;
+  width: 55%;
+  margin-bottom: 20px;
+}
+.skelMatchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.skelShield {
+  composes: skelBase;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+}
+.skelCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.skelVs {
+  composes: skelBase;
+  width: 24px;
+  height: 18px;
+}
+.skelDate {
+  composes: skelBase;
+  width: 80px;
+  height: 11px;
+}
+.skelPills {
+  display: flex;
+  gap: 8px;
+}
+.skelPill {
+  composes: skelBase;
+  height: 26px;
+  width: 90px;
+  border-radius: 20px;
+}

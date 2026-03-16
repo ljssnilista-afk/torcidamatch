@@ -1,0 +1,46 @@
+/* ── Screen enter animation ────────────────────────────────────────────────── */
+/* Applied to the wrapper div, keyed by route pathname.                         */
+/* Re-mounts on each route change, triggering the animation fresh.              */
+.screenEnter {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  animation: screenFadeIn 0.2s ease forwards;
+}
+
+@keyframes screenFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Skeleton loader ────────────────────────────────────────────────────────── */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+  gap: 12px;
+}
+.skeletonHeader {
+  height: 44px;
+  border-radius: 12px;
+  background: #181818;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+.skeletonCard {
+  height: 88px;
+  border-radius: 14px;
+  background: #181818;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+@keyframes shimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.75; }
+}

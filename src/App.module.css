@@ -1,0 +1,67 @@
+.appWrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #212121 0%, #1a1a1a 100%);
+  padding: 20px 0;
+}
+
+.phone {
+  width: 100%;
+  max-width: var(--phone-max-width);
+  height: var(--phone-height);
+  background: linear-gradient(180deg, #212121 0%, #1a1a1a 100%);
+  border-radius: 30px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.95);
+  position: relative;
+}
+
+/* On small screens, go full height */
+@media (max-width: 440px) {
+  .appWrap {
+    padding: 0;
+    align-items: flex-start;
+  }
+  .phone {
+    border-radius: 0;
+    height: 100vh;
+    height: 100dvh;
+    max-width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.screenContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+  height: 0; /* forces flex child to respect parent boundary, enabling inner scroll */
+}
+
+.placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.placeholderText {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.placeholderSub {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+}

@@ -1,0 +1,72 @@
+/* ─── Global Resets ─── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  background: linear-gradient(145deg, #212121 0%, #1a1a1a 100%);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  border: none;
+  background: none;
+  transition: transform 0.16s ease, opacity 0.16s ease;
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+/* ─── Design Tokens ─── */
+:root {
+  /* Backgrounds */
+  --color-bg: #1a1a1a;
+  --color-surface-1: #212121;
+  --color-surface-2: #2c2c2c;
+  --color-surface-3: #333333;
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-2: rgba(255, 255, 255, 0.12);
+
+  /* Brand */
+  --color-brand: #22C55E;
+  --color-brand-light: #5BDF6A;
+  --color-brand-dark: #0d5428;
+  --color-brand-dim: rgba(34, 197, 94, 0.12);
+  --color-brand-glow: rgba(34, 197, 94, 0.35);
+
+  /* Accents */
+  --color-gold: #D4AF37;
+  --color-gold-dim: rgba(212, 175, 55, 0.12);
+  --color-silver: #C8C8C8;
+  --color-silver-dim: rgba(200, 200, 200, 0.10);
+  --color-danger: #EF4444;
+  --color-danger-dim: rgba(239, 68, 68, 0.10);
+  --color-feminine: #C060C0;
+  --color-feminine-dim: rgba(192, 96, 192, 0.10);
+
+  /* Text */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: rgba(255, 255, 255, 0.62);
+  --color-text-tertiary: rgba(255, 255, 255, 0.35);
+
+  /* Layout */
+  --radius-card: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+  --radius-chip: 18px;
+
+  /* Transitions */
+  --transition: 0.16s ease;
+
+  /* Phone shell */
+  --phone-max-width: 390px;
+  --phone-height: 920px;
+}

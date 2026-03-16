@@ -1,0 +1,635 @@
+/* ─── Screen ────────────────────────────────────────────────────────────────── */
+.screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--color-bg);
+  position: relative;
+}
+
+/* ─── Background decoration ─────────────────────────────────────────────────── */
+.bgDeco {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.bgCircle1 {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,197,94,0.07) 0%, transparent 70%);
+  top: -80px;
+  left: -80px;
+}
+.bgCircle2 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,197,94,0.05) 0%, transparent 70%);
+  bottom: 60px;
+  right: -60px;
+}
+
+/* ─── Content ───────────────────────────────────────────────────────────────── */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: 40px 28px 32px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Brand ──────────────────────────────────────────────────────────────────── */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 44px;
+}
+.logoMark {
+  filter: drop-shadow(0 0 16px rgba(34,197,94,0.4));
+  animation: logoFloat 3s ease-in-out infinite;
+}
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+.brandName {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  letter-spacing: -0.7px;
+  line-height: 1;
+}
+.brandName em {
+  font-style: normal;
+  color: var(--color-brand);
+}
+.brandTagline {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-align: center;
+  line-height: 1.45;
+  max-width: 220px;
+}
+
+/* ─── Form ───────────────────────────────────────────────────────────────────── */
+.form {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ─── Input wrap (floating label) ───────────────────────────────────────────── */
+.inputWrap {
+  position: relative;
+  width: 100%;
+}
+.inputWrapError .input {
+  border-color: rgba(239,68,68,0.55);
+}
+.inputWrapError .input:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.12);
+}
+
+.inputLabel {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  transition: all 0.18s ease;
+  background: transparent;
+  padding: 0 2px;
+}
+.inputLabelActive {
+  top: 0;
+  font-size: 11px;
+  color: var(--color-brand);
+  background: var(--color-bg);
+  padding: 0 4px;
+  transform: translateY(-50%);
+}
+
+.input {
+  width: 100%;
+  padding: 15px 14px 11px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border-2);
+  background: var(--color-surface-1);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  -webkit-appearance: none;
+}
+.input:focus {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+}
+.input::placeholder {
+  color: transparent; /* hidden — label acts as placeholder */
+}
+
+.inputError {
+  display: block;
+  font-size: 11px;
+  color: var(--color-danger);
+  margin-top: 5px;
+  padding-left: 4px;
+}
+
+/* ─── Password wrapper ───────────────────────────────────────────────────────── */
+.passwordWrap {
+  position: relative;
+}
+.eyeBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--color-text-tertiary);
+  transition: color var(--transition);
+  /* push up when error is shown */
+  margin-top: -10px;
+}
+.eyeBtn:hover { color: var(--color-text-secondary); }
+
+/* ─── Forgot password ────────────────────────────────────────────────────────── */
+.forgotRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -4px;
+}
+.forgotBtn {
+  font-size: 12px;
+  color: var(--color-brand);
+  font-weight: 500;
+  padding: 2px 0;
+  transition: opacity var(--transition);
+}
+.forgotBtn:hover { opacity: 0.75; }
+
+/* ─── Submit button ──────────────────────────────────────────────────────────── */
+.submitBtn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 12px;
+  background: var(--color-brand);
+  color: #000;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.2px;
+  border: none;
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+  margin-top: 4px;
+}
+.submitBtn:hover:not(:disabled) { opacity: 0.88; }
+.submitBtn:active:not(:disabled) { transform: scale(0.98); }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.submitBtnLoading { pointer-events: none; }
+
+/* ─── Loading dots inside submit ─────────────────────────────────────────────── */
+.loadingDots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 18px;
+}
+.loadingDots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #000;
+  animation: dotBounce 1.2s infinite ease-in-out;
+}
+.loadingDots span:nth-child(2) { animation-delay: 0.18s; }
+.loadingDots span:nth-child(3) { animation-delay: 0.36s; }
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.65); opacity: 0.4; }
+  40%            { transform: scale(1);    opacity: 1;   }
+}
+
+/* ─── Divider ────────────────────────────────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+  margin: 18px 0 0;
+}
+.dividerLine {
+  flex: 1;
+  height: 0.5px;
+  background: var(--color-border);
+}
+.dividerText {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+
+/* ─── Demo button ────────────────────────────────────────────────────────────── */
+.demoBtn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 22px;
+  border-radius: 12px;
+  border: 0.5px solid var(--color-border-2);
+  background: var(--color-surface-1);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  margin-top: 14px;
+  transition: border-color var(--transition), background var(--transition);
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+.demoBtn:hover {
+  border-color: rgba(34,197,94,0.3);
+  background: var(--color-surface-2);
+  color: var(--color-brand);
+}
+
+/* ─── Register link ──────────────────────────────────────────────────────────── */
+.registerText {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin-top: 22px;
+}
+.registerBtn {
+  color: var(--color-brand);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  transition: opacity var(--transition);
+}
+.registerBtn:hover { opacity: 0.75; }
+
+/* ─── Hint box ───────────────────────────────────────────────────────────────── */
+.hint {
+  margin-top: 28px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 0.5px dashed rgba(34,197,94,0.2);
+  background: rgba(34,197,94,0.04);
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+}
+.hintTitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.hintText {
+  font-size: 12px;
+  color: var(--color-brand);
+  font-weight: 500;
+  font-family: 'Inter', monospace;
+}
+
+/* ─── Cadastro — estrutura geral ─────────────────────────────────────────── */
+.stepWrap {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.stepHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.backLink {
+  font-size: 12px;
+  color: var(--color-brand);
+  font-weight: 600;
+  padding: 2px 0;
+  transition: opacity var(--transition);
+}
+.backLink:hover { opacity: 0.75; }
+
+.stepIndicator {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-surface-3);
+  transition: all 0.2s ease;
+}
+.stepDotActive {
+  background: var(--color-brand);
+  width: 20px;
+  border-radius: 4px;
+}
+.stepDotDone {
+  background: rgba(34,197,94,0.4);
+}
+
+.stepTitle {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--color-text-primary);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+.stepSub {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  margin: -6px 0 4px;
+}
+
+/* ─── Seleção de clube ────────────────────────────────────────────────────── */
+.contentClube {
+  padding-top: 24px !important;
+  padding-bottom: 24px !important;
+}
+.clubeSearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface-1);
+  border: 0.5px solid var(--color-border-2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--color-text-tertiary);
+}
+.clubeSearchInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+}
+.clubeSearchInput::placeholder { color: var(--color-text-tertiary); }
+
+.clubeList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.clubeList::-webkit-scrollbar { width: 3px; }
+.clubeList::-webkit-scrollbar-thumb { background: var(--color-surface-3); border-radius: 2px; }
+
+.clubeGroup {}
+.clubeGroupLabel {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+.clubeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.clubeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 6px 8px;
+  border-radius: 12px;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  text-align: center;
+}
+.clubeCard:hover {
+  border-color: rgba(34,197,94,0.3);
+  background: var(--color-surface-2);
+}
+.clubeCardSelected {
+  border-color: var(--color-brand) !important;
+  background: rgba(34,197,94,0.08) !important;
+}
+.clubeShield {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.clubeLogo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.4));
+}
+.clubeName {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.clubeCidade {
+  font-size: 9px;
+  color: var(--color-text-tertiary);
+  line-height: 1;
+}
+.clubeCheck {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.clubeError {
+  font-size: 12px;
+  color: var(--color-danger);
+  text-align: center;
+}
+.clubeSelected {
+  font-size: 12px;
+  color: var(--color-brand);
+  text-align: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.2);
+}
+
+/* ─── Confirm step ────────────────────────────────────────────────────────── */
+.confirmIcon {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0 4px;
+}
+.confirmShield {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 0 0 24px rgba(34,197,94,0.25);
+}
+.confirmCard {
+  background: var(--color-surface-1);
+  border: 0.5px solid var(--color-border-2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.confirmRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.confirmLabel {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+.confirmValue {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  text-align: right;
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Submit desabilitado ─────────────────────────────────────────────────── */
+.submitBtnDisabled {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+}
+
+/* ─── Input inner (prefix + success icon) ────────────────────────────────── */
+.inputInner {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.inputPrefix {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  color: var(--color-brand);
+  font-weight: 700;
+  pointer-events: none;
+  z-index: 1;
+}
+.inputWithPrefix {
+  padding-left: 26px !important;
+}
+.inputSuccessIcon {
+  position: absolute;
+  right: 12px;
+  color: var(--color-brand);
+  display: flex;
+  align-items: center;
+}
+.inputWrapSuccess .input {
+  border-color: rgba(34,197,94,0.4);
+}
+.inputHint {
+  font-size: 11px;
+  color: var(--color-brand);
+  margin-top: 4px;
+  padding-left: 4px;
+}
+
+/* ─── Row 2 colunas ──────────────────────────────────────────────────────── */
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 10px;
+}
+
+/* ─── Confirm logo grande ────────────────────────────────────────────────── */
+.confirmLogo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 16px rgba(34,197,94,0.3));
+}
+
+/* ─── Placeholder como label (abordagem simples e confiável) ─────────────── */
+.input::placeholder {
+  color: var(--color-text-tertiary);
+  font-size: 14px;
+}
+/* Label flutuante que aparece ACIMA quando campo está ativo/preenchido */
+.inputLabelFloat {
+  position: absolute;
+  left: 14px;
+  top: -8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-brand);
+  background: var(--color-surface-1);
+  padding: 0 4px;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 2;
+}
