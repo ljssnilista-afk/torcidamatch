@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TorcidaMatch</string>
+    <string name="title_activity_main">TorcidaMatch</string>
+    <string name="package_name">com.torcidamatch.app</string>
+    <string name="custom_url_scheme">com.torcidamatch.app</string>
+</resources>

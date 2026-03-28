@@ -2,9 +2,7 @@
 // Base: https://sports.bzzoiro.com/api/
 // Auth: Token e06ac9d43652a8adb1f8997bc4f9c4575db1353f
 
-const BASE_URL = import.meta.env.DEV
-  ? '/bsd-api/api'   // proxy Vite em desenvolvimento → sem CORS
-  : 'https://sports.bzzoiro.com/api'  // produção direta
+const BASE_URL = 'https://sports.bzzoiro.com/api'
 const TOKEN    = 'e06ac9d43652a8adb1f8997bc4f9c4575db1353f'
 const IMG_BASE = 'https://sports.bzzoiro.com/img'
 
