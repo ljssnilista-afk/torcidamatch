@@ -140,7 +140,10 @@
   font-weight: 600;
   color: var(--color-brand);
   flex-shrink: 0;
+  transition: opacity 0.15s;
 }
+.fieldPrefixVisible { opacity: 1; }
+.fieldPrefixHidden  { opacity: 0; pointer-events: none; }
 .fieldInput {
   flex: 1;
   height: 100%;
@@ -152,11 +155,10 @@
   font-family: 'Inter', sans-serif;
   padding: 16px 12px 0;
 }
-.fieldInputIcon { padding-left: 0; }
+.fieldInputIcon   { padding-left: 0; }
 .fieldInputPrefix { padding-left: 4px; }
 .fieldLabel {
   position: absolute;
-  left: 44px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 14px;
@@ -165,9 +167,6 @@
   transition: all 0.15s ease;
   line-height: 1;
 }
-.fieldLabel:first-of-type { left: 14px; }
-.fieldInputIcon ~ .fieldLabel { left: 44px; }
-.fieldInputPrefix ~ .fieldLabel { left: 14px; }
 .fieldLabelFloat {
   top: 10px;
   font-size: 10px;
@@ -175,6 +174,7 @@
   font-weight: 600;
   letter-spacing: 0.3px;
   transform: none;
+  left: 14px !important;
 }
 .fieldErr {
   position: absolute;

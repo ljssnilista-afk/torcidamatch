@@ -42,10 +42,17 @@ function Field({ id, label, type = 'text', value, onChange, error, prefix, icon,
   const isFloat  = focused || hasValue
   const isPw     = type === 'password'
 
+  // Label position: com ícone começa em 44px, com prefix começa após o @, sem nada em 14px
+  const labelLeft = icon ? 44 : prefix ? 38 : 14
+
   return (
     <div className={`${styles.field} ${error ? styles.fieldError : ''} ${focused ? styles.fieldFocused : ''}`}>
       {icon && <span className={styles.fieldIcon}>{icon}</span>}
-      {prefix && <span className={styles.fieldPrefix}>{prefix}</span>}
+      {prefix && (
+        <span className={`${styles.fieldPrefix} ${isFloat ? styles.fieldPrefixVisible : styles.fieldPrefixHidden}`}>
+          {prefix}
+        </span>
+      )}
       <input
         id={id}
         type={isPw ? (showPw ? 'text' : 'password') : type}
@@ -58,7 +65,11 @@ function Field({ id, label, type = 'text', value, onChange, error, prefix, icon,
         onBlur={() => setFocused(false)}
         autoComplete={isPw ? 'current-password' : 'on'}
       />
-      <label htmlFor={id} className={`${styles.fieldLabel} ${isFloat ? styles.fieldLabelFloat : ''}`}>
+      <label
+        htmlFor={id}
+        className={`${styles.fieldLabel} ${isFloat ? styles.fieldLabelFloat : ''}`}
+        style={{ left: isFloat ? 14 : labelLeft }}
+      >
         {label}
       </label>
       {isPw && (
