@@ -61,6 +61,7 @@ export const ROUTES = {
   HOME:          '/',
   GRUPOS:        '/grupos',
   CRIAR_GRUPO:   '/grupos/criar',
+  GRUPO_DETAIL:  '/grupos/:id',
   VAMOS_COMIGO:  '/vamos-comigo',
   FAVORITOS:     '/favoritos',
   PERFIL:        '/perfil',

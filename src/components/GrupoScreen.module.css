@@ -1,0 +1,433 @@
+/* ─── Screen ─────────────────────────────────────────────────────────────── */
+.screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+/* ─── Header ─────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  flex-shrink: 0;
+  border-bottom: 0.5px solid var(--color-border);
+  background: var(--color-surface-1);
+}
+.backBtn, .menuBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.backBtn:hover, .menuBtn:hover { background: rgba(255,255,255,0.07); }
+.headerAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.headerInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.headerName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.headerMeta {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── WS status ──────────────────────────────────────────────────────────── */
+.wsStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  background: var(--color-surface-1);
+  border-bottom: 0.5px solid var(--color-border);
+  flex-shrink: 0;
+}
+.wsDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.3; }
+}
+
+/* ─── Chat area ──────────────────────────────────────────────────────────── */
+.chatArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.chatArea::-webkit-scrollbar { display: none; }
+
+/* ─── Empty chat ─────────────────────────────────────────────────────────── */
+.emptyChat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 20px;
+  text-align: center;
+}
+.emptyChatIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+.emptyChatTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+.emptyChatSub {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin-bottom: 8px;
+}
+
+/* ─── Mensagens ──────────────────────────────────────────────────────────── */
+.systemMsg {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+.systemMsg span {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 3px 10px;
+}
+.bubble {
+  display: flex;
+  gap: 8px;
+  max-width: 80%;
+  animation: fadeUp 0.15s ease;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bubbleOwn   { align-self: flex-end; flex-direction: row-reverse; }
+.bubbleOther { align-self: flex-start; }
+.bubbleAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+.bubbleContent { display: flex; flex-direction: column; gap: 2px; }
+.bubbleSender {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-brand);
+  padding-left: 2px;
+}
+.bubbleText {
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: 14px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.bubbleOwn .bubbleText {
+  background: rgba(34,197,94,0.15);
+  border-color: rgba(34,197,94,0.25);
+}
+.bubbleTime {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  padding: 0 2px;
+  align-self: flex-end;
+}
+
+/* ─── Input area ─────────────────────────────────────────────────────────── */
+.inputArea {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 0.5px solid var(--color-border);
+  background: var(--color-surface-1);
+  flex-shrink: 0;
+}
+.msgInput {
+  flex: 1;
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border-2);
+  border-radius: 20px;
+  padding: 10px 14px;
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  resize: none;
+  max-height: 100px;
+  line-height: 1.4;
+  transition: border-color 0.15s;
+}
+.msgInput:focus { border-color: rgba(34,197,94,0.35); }
+.msgInput::placeholder { color: var(--color-text-tertiary); }
+.sendBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  border: 0.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.sendBtnActive {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+  color: #000;
+}
+
+/* ─── Menu / Modais overlay ──────────────────────────────────────────────── */
+.menuOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+.menuSheet, .membersSheet, .inviteSheet {
+  width: 100%;
+  background: var(--color-surface-1);
+  border-radius: 20px 20px 0 0;
+  border-top: 0.5px solid var(--color-border);
+  padding-bottom: 24px;
+  animation: slideUp 0.22s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.menuHandle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  margin: 10px auto 16px;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  transition: background 0.12s;
+  text-align: left;
+}
+.menuItem:hover { background: rgba(255,255,255,0.05); }
+.menuItemDanger { color: #EF4444; }
+.menuItemIcon { font-size: 18px; width: 24px; }
+.menuItem svg { margin-left: auto; color: var(--color-text-tertiary); }
+
+/* ─── Members modal ──────────────────────────────────────────────────────── */
+.membersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px 12px;
+}
+.membersTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.closeBtn {
+  font-size: 16px;
+  color: var(--color-text-tertiary);
+  padding: 4px;
+}
+.membersList {
+  max-height: 280px;
+  overflow-y: auto;
+}
+.memberRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+.memberAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.memberInfo { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.memberName { font-size: 13px; font-weight: 600; color: var(--color-text-primary); }
+.memberHandle { font-size: 11px; color: var(--color-text-tertiary); }
+.leaderBadge {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-gold);
+  background: rgba(212,175,55,0.1);
+  border: 0.5px solid rgba(212,175,55,0.25);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+/* ─── Invite modal ───────────────────────────────────────────────────────── */
+.inviteSheet { padding: 0 16px 24px; }
+.inviteTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  padding: 0 4px 4px;
+}
+.inviteSub { font-size: 12px; color: var(--color-text-tertiary); padding: 0 4px; margin-bottom: 14px; }
+.inviteLink {
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.inviteLinkText {
+  font-size: 12px;
+  color: var(--color-brand);
+  word-break: break-all;
+}
+
+/* ─── Botões ─────────────────────────────────────────────────────────────── */
+.btnPrimary {
+  width: 100%;
+  padding: 13px;
+  border-radius: 12px;
+  background: var(--color-brand);
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  transition: opacity 0.15s;
+}
+.btnPrimary:hover { opacity: 0.88; }
+.btnSecondary {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: 0.5px solid var(--color-border-2);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+.inviteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 0.5px solid rgba(34,197,94,0.35);
+  background: rgba(34,197,94,0.08);
+  color: var(--color-brand);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.inviteBtn:hover { background: rgba(34,197,94,0.14); }
+
+/* ─── Skeleton ───────────────────────────────────────────────────────────── */
+.skeletonHeader {
+  height: 62px;
+  background: var(--color-surface-1);
+  border-bottom: 0.5px solid var(--color-border);
+  flex-shrink: 0;
+}
+.skeletonChat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+}
+.skeletonBubble {
+  height: 40px;
+  background: var(--color-surface-2);
+  border-radius: 14px;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+@keyframes shimmer {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 0.8; }
+}
