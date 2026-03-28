@@ -223,7 +223,7 @@ export default function GruposScreen() {
         </div>
 
         {/* Create group CTA */}
-        <div className={styles.createCta} role="button" tabIndex={0} aria-label="Criar novo grupo">
+        <div className={styles.createCta} role="button" tabIndex={0} aria-label="Criar novo grupo" onClick={() => navigate(ROUTES.CRIAR_GRUPO)}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(34,197,94,0.4)" strokeWidth="1.5">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="16" />
@@ -233,7 +233,7 @@ export default function GruposScreen() {
           <p className={styles.ctaSub}>
             Crie um grupo alvinegro no seu bairro e conecte torcedores da sua região
           </p>
-          <button className={styles.ctaBtn}>Criar novo grupo</button>
+          <button className={styles.ctaBtn} onClick={(e) => { e.stopPropagation(); navigate(ROUTES.CRIAR_GRUPO) }}>Criar novo grupo</button>
         </div>
 
       </div>

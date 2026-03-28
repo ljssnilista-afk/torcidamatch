@@ -60,6 +60,7 @@ export const ROUTES = {
   LOGIN:         '/login',
   HOME:          '/',
   GRUPOS:        '/grupos',
+  CRIAR_GRUPO:   '/grupos/criar',
   VAMOS_COMIGO:  '/vamos-comigo',
   FAVORITOS:     '/favoritos',
   PERFIL:        '/perfil',

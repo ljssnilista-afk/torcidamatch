@@ -7,6 +7,7 @@ import styles from './AppRouter.module.css'
 const LoginScreen          = lazy(() => import('../components/LoginScreen'))
 const HomeScreen           = lazy(() => import('../components/HomeScreen'))
 const GruposScreen         = lazy(() => import('../components/GruposScreen'))
+const CriarGrupoScreen     = lazy(() => import('../components/CriarGrupoScreen'))
 const VamosComigoScreen    = lazy(() => import('../components/VamosComigoScreen'))
 const FavoritosScreen      = lazy(() => import('../components/FavoritosScreen'))
 const PerfilScreen         = lazy(() => import('../components/PerfilScreen'))
@@ -45,6 +46,7 @@ export default function AppRouter() {
           <Route path={ROUTES.LOGIN}          element={<LoginScreen />} />
           <Route path={ROUTES.HOME}           element={<HomeScreen />} />
           <Route path={ROUTES.GRUPOS}         element={<GruposScreen />} />
+          <Route path={ROUTES.CRIAR_GRUPO}    element={<CriarGrupoScreen />} />
           <Route path={ROUTES.VAMOS_COMIGO}   element={<VamosComigoScreen />} />
           <Route path={ROUTES.FAVORITOS}      element={<FavoritosScreen />} />
           <Route path={ROUTES.PERFIL}         element={<PerfilScreen />} />
