@@ -140,10 +140,7 @@
   font-weight: 600;
   color: var(--color-brand);
   flex-shrink: 0;
-  transition: opacity 0.15s;
 }
-.fieldPrefixVisible { opacity: 1; }
-.fieldPrefixHidden  { opacity: 0; pointer-events: none; }
 .fieldInput {
   flex: 1;
   height: 100%;
@@ -159,6 +156,7 @@
 .fieldInputPrefix { padding-left: 4px; }
 .fieldLabel {
   position: absolute;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 14px;
@@ -168,13 +166,15 @@
   line-height: 1;
 }
 .fieldLabelFloat {
-  top: 10px;
+  position: absolute;
+  left: 14px !important;
+  top: 8px;
   font-size: 10px;
   color: var(--color-brand);
   font-weight: 600;
   letter-spacing: 0.3px;
   transform: none;
-  left: 14px !important;
+  pointer-events: none;
 }
 .fieldErr {
   position: absolute;

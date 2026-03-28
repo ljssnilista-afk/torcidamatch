@@ -42,36 +42,32 @@ function Field({ id, label, type = 'text', value, onChange, error, prefix, icon,
   const isFloat  = focused || hasValue
   const isPw     = type === 'password'
 
-  // Label position: com ícone começa em 44px, com prefix começa após o @, sem nada em 14px
-  const labelLeft = icon ? 44 : prefix ? 38 : 14
-
   return (
     <div className={`${styles.field} ${error ? styles.fieldError : ''} ${focused ? styles.fieldFocused : ''}`}>
       {icon && <span className={styles.fieldIcon}>{icon}</span>}
-      {prefix && (
-        <span className={`${styles.fieldPrefix} ${isFloat ? styles.fieldPrefixVisible : styles.fieldPrefixHidden}`}>
-          {prefix}
-        </span>
-      )}
+      {prefix && isFloat && <span className={styles.fieldPrefix}>{prefix}</span>}
       <input
         id={id}
         type={isPw ? (showPw ? 'text' : 'password') : type}
         value={value}
         onChange={onChange}
         maxLength={maxLength}
-        placeholder=""
-        className={`${styles.fieldInput} ${icon ? styles.fieldInputIcon : ''} ${prefix ? styles.fieldInputPrefix : ''}`}
+        placeholder={!isFloat && !prefix ? '' : ''}
+        className={`${styles.fieldInput} ${icon ? styles.fieldInputIcon : ''} ${(prefix && isFloat) ? styles.fieldInputPrefix : ''}`}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         autoComplete={isPw ? 'current-password' : 'on'}
       />
-      <label
-        htmlFor={id}
-        className={`${styles.fieldLabel} ${isFloat ? styles.fieldLabelFloat : ''}`}
-        style={{ left: isFloat ? 14 : labelLeft }}
-      >
-        {label}
-      </label>
+      {!isFloat && (
+        <label htmlFor={id} className={styles.fieldLabel} style={{ left: icon ? 44 : 14 }}>
+          {label}
+        </label>
+      )}
+      {isFloat && (
+        <label htmlFor={id} className={`${styles.fieldLabel} ${styles.fieldLabelFloat}`}>
+          {label}
+        </label>
+      )}
       {isPw && (
         <button type="button" className={styles.eyeBtn} onClick={() => setShowPw(p => !p)} tabIndex={-1}>
           {showPw
@@ -144,7 +140,6 @@ function StepDados({ onNext, onBack }) {
               <option value="">Zona</option>
               {ZONAS.map(z => <option key={z} value={z}>{z}</option>)}
             </select>
-            <label className={`${styles.fieldLabel} ${f.zona ? styles.fieldLabelFloat : ''}`}>Zona</label>
             {errs.zona && <span className={styles.fieldErr}>{errs.zona}</span>}
           </div>
         </div>
