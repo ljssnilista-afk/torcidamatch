@@ -2,16 +2,16 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Filters from './Filters'
 import GruposListaCard from './GruposLista'
-import { drawMiniMap, drawThumb, THUMB_CONFIGS } from '../utils/canvasHelpers'
+import { drawMiniMap, drawThumb } from '../utils/canvasHelpers'
 import { ROUTES } from '../utils/constants'
 import { useGame } from '../context/GameContext'
-import {
-  GRUPOS_FILTERS,
-  MY_GROUP,
-  GRUPOS_PROXIMOS,
-  GRUPOS_OUTROS,
-} from '../data/gruposData'
+import { useUser } from '../context/UserContext'
+import { GRUPOS_FILTERS } from '../data/gruposData'
 import styles from './GruposScreen.module.css'
+
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/torcida-api/api'
 
 // Mini map component
 function MiniMap({ visible }) {
@@ -33,7 +33,7 @@ function MiniMap({ visible }) {
 }
 
 // My group banner
-function MyGroupBanner({ group }) {
+function MyGroupBanner({ group, onAccess }) {
   const canvasRef = useRef(null)
   useEffect(() => {
     const raf = requestAnimationFrame(() =>
@@ -69,7 +69,7 @@ function MyGroupBanner({ group }) {
         </div>
         <div className={styles.mgActions}>
           <button className={styles.btnManage}>Gerenciar</button>
-          <button className={styles.btnSecondary}>Ver grupo</button>
+          <button className={styles.btnSecondary} onClick={onAccess}>Ver grupo</button>
         </div>
       </div>
     </div>
@@ -79,19 +79,71 @@ function MyGroupBanner({ group }) {
 export default function GruposScreen() {
   const navigate = useNavigate()
   const { banner } = useGame()
+  const { user } = useUser()
   const [mapVisible, setMapVisible] = useState(false)
   const [activeFilter, setActiveFilter] = useState('todos')
+  const [grupos, setGrupos] = useState([])
+  const [meuGrupo, setMeuGrupo] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  // Busca grupos reais do backend
+  useEffect(() => {
+    async function loadGrupos() {
+      try {
+        const res = await fetch(`${API_URL}/grupos`, {
+          headers: user?.token ? { Authorization: `Bearer ${user.token}` } : {},
+        })
+        if (res.ok) {
+          const data = await res.json()
+          const todos = data.groups || []
+          // Separa meu grupo dos demais
+          const meu = todos.find(g =>
+            g.leader?._id === user?.id || g.leader === user?.id ||
+            g.members?.some(m => (m._id || m) === user?.id)
+          )
+          setMeuGrupo(meu || null)
+          setGrupos(todos.filter(g => g._id !== meu?._id))
+        }
+      } catch (err) {
+        console.warn('[GruposScreen] erro ao carregar grupos:', err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadGrupos()
+  }, [user])
+
+  // Converte grupo do banco para formato do card
+  const toCardFormat = (g) => ({
+    id: g._id,
+    name: g.name,
+    location: `${g.bairro} • ${g.zona}`,
+    distance: '',
+    distanceKm: 0,
+    members: g.members?.length || 1,
+    maxMembers: g.maxMembers || 100,
+    rating: null,
+    ratingCount: 0,
+    mensalidade: null,
+    badges: [
+      { type: g.privacy === 'private' ? 'silver' : 'green', label: g.privacy === 'private' ? '🔒 Privado' : '🌐 Público' },
+    ],
+    actionLabel: 'Ver grupo',
+    actionVariant: 'brand',
+    thumbVariant: 'green',
+    zone: g.zona?.toLowerCase().replace(' ', '-') || 'todos',
+    type: 'misto',
+    _raw: g,
+  })
 
   const filterGroups = (groups) => {
     if (activeFilter === 'todos') return groups
-    return groups.filter(
-      (g) => g.zone === activeFilter || g.type === activeFilter
-    )
+    return groups.filter(g => g.zone === activeFilter || g.type === activeFilter)
   }
 
-  const proxFiltered = filterGroups(GRUPOS_PROXIMOS)
-  const outrosFiltered = filterGroups(GRUPOS_OUTROS)
-  const totalCount = proxFiltered.length + outrosFiltered.length
+  const gruposFormatados = grupos.map(toCardFormat)
+  const filtered = filterGroups(gruposFormatados)
+  const totalCount = filtered.length + (meuGrupo ? 1 : 0)
 
   return (
     <div className={styles.screen}>
@@ -173,54 +225,57 @@ export default function GruposScreen() {
         {/* Mini map */}
         <MiniMap visible={mapVisible} />
 
-        {/* My group */}
-        <MyGroupBanner group={MY_GROUP} />
+        {/* Meu grupo */}
+        {meuGrupo && (
+          <MyGroupBanner
+            group={{
+              id: meuGrupo._id,
+              name: meuGrupo.name,
+              location: meuGrupo.bairro,
+              members: meuGrupo.members?.length || 1,
+              maxMembers: meuGrupo.maxMembers || 100,
+              rating: null,
+              nextCaravana: 'Em breve',
+              isLeader: meuGrupo.leader?._id === user?.id || meuGrupo.leader === user?.id,
+            }}
+            onAccess={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
+          />
+        )}
 
-        {/* Section: nearby */}
-        {proxFiltered.length > 0 && (
+        {/* Loading */}
+        {loading && (
+          <div className={styles.loadingMore}>
+            <span>Carregando grupos...</span>
+            <div className={styles.loadingDots}>
+              <div className={styles.dot}/><div className={styles.dot}/><div className={styles.dot}/>
+            </div>
+          </div>
+        )}
+
+        {/* Grupos reais */}
+        {!loading && filtered.length > 0 && (
           <>
             <div className={styles.sectionDivider}>
-              <span className={styles.dividerTitle}>Perto de você</span>
+              <span className={styles.dividerTitle}>Grupos disponíveis</span>
               <div className={styles.dividerLine} />
-              <span className={styles.dividerCount}>{proxFiltered.length} grupos</span>
+              <span className={styles.dividerCount}>{filtered.length} grupos</span>
             </div>
-            {proxFiltered.map((g) => (
+            {filtered.map((g) => (
               <GruposListaCard
                 key={g.id}
                 group={g}
-                onClick={() => navigate(ROUTES.GRUPOS)}
+                onClick={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
               />
             ))}
           </>
         )}
 
-        {/* Section: others */}
-        {outrosFiltered.length > 0 && (
-          <>
-            <div className={styles.sectionDivider} style={{ marginTop: 6 }}>
-              <span className={styles.dividerTitle}>Outros grupos</span>
-              <div className={styles.dividerLine} />
-              <span className={styles.dividerCount}>{outrosFiltered.length} grupos</span>
-            </div>
-            {outrosFiltered.map((g) => (
-              <GruposListaCard
-                key={g.id}
-                group={g}
-                onClick={() => navigate(ROUTES.GRUPOS)}
-              />
-            ))}
-          </>
-        )}
-
-        {/* Loading indicator */}
-        <div className={styles.loadingMore} aria-label="Carregando mais grupos">
-          <span>Carregando mais grupos...</span>
-          <div className={styles.loadingDots}>
-            <div className={styles.dot} />
-            <div className={styles.dot} />
-            <div className={styles.dot} />
+        {/* Sem grupos */}
+        {!loading && filtered.length === 0 && !meuGrupo && (
+          <div className={styles.loadingMore}>
+            <span>Nenhum grupo encontrado ainda. Crie o primeiro! 🏟️</span>
           </div>
-        </div>
+        )}
 
         {/* Create group CTA */}
         <div className={styles.createCta} role="button" tabIndex={0} aria-label="Criar novo grupo" onClick={() => navigate(ROUTES.CRIAR_GRUPO)}>
@@ -231,7 +286,7 @@ export default function GruposScreen() {
           </svg>
           <p className={styles.ctaTitle}>Não encontrou seu grupo?</p>
           <p className={styles.ctaSub}>
-            Crie um grupo alvinegro no seu bairro e conecte torcedores da sua região
+            Crie um grupo no seu bairro e conecte torcedores da sua região
           </p>
           <button className={styles.ctaBtn} onClick={(e) => { e.stopPropagation(); navigate(ROUTES.CRIAR_GRUPO) }}>Criar novo grupo</button>
         </div>
