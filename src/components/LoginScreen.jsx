@@ -127,13 +127,50 @@ function StepClube({ onNext, onBack }) {
       <div className={styles.clubeList}>
         <div className={styles.clubeGrid}>
           {filtered.map(clube => (
-            <button key={clube.id} className={`${styles.clubeCard} ${selected?.id === clube.id ? styles.clubeCardSelected : ''}`} onClick={() => setSelected(clube)}>
-              <span className={styles.clubeName}>{clube.emoji} {clube.name}</span>
+            <button
+              key={clube.id}
+              className={`${styles.clubeCard} ${selected?.id === clube.id ? styles.clubeCardSelected : ''}`}
+              onClick={() => setSelected(clube)}
+              aria-pressed={selected?.id === clube.id}
+            >
+              {/* Escudo real para os 4 grandes, emoji para os demais */}
+              {clube.apiId ? (
+                <img
+                  src={teamLogoUrl(clube.apiId)}
+                  alt={clube.name}
+                  className={styles.clubeLogo}
+                  onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex' }}
+                />
+              ) : null}
+              <div
+                className={styles.clubeShield}
+                style={{
+                  background: clube.cores[0],
+                  color: clube.cores[1],
+                  display: clube.apiId ? 'none' : 'flex',
+                }}
+              >
+                {clube.name.slice(0,2).toUpperCase()}
+              </div>
+              <span className={styles.clubeName}>{clube.name}</span>
+              {selected?.id === clube.id && (
+                <div className={styles.clubeCheck}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                    <polyline points="20,6 9,17 4,12"/>
+                  </svg>
+                </div>
+              )}
             </button>
           ))}
         </div>
       </div>
-      <button className={styles.submitBtn} onClick={() => onNext({ team: selected.name, teamEmoji: selected.emoji, teamId: selected.id })} disabled={!selected}>Próximo →</button>
+      <button
+        className={`${styles.submitBtn} ${!selected ? styles.submitBtnDisabled : ''}`}
+        onClick={() => selected && onNext({ team: selected.name, teamEmoji: selected.emoji, teamId: selected.id })}
+        disabled={!selected}
+      >
+        Próximo →
+      </button>
     </div>
   )
 }
