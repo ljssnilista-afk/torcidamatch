@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
 import { ROUTES } from '../utils/constants'
-import { teamLogoUrl } from '../utils/bsdApi'
-import { registerUser, loginUser } from '../services/authApi' // ✅ Importando sua API real
+import { registerUser, loginUser } from '../services/authApi'
 import styles from './LoginScreen.module.css'
+
+// URL de imagem via proxy Railway (sem CORS)
+const teamLogoUrl = (apiId) =>
+  `https://torcida-match-api-production.up.railway.app/api/bsd/img/team/${apiId}/`
 
 // ─── 20 clubes do RJ ──────────────────────────────────────────────────────────
 const CLUBES_RJ = [
@@ -223,62 +226,14 @@ export default function LoginScreen() {
 
   return (
     <div className={styles.screen}>
-      <div className={styles.bgDeco} aria-hidden="true">
-        <div className={styles.bgCircle1}/><div className={styles.bgCircle2}/>
-      </div>
       <div className={styles.content}>
-        <div className={styles.brand}>
-          <h1 className={styles.brandName}>Torcida<em>Match</em></h1>
-          <p className={styles.brandTagline}>Conecte-se com sua torcida. Vá junto ao estádio.</p>
-        </div>
-        <form className={styles.form} onSubmit={handleLogin} noValidate>
-          <InputField label="E-mail" type="email" value={email}
-            onChange={e => setEmail(e.target.value)} />
-          <InputField label="Senha" type="password" value={password}
-            onChange={e => setPassword(e.target.value)} />
-          <div className={styles.forgotRow}>
-            <button type="button" className={styles.forgotBtn}>Esqueci a senha</button>
-          </div>
-          <button type="submit" className={`${styles.submitBtn} ${loading ? styles.submitBtnLoading : ''}`}
-            disabled={loading} aria-busy={loading}>
-            {loading
-              ? <span className={styles.loadingDots}><span/><span/><span/></span>
-              : 'Entrar'
-            }
-          </button>
+        <div className={styles.brand}><h1 className={styles.brandName}>Torcida<em>Match</em></h1></div>
+        <form className={styles.form} onSubmit={handleLogin}>
+          <InputField label="E-mail" value={email} onChange={e => setEmail(e.target.value)} />
+          <InputField label="Senha" type="password" value={password} onChange={e => setPassword(e.target.value)} />
+          <button type="submit" className={styles.submitBtn} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
         </form>
-
-        <div className={styles.divider} aria-hidden="true">
-          <div className={styles.dividerLine}/>
-          <span className={styles.dividerText}>ou</span>
-          <div className={styles.dividerLine}/>
-        </div>
-
-        {/* Botão demo — preenche credenciais automaticamente */}
-        <button
-          type="button"
-          className={styles.demoBtn}
-          onClick={() => { setEmail('bianca@torcida.com'); setPassword('123456') }}
-          aria-label="Usar credenciais de demonstração"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-          </svg>
-          Acesso rápido (demo)
-        </button>
-
-        <p className={styles.registerText}>
-          Não tem conta?{' '}
-          <button type="button" className={styles.registerBtn}
-            onClick={() => setMode('register-dados')}>
-            Cadastre-se
-          </button>
-        </p>
-
-        <div className={styles.hint}>
-          <p className={styles.hintTitle}>Credenciais de teste</p>
-          <p className={styles.hintText}>bianca@torcida.com / 123456</p>
-        </div>
+        <p className={styles.registerText}>Não tem conta? <button onClick={() => setMode('register-dados')} className={styles.registerBtn}>Cadastre-se</button></p>
       </div>
     </div>
   )
