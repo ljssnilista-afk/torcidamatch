@@ -49,8 +49,13 @@ function MapaReal({ grupos, userLocation, onClose }) {
         <div className={styles.mapaWrap}>
           <MapContainer center={center} zoom={13} style={{ width:'100%', height:'100%' }} zoomControl={false}>
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-              attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}{r}.png"
+              attribution='&copy; CARTO'
+            />
+            <TileLayer
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/light_only_labels/{z}/{x}/{y}{r}.png"
+              attribution=''
+              opacity={0.7}
             />
             {userLocation && (
               <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
@@ -163,17 +168,23 @@ export default function GruposScreen() {
         if (res.ok) {
           const data = await res.json()
           const todos = data.groups || []
-          // "Meus grupos" = qualquer grupo que o usuário seja membro
-          const meusGrupos = todos.filter(g =>
-            g.leader?._id === user?.id || g.leader === user?.id ||
-            g.members?.some(m => (m._id || m) === user?.id)
-          )
-          // Usa o primeiro como banner principal se for líder, senão qualquer
-          const meu = meusGrupos[0] || null
-          setMeuGrupo(meu || null)
-          // "Grupos próximos" = todos os outros que o usuário NÃO participa
-          const meusIds = new Set(meusGrupos.map(g => g._id))
-          setGrupos(todos.filter(g => !meusIds.has(g._id)))
+
+          // "Meus grupos" = grupos onde o usuário é líder OU membro
+          const userId = user?.id || user?._id
+          const meusGrupos = todos.filter(g => {
+            const isLider = g.leader?._id === userId || g.leader === userId
+            const isMembro = Array.isArray(g.members) && g.members.some(m =>
+              (m._id || m) === userId || (m._id || m)?.toString() === userId?.toString()
+            )
+            return isLider || isMembro
+          })
+
+          // "Grupos próximos" = grupos que o usuário NÃO participa
+          const meusIds = new Set(meusGrupos.map(g => String(g._id)))
+          const proximos = todos.filter(g => !meusIds.has(String(g._id)))
+
+          setMeuGrupo(meusGrupos[0] || null)
+          setGrupos(proximos)
         }
       } catch (err) { console.warn(err) }
       finally { setLoading(false) }
