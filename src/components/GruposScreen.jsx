@@ -168,20 +168,35 @@ export default function GruposScreen() {
         if (res.ok) {
           const data = await res.json()
           const todos = data.groups || []
+          console.log('[Grupos] user:', user?.id, user?._id, '| total grupos:', todos.length)
+          todos.forEach(g => console.log(' grupo:', g.name, '| members:', g.members))
 
-          // "Meus grupos" = grupos onde o usuário é líder OU membro
+          // userId pode vir como id, _id ou string
           const userId = user?.id || user?._id
-          const meusGrupos = todos.filter(g => {
-            const isLider = g.leader?._id === userId || g.leader === userId
-            const isMembro = Array.isArray(g.members) && g.members.some(m =>
-              (m._id || m) === userId || (m._id || m)?.toString() === userId?.toString()
-            )
-            return isLider || isMembro
-          })
+          if (!userId) {
+            setGrupos(todos)
+            setLoading(false)
+            return
+          }
 
-          // "Grupos próximos" = grupos que o usuário NÃO participa
-          const meusIds = new Set(meusGrupos.map(g => String(g._id)))
-          const proximos = todos.filter(g => !meusIds.has(String(g._id)))
+          const isMyGroup = (g) => {
+            const uid = String(userId)
+            // Checa líder
+            const leaderId = String(g.leader?._id || g.leader || '')
+            if (leaderId === uid) return true
+            // Checa membros
+            if (Array.isArray(g.members)) {
+              return g.members.some(m => {
+                const mid = String(m._id || m || '')
+                return mid === uid
+              })
+            }
+            return false
+          }
+
+          const meusGrupos = todos.filter(isMyGroup)
+          const meusIds    = new Set(meusGrupos.map(g => String(g._id)))
+          const proximos   = todos.filter(g => !meusIds.has(String(g._id)))
 
           setMeuGrupo(meusGrupos[0] || null)
           setGrupos(proximos)
