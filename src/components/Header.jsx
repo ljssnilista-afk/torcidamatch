@@ -60,12 +60,7 @@ function Header({ onSearch, onNotification }) {
             <span className={styles.logoName}>Torcida<em>Match</em></span>
           </div>
           <div className={styles.actions}>
-            <button className={styles.iconBtn} aria-label="Buscar grupos e caronas" onClick={handleOpen}>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                <circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 3.5 3.5" />
-              </svg>
-            </button>
-            <button className={styles.iconBtn} aria-label="Notificações — 1 nova" onClick={onNotification}>
+            <button className={styles.iconBtn} aria-label="Notificações" onClick={onNotification}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 01-3.46 0" />
