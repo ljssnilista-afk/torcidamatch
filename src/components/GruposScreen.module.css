@@ -1,7 +1,7 @@
 .screenHeader {
-  padding: 14px 16px 0;
+  padding: 0 16px 0;
   flex-shrink: 0;
-  background: linear-gradient(180deg, #000 0%, rgba(0,0,0,0.95) 100%);
+  background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.95) 100%);
 }
 
 /* Root wrapper — gives scrollArea a bounded flex parent */
@@ -94,6 +94,33 @@
   font-family: 'Inter', sans-serif;
 }
 .searchInput::placeholder { color: var(--color-text-tertiary); }
+.searchClear {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  padding: 2px 4px;
+  transition: color 0.15s;
+}
+.searchClear:hover { color: var(--color-text-secondary); }
+
+/* ─── Mapa real ───────────────────────────────────────────────────────────── */
+.realMap {
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  height: 200px;
+  border: 0.5px solid var(--color-border);
+  position: relative;
+}
+.realMapCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── Map toggle ativo ────────────────────────────────────────────────────── */
+.mapToggleBtnActive {
+  border-color: rgba(34,197,94,0.4) !important;
+  background: rgba(34,197,94,0.1) !important;
+}
 .scrollArea {
   flex: 1;
   overflow-y: auto;
@@ -136,15 +163,11 @@
 /* My group banner */
 .myGroupBanner {
   margin-bottom: 12px;
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   position: relative;
-  border: 0.5px solid rgba(34,197,94,0.3);
+  border: 0.5px solid rgba(34, 197, 94, 0.2);
   background: linear-gradient(135deg, #0a180a 0%, #060d06 100%);
-  transition: box-shadow 0.15s;
-}
-.myGroupBanner:hover {
-  box-shadow: 0 6px 24px rgba(34,197,94,0.15);
 }
 .mgLabel {
   position: absolute;
@@ -164,27 +187,20 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 36px 14px 14px;
+  padding: 12px 14px;
   position: relative;
   z-index: 1;
 }
 .mgThumb {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: 10px;
   flex-shrink: 0;
   overflow: hidden;
-  border: 0.5px solid rgba(34,197,94,0.2);
 }
 .mgCanvas { width: 100%; height: 100%; display: block; }
 .mgInfo { flex: 1; min-width: 0; }
-.mgName {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.3px;
-  margin-bottom: 3px;
-}
+.mgName { font-size: 15px; font-weight: 800; color: var(--color-text-primary); letter-spacing: -0.3px; margin-bottom: 3px; }
 .mgMeta { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 5px; }
 .mgNext {
   display: flex;
@@ -196,8 +212,8 @@
 }
 .mgActions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .btnManage {
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 7px 14px;
+  border-radius: var(--radius-xs);
   background: var(--color-brand);
   color: #000;
   font-size: 11px;
@@ -205,8 +221,8 @@
   white-space: nowrap;
 }
 .btnSecondary {
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 7px 14px;
+  border-radius: var(--radius-xs);
   background: rgba(255,255,255,0.07);
   border: 0.5px solid var(--color-border-2);
   color: var(--color-silver);
