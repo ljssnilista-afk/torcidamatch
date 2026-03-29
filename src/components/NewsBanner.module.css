@@ -1,0 +1,143 @@
+.banner {
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  cursor: pointer;
+  animation: fadeIn 0.3s ease;
+  transition: background 0.15s;
+}
+.banner:hover { background: rgba(255,255,255,0.05); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.iconWrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+.text { flex: 1; min-width: 0; }
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+.teamTag {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--color-brand);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.dot { font-size: 9px; color: rgba(255,255,255,0.2); }
+.time { font-size: 9px; color: rgba(255,255,255,0.3); font-weight: 500; }
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.source { font-size: 10px; color: rgba(255,255,255,0.3); font-weight: 500; }
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.dots { display: flex; gap: 4px; }
+.dotBtn {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all 0.2s;
+}
+.dotBtnActive {
+  background: var(--color-brand);
+  width: 12px;
+  border-radius: 3px;
+}
+.arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ─── Skeleton ────────────────────────────────────────────────────────────── */
+.skeleton {
+  margin: 0 14px 10px;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.03);
+  border: 0.5px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.skIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.06);
+  flex-shrink: 0;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+.skText { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.skLine {
+  height: 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 5px;
+  animation: shimmer 1.4s infinite ease-in-out;
+}
+@keyframes shimmer {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 0.8; }
+}
+
+/* ─── Fallback ────────────────────────────────────────────────────────────── */
+.fallback {
+  margin: 0 14px 10px;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.02);
+  border: 0.5px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.fallbackIcon { font-size: 22px; }
+.fallbackTitle { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); }
+.fallbackSub   { font-size: 10px; color: rgba(255,255,255,0.25); }

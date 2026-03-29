@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
 import { useGame } from '../context/GameContext'
-import ChampionBanner from './ChampionBanner'
+import NewsBanner from './NewsBanner'
 import NotificationBar from './NotificationBar'
 import Filters from './Filters'
 import GroupCard from './GroupCard'
@@ -11,7 +11,6 @@ import NextGame from './NextGame'
 import RidesSection from './RidesSection'
 import FemaleAlert from './FemaleAlert'
 import {
-  CHAMPION_INFO,
   ALERT,
   FILTERS,
   GROUP_CARDS,
@@ -24,16 +23,15 @@ import styles from './HomeScreen.module.css'
 
 export default function HomeScreen() {
   const navigate = useNavigate()
-  const { user }  = useUser()
-
+  const { user } = useUser()
   const { game: nextGame, loading: gameLoading } = useGame()
-
-  // Enquanto carrega, usa o mock para não deixar vazio
   const displayGame = nextGame ?? NEXT_GAME
 
   return (
     <div className={styles.screen}>
-      <ChampionBanner info={CHAMPION_INFO} />
+      {/* Banner de notícias em tempo real do time do usuário */}
+      <NewsBanner />
+
       <NotificationBar text={ALERT.text} />
       <Filters filters={FILTERS} />
 
@@ -54,7 +52,9 @@ export default function HomeScreen() {
               <h3 className={styles.sectionTitle} id="sugg-title">
                 Grupos sugeridos para você
               </h3>
-              <p className={styles.sectionSubtitle}>Baseado na sua região • Glória Alvinegra</p>
+              <p className={styles.sectionSubtitle}>
+                Baseado na sua região • {user?.team ?? 'Seu time'}
+              </p>
             </div>
             <button className={styles.sectionLink} onClick={() => navigate(ROUTES.GRUPOS)}>
               Ver todos
