@@ -361,3 +361,13 @@
   border: 0.5px solid rgba(255,255,255,0.1) !important;
 }
 .leaflet-popup-tip { background: #1a1a1a !important; }
+
+/* ─── Fix popup Leaflet tema claro ─────────────────────────────────────── */
+:global(.leaflet-popup-content-wrapper) {
+  background: #fff !important;
+  color: #333 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2) !important;
+}
+:global(.leaflet-popup-tip) { background: #fff !important; }
+:global(.leaflet-popup-content) { font-size: 13px !important; font-family: 'Inter', sans-serif !important; }

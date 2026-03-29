@@ -49,8 +49,8 @@ function MapaReal({ grupos, userLocation, onClose }) {
         <div className={styles.mapaWrap}>
           <MapContainer center={center} zoom={13} style={{ width:'100%', height:'100%' }} zoomControl={false}>
             <TileLayer
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-              attribution='&copy; CARTO'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+              attribution='&copy; <a href="https://carto.com/">CARTO</a>'
             />
             {userLocation && (
               <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
@@ -163,12 +163,17 @@ export default function GruposScreen() {
         if (res.ok) {
           const data = await res.json()
           const todos = data.groups || []
-          const meu = todos.find(g =>
+          // "Meus grupos" = qualquer grupo que o usuário seja membro
+          const meusGrupos = todos.filter(g =>
             g.leader?._id === user?.id || g.leader === user?.id ||
             g.members?.some(m => (m._id || m) === user?.id)
           )
+          // Usa o primeiro como banner principal se for líder, senão qualquer
+          const meu = meusGrupos[0] || null
           setMeuGrupo(meu || null)
-          setGrupos(todos.filter(g => g._id !== meu?._id))
+          // "Grupos próximos" = todos os outros que o usuário NÃO participa
+          const meusIds = new Set(meusGrupos.map(g => g._id))
+          setGrupos(todos.filter(g => !meusIds.has(g._id)))
         }
       } catch (err) { console.warn(err) }
       finally { setLoading(false) }
