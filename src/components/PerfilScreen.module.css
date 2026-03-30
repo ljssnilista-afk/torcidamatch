@@ -1031,3 +1031,125 @@
   line-height: 1.3;
   margin-top: 1px;
 }
+
+/* ─── Avatar com upload ───────────────────────────────────────────────────── */
+.avatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.avatarPhoto {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba(34,197,94,0.4);
+}
+.avatarUploadBtn {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-bg);
+  z-index: 2;
+  transition: opacity 0.15s;
+}
+.avatarUploadBtn:hover { opacity: 0.85; }
+.avatarInput { display: none; }
+
+/* ─── Stats zeradas ───────────────────────────────────────────────────────── */
+.statValueEmpty {
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.statHint {
+  font-size: 9px;
+  color: rgba(255,255,255,0.2);
+  text-align: center;
+  line-height: 1.3;
+  margin-top: 1px;
+}
+
+/* ─── Crop modal ──────────────────────────────────────────────────────────── */
+.cropOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+}
+.cropSheet {
+  width: 100%;
+  background: #111;
+  border-radius: 20px 20px 0 0;
+  border-top: 0.5px solid rgba(255,255,255,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUp 0.22s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.cropHandle {
+  width: 36px; height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.15);
+  margin: 10px auto 0;
+}
+.cropHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+}
+.cropTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+.cropCancelBtn {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+}
+.cropConfirmBtn {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-brand);
+}
+.cropConfirmBtn:disabled { opacity: 0.4; }
+.cropArea {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  background: #000;
+}
+.cropZoom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px 24px;
+}
+.cropZoomLabel {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cropSlider {
+  flex: 1;
+  accent-color: var(--color-brand);
+  height: 3px;
+}
