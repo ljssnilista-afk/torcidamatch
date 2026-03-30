@@ -171,14 +171,14 @@ function EmptyState({ tab, onExplore }) {
           <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
         </svg>
       </div>
-      <p className={styles.emptyTitle}>{isGroups ? 'Nenhum grupo favorito' : 'Nenhuma carona favorita'}</p>
+      <p className={styles.emptyTitle}>{isGroups ? 'Nenhum grupo favorito' : 'Nenhuma viagem favorita'}</p>
       <p className={styles.emptySubtitle}>
         {isGroups
-          ? 'Explore grupos alvinegros e toque no coração para salvar.'
-          : 'Explore as caronas disponíveis e salve as que preferir.'}
+          ? 'Explore grupos de torcedores e toque no coração para salvar.'
+          : 'Explore as viagens disponíveis e salve as que preferir.'}
       </p>
       <button className={styles.emptyBtn} onClick={() => onExplore(isGroups ? ROUTES.GRUPOS : ROUTES.VAMOS_COMIGO)}>
-        {isGroups ? 'Explorar grupos' : 'Explorar caronas'}
+        {isGroups ? 'Explorar grupos' : 'Explorar viagens'}
       </button>
     </div>
   )
@@ -203,8 +203,8 @@ function TabBar({ active, onSwitch, groupCount, rideCount }) {
   return (
     <div className={styles.tabBar} role="tablist" aria-label="Categorias de favoritos">
       {[
-        { id: 'grupos',  label: 'Grupos',  count: groupCount, icon: 'users' },
-        { id: 'caronas', label: 'Caronas', count: rideCount,  icon: 'bus'   },
+        { id: 'grupos',   label: 'Grupos',   count: groupCount },
+        { id: 'viagens',  label: 'Viagens',  count: rideCount  },
       ].map(({ id, label, count }) => (
         <button
           key={id}
@@ -270,11 +270,6 @@ export default function FavoritosScreen() {
             <span className={styles.totalBadge}>{totalCount}</span>
           )}
         </div>
-        <button className={styles.iconBtn} aria-label="Buscar favoritos">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 3.5 3.5" />
-          </svg>
-        </button>
       </div>
 
       {/* Tabs */}
@@ -289,7 +284,7 @@ export default function FavoritosScreen() {
       <div
         className={styles.scrollArea}
         role="tabpanel"
-        aria-label={activeTab === 'grupos' ? 'Grupos favoritos' : 'Caronas favoritas'}
+        aria-label={activeTab === 'grupos' ? 'Grupos favoritos' : 'Viagens favoritas'}
       >
         {loading ? (
           <div className={styles.listWrap}>
@@ -317,6 +312,19 @@ export default function FavoritosScreen() {
                   />
                 </div>
               ))}
+
+              {/* Stats do usuário */}
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <span className={styles.statNum}>{favGroups.length}</span>
+                  <span className={styles.statLabel}>Grupos salvos</span>
+                </div>
+                <div className={styles.statCard}>
+                  <span className={styles.statNum}>{favRides.length}</span>
+                  <span className={styles.statLabel}>Viagens salvas</span>
+                </div>
+              </div>
+
               <div className={styles.suggestStrip}>
                 <p className={styles.suggestLabel}>Você pode gostar</p>
                 <button className={styles.suggestBtn} onClick={() => navigate(ROUTES.GRUPOS)}>
@@ -328,15 +336,33 @@ export default function FavoritosScreen() {
                   Explorar mais grupos
                 </button>
               </div>
+
+              {/* Banner CTA */}
+              <div className={styles.ctaBanner} onClick={() => navigate(ROUTES.VAMOS_COMIGO)}>
+                <div className={styles.ctaLeft}>
+                  <div className={styles.ctaIcon}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p className={styles.ctaTitle}>Próximo jogo chegando!</p>
+                    <p className={styles.ctaSub}>Veja viagens disponíveis para torcedores</p>
+                  </div>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </div>
             </div>
           )
         ) : (
           favRides.length === 0 ? (
-            <EmptyState tab="caronas" onExplore={navigate} />
+            <EmptyState tab="viagens" onExplore={navigate} />
           ) : (
             <div className={styles.listWrap}>
               <p className={styles.sectionLabel}>
-                {favRides.length} {favRides.length === 1 ? 'carona salva' : 'caronas salvas'}
+                {favRides.length} {favRides.length === 1 ? 'viagem salva' : 'viagens salvas'}
               </p>
               {favRides.map((r) => (
                 <div
@@ -356,7 +382,7 @@ export default function FavoritosScreen() {
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8l5 3-5 3" />
                   </svg>
-                  Ver todas as caronas
+                  Ver todas as viagens
                 </button>
               </div>
             </div>

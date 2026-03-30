@@ -507,3 +507,82 @@
   0%, 100% { opacity: 0.4; }
   50%       { opacity: 0.8; }
 }
+
+/* ─── Stats grid ────────────────────────────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+.statCard {
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.statNum {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-brand);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.statLabel {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ─── CTA Banner ────────────────────────────────────────────────────────────── */
+.ctaBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0a180a 0%, #060d06 100%);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+  color: rgba(255,255,255,0.4);
+}
+.ctaBanner:hover { border-color: rgba(34,197,94,0.35); }
+.ctaLeft { display: flex; align-items: center; gap: 12px; flex: 1; }
+.ctaIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+.ctaTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+.ctaSub {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+/* ─── Header sem lupa ───────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 18px 14px;
+  flex-shrink: 0;
+}
