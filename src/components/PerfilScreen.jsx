@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
@@ -32,12 +32,43 @@ function formatMemberSince(iso) {
   return `${months[d.getMonth()]}/${d.getFullYear()}`
 }
 
-// ─── Avatar ───────────────────────────────────────────────────────────────────
-function Avatar({ initials, size = 82 }) {
+// ─── Avatar com upload de foto ────────────────────────────────────────────────
+function Avatar({ initials, photo, size = 82, onUpload }) {
+  const inputRef = React.useRef(null)
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { alert('Imagem muito grande. Máximo 5MB.'); return }
+    const reader = new FileReader()
+    reader.onload = (ev) => onUpload?.(ev.target.result)
+    reader.readAsDataURL(file)
+  }
+
   return (
-    <div className={styles.avatar} style={{ width: size, height: size, fontSize: size * 0.3 }}>
-      {initials}
+    <div className={styles.avatarWrap} style={{ width: size, height: size }}>
+      {photo
+        ? <img src={photo} alt={initials} className={styles.avatarPhoto} />
+        : <div className={styles.avatar} style={{ width: size, height: size, fontSize: size * 0.3 }}>
+            {initials}
+          </div>
+      }
       <div className={styles.avatarOnline} />
+      {onUpload && (
+        <>
+          <button
+            className={styles.avatarUploadBtn}
+            onClick={() => inputRef.current?.click()}
+            aria-label="Alterar foto de perfil"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </button>
+          <input ref={inputRef} type="file" accept="image/*" className={styles.avatarInput} onChange={handleFile}/>
+        </>
+      )}
     </div>
   )
 }
@@ -200,6 +231,13 @@ export default function PerfilScreen() {
   const [loading,      setLoading]      = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [editOpen,     setEditOpen]     = useState(false)
+  const [photo,        setPhoto]        = useState(user?.photo || null)
+
+  const handlePhotoUpload = (dataUrl) => {
+    setPhoto(dataUrl)
+    updateUser({ photo: dataUrl })
+    toast.success('Foto atualizada!')
+  }
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 500)
@@ -240,11 +278,11 @@ export default function PerfilScreen() {
   const email       = user?.email       ?? ''
   const memberSince = user?.memberSince ?? new Date().toISOString()
 
-  // Stats sempre zeradas para conta nova (futuramente virão do backend)
+  // Stats — zeradas para conta nova com labels corretas
   const stats = [
-    { id: 'grupos',  icon: 'users',    label: 'Grupos',    value: user?.grupos ?? 0,            color: 'green' },
-    { id: 'offered', icon: 'car-give', label: 'Caronas ofertadas', value: user?.caronasOferecidas ?? 0, color: 'green' },
-    { id: 'taken',   icon: 'car-take', label: 'Caronas pegadas',   value: user?.caronasPegadas ?? 0,   color: 'blue'  },
+    { id: 'grupos',  icon: 'users',    label: 'Grupos',            value: user?.grupos ?? 0,               color: 'green' },
+    { id: 'offered', icon: 'car-give', label: 'Viagens ofertadas', value: user?.viagensOferecidas ?? 0,    color: 'green' },
+    { id: 'taken',   icon: 'car-take', label: 'Viagens feitas',    value: user?.viagensFeitas ?? 0,        color: 'blue'  },
   ]
 
   const location = [bairro, zona].filter(Boolean).join(', ')
@@ -272,7 +310,7 @@ export default function PerfilScreen() {
             {/* ── Card de perfil ── */}
             <div className={styles.profileCard}>
               <div className={styles.profileCardInner}>
-                <Avatar initials={initials} size={82} />
+                <Avatar initials={initials} photo={photo} size={82} onUpload={handlePhotoUpload} />
 
                 <div className={styles.profileInfo}>
                   <h2 className={styles.profileName}>{name}</h2>
@@ -324,8 +362,14 @@ export default function PerfilScreen() {
                   <div className={`${styles.statIcon} ${s.color === 'blue' ? styles.statIconBlue : styles.statIconGreen}`}>
                     {ICONS[s.icon]}
                   </div>
-                  <span className={styles.statValue}>{s.value}</span>
+                  {s.value > 0
+                    ? <span className={styles.statValue}>{s.value}</span>
+                    : <span className={styles.statValueEmpty}>—</span>
+                  }
                   <span className={styles.statLabel}>{s.label}</span>
+                  {s.value === 0 && (
+                    <span className={styles.statHint}>Participe para pontuar</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -344,7 +388,7 @@ export default function PerfilScreen() {
                   ))}
                 </div>
                 <p className={styles.ratingEmpty}>
-                  Ainda sem avaliações. Participe de grupos e caronas para começar!
+                  Ainda sem avaliações. Participe de grupos e viagens para começar!
                 </p>
               </div>
             </div>
@@ -362,7 +406,7 @@ export default function PerfilScreen() {
                   </svg>
                 </div>
                 <p className={styles.emptyActivityText}>Nenhuma atividade recente</p>
-                <p className={styles.emptyActivitySub}>Explore grupos e caronas para começar sua jornada!</p>
+                <p className={styles.emptyActivitySub}>Explore grupos e viagens para começar sua jornada!</p>
                 <button className={styles.exploreBtn} onClick={() => navigate(ROUTES.GRUPOS)}>
                   Explorar grupos
                 </button>
