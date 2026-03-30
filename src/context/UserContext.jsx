@@ -25,7 +25,13 @@ export function UserProvider({ children }) {
   const updateUser = (patch) => setUser((prev) => ({ ...prev, ...patch }))
 
   const login = (userData = {}) => {
-    updateUser(userData)
+    // Backend retorna _id (MongoDB) — normaliza para id
+    const normalized = {
+      ...userData,
+      id: userData._id || userData.id,
+    }
+    console.log('[UserContext] login id:', normalized.id) // debug
+    updateUser(normalized)
     setIsLoggedIn(true)
   }
 

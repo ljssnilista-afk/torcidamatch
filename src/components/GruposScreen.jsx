@@ -168,11 +168,15 @@ export default function GruposScreen() {
         if (res.ok) {
           const data = await res.json()
           const todos = data.groups || []
-          console.log('[Grupos] user:', user?.id, user?._id, '| total grupos:', todos.length)
-          todos.forEach(g => console.log(' grupo:', g.name, '| members:', g.members))
 
-          // userId pode vir como id, _id ou string
-          const userId = user?.id || user?._id
+          const userId = String(user?.id || user?._id || '')
+          console.log('[Grupos] userId usado:', userId, '| total:', todos.length)
+          todos.forEach(g => {
+            const leaderId = String(g.leader?._id || g.leader || '')
+            const memberIds = (g.members || []).map(m => String(m._id || m))
+            console.log(`  grupo: ${g.name} | leader: ${leaderId} | members:`, memberIds)
+          })
+
           if (!userId) {
             setGrupos(todos)
             setLoading(false)
@@ -180,16 +184,10 @@ export default function GruposScreen() {
           }
 
           const isMyGroup = (g) => {
-            const uid = String(userId)
-            // Checa líder
             const leaderId = String(g.leader?._id || g.leader || '')
-            if (leaderId === uid) return true
-            // Checa membros
+            if (leaderId === userId) return true
             if (Array.isArray(g.members)) {
-              return g.members.some(m => {
-                const mid = String(m._id || m || '')
-                return mid === uid
-              })
+              return g.members.some(m => String(m._id || m) === userId)
             }
             return false
           }
@@ -197,6 +195,8 @@ export default function GruposScreen() {
           const meusGrupos = todos.filter(isMyGroup)
           const meusIds    = new Set(meusGrupos.map(g => String(g._id)))
           const proximos   = todos.filter(g => !meusIds.has(String(g._id)))
+
+          console.log('[Grupos] meus:', meusGrupos.map(g=>g.name), '| proximos:', proximos.map(g=>g.name))
 
           setMeuGrupo(meusGrupos[0] || null)
           setGrupos(proximos)

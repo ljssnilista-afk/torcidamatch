@@ -308,7 +308,9 @@ export default function LoginScreen() {
     setLoading(true)
     try {
       const res = await loginUser(email, password)
-      login({ ...res.user, token: res.token })
+      // Normaliza _id → id para uso consistente no app
+      const userData = { ...res.user, id: res.user._id || res.user.id, token: res.token }
+      login(userData)
       toast.success('Bem-vindo de volta!')
       navigate(ROUTES.HOME)
     } catch (err) {
@@ -326,7 +328,9 @@ export default function LoginScreen() {
         password: regDados.password, team: regDados.team,
         teamEmoji: regDados.teamEmoji, teamId: regDados.teamId,
       })
-      login({ ...res.user, token: res.token })
+      // Normaliza _id → id
+      const userData = { ...res.user, id: res.user._id || res.user.id, token: res.token }
+      login(userData)
       toast.success(`Conta criada! ${regDados.teamEmoji}`)
       navigate(ROUTES.HOME)
     } catch (err) {
