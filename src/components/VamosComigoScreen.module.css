@@ -9,7 +9,7 @@
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 .screenHeader {
-  padding: 0 16px 0;
+  padding: 14px 16px 0;
   flex-shrink: 0;
   background: var(--color-bg);
 }
@@ -20,10 +20,13 @@
   padding-bottom: 12px;
 }
 .title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--color-text-primary);
   letter-spacing: -0.5px;
+}
+.titleGreen {
+  color: var(--color-brand);
 }
 .filterBtn {
   width: 34px;
@@ -479,3 +482,70 @@
 }
 .emptyTitle { font-size: 15px; font-weight: 600; color: var(--color-text-secondary); }
 .emptySub { font-size: 12px; color: var(--color-text-tertiary); line-height: 1.4; }
+
+/* ─── Location bar ────────────────────────────────────────────────────────── */
+.locationBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34,197,94,0.07);
+  border-radius: 10px;
+  border: 0.5px solid rgba(34,197,94,0.15);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  color: var(--color-brand);
+  width: 100%;
+  transition: background 0.15s;
+}
+.locationBar:hover { background: rgba(34,197,94,0.1); }
+.locationText { font-size: 11px; font-weight: 600; flex: 1; color: var(--color-brand); text-align: left; }
+.locationUpdate { font-size: 10px; color: rgba(34,197,94,0.55); font-weight: 500; }
+
+/* ─── Mapa ────────────────────────────────────────────────────────────────── */
+.mapaOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+}
+.mapaSheet {
+  width: 100%;
+  background: #111;
+  border-radius: 20px 20px 0 0;
+  border-top: 0.5px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+  animation: slideUp 0.22s ease;
+  display: flex;
+  flex-direction: column;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.mapaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  flex-shrink: 0;
+}
+.mapaTitle { font-size: 15px; font-weight: 700; color: #fff; }
+.mapaClose {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mapaWrap { height: 380px; flex-shrink: 0; }
+.mapaHint {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  padding: 10px;
+  flex-shrink: 0;
+}

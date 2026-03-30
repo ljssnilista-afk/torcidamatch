@@ -1,11 +1,30 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { RIDES, VC_FILTERS, NEXT_GAME_BANNER, filterRides, sortRides } from '../data/vamosComigoData'
 import { ROUTES } from '../utils/constants'
 import { useToast } from '../context/ToastContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useGame } from '../context/GameContext'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import L from 'leaflet'
 import styles from './VamosComigoScreen.module.css'
+
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+})
+
+const rideIcon = new L.DivIcon({
+  html: `<div style="width:28px;height:28px;border-radius:50%;background:#22C55E;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.4)">🚗</div>`,
+  className: '', iconSize: [28,28], iconAnchor: [14,14],
+})
+const userIcon = new L.DivIcon({
+  html: `<div style="width:18px;height:18px;border-radius:50%;background:#3B82F6;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>`,
+  className: '', iconSize: [18,18], iconAnchor: [9,9],
+})
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -214,12 +233,37 @@ export default function VamosComigoScreen() {
   const { isRideFav, toggleRide } = useFavorites()
   const { banner, loading: gameLoading } = useGame()
 
-  // Usa banner da API ou fallback do mock
   const gameBanner = banner ?? NEXT_GAME_BANNER
 
   const [activeFilter, setActiveFilter] = useState('todos')
-  const [search, setSearch] = useState('')
-  const [loading] = useState(false)
+  const [search,       setSearch]       = useState('')
+  const [loading]                       = useState(false)
+  const [userLocation,  setUserLocation]  = useState(null)
+  const [locationLabel, setLocationLabel] = useState('Obtendo localização...')
+  const [mapVisible,    setMapVisible]    = useState(false)
+
+  // Localização real
+  useEffect(() => {
+    if (!navigator.geolocation) { setLocationLabel('Localização indisponível'); return }
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords
+        setUserLocation({ lat, lng })
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
+            { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
+          )
+          const data = await res.json()
+          const bairro = data.address?.suburb || data.address?.neighbourhood || data.address?.city_district || ''
+          const cidade = data.address?.city || 'Rio de Janeiro'
+          setLocationLabel(bairro ? `${bairro} • ${cidade}` : cidade)
+        } catch { setLocationLabel('Rio de Janeiro') }
+      },
+      () => setLocationLabel('Toque para permitir localização'),
+      { timeout: 8000, maximumAge: 60000 }
+    )
+  }, [])
 
   const filteredRides = useMemo(() => {
     let rides = filterRides(RIDES, activeFilter)
@@ -246,7 +290,9 @@ export default function VamosComigoScreen() {
       {/* Screen header */}
       <div className={styles.screenHeader}>
         <div className={styles.titleRow}>
-          <h1 className={styles.title}>Vamos Comigo!</h1>
+          <h1 className={styles.title}>
+            Vamos <em className={styles.titleGreen}>Comigo!</em>
+          </h1>
           <button className={styles.filterBtn} aria-label="Abrir filtros avançados">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <line x1="4" y1="6" x2="20" y2="6"/>
@@ -255,6 +301,25 @@ export default function VamosComigoScreen() {
             </svg>
           </button>
         </div>
+
+        {/* Localização real */}
+        <button
+          className={styles.locationBar}
+          onClick={() => navigator.geolocation?.getCurrentPosition(() => window.location.reload(), () => {})}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span className={styles.locationText}>
+            {userLocation ? `📍 ${locationLabel}` : locationLabel}
+          </span>
+          <button
+            className={styles.locationUpdate}
+            onClick={e => { e.stopPropagation(); setMapVisible(true) }}
+          >
+            Ver no mapa →
+          </button>
+        </button>
 
         {/* Search bar */}
         <div className={styles.searchBar}>
@@ -385,6 +450,41 @@ export default function VamosComigoScreen() {
         </div>
 
       </div>
+
+      {/* Mapa real */}
+      {mapVisible && (
+        <div className={styles.mapaOverlay} onClick={() => setMapVisible(false)}>
+          <div className={styles.mapaSheet} onClick={e => e.stopPropagation()}>
+            <div className={styles.mapaHeader}>
+              <span className={styles.mapaTitle}>Caronas no mapa</span>
+              <button className={styles.mapaClose} onClick={() => setMapVisible(false)}>✕</button>
+            </div>
+            <div className={styles.mapaWrap}>
+              <MapContainer
+                center={userLocation ? [userLocation.lat, userLocation.lng] : [-22.9068, -43.1729]}
+                zoom={13}
+                style={{ width: '100%', height: '100%' }}
+                zoomControl={false}
+              >
+                <TileLayer
+                  url="https://{s}.basemaps.cartocdn.com/rastertiles/light_nolabels/{z}/{x}/{y}{r}.png"
+                  attribution='&copy; CARTO'
+                />
+                <TileLayer
+                  url="https://{s}.basemaps.cartocdn.com/rastertiles/light_only_labels/{z}/{x}/{y}{r}.png"
+                  attribution='' opacity={0.7}
+                />
+                {userLocation && (
+                  <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
+                    <Popup>📍 Você está aqui</Popup>
+                  </Marker>
+                )}
+              </MapContainer>
+            </div>
+            <p className={styles.mapaHint}>{filteredRides.length} carona{filteredRides.length !== 1 ? 's' : ''} disponível{filteredRides.length !== 1 ? 'is' : ''}</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
