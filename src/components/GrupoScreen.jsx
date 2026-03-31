@@ -251,7 +251,8 @@ export default function GrupoScreen() {
   // ── WebSocket ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!id) return
-    const ws = new WebSocket(`${WS_URL}/ws/grupos/${id}`)
+    // 🔒 Enviar token JWT na conexão WebSocket para autenticação
+    const ws = new WebSocket(`${WS_URL}/ws/grupos/${id}${token ? `?token=${token}` : ''}`)
     wsRef.current = ws
 
     ws.onopen  = () => setWsReady(true)
@@ -277,7 +278,7 @@ export default function GrupoScreen() {
     }
 
     return () => ws.close()
-  }, [id])
+  }, [id, token]) // 🔒 Reconectar se o token mudar
 
   // ── Auto scroll ────────────────────────────────────────────────────────────
   useEffect(() => {
