@@ -1,14 +1,19 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { RIDES, VC_FILTERS, NEXT_GAME_BANNER, filterRides, sortRides } from '../data/vamosComigoData'
+import { VC_FILTERS } from '../data/vamosComigoData'
 import { ROUTES } from '../utils/constants'
 import { useToast } from '../context/ToastContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { useGame } from '../context/GameContext'
+import { useUser } from '../context/UserContext'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import styles from './VamosComigoScreen.module.css'
+
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/torcida-api/api'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -25,6 +30,35 @@ const userIcon = new L.DivIcon({
   html: `<div style="width:18px;height:18px;border-radius:50%;background:#3B82F6;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.4)"></div>`,
   className: '', iconSize: [18,18], iconAnchor: [9,9],
 })
+
+// ─── Helpers ───────────────────────────────────────────────────────────────────
+
+function avatarColor(name = '') {
+  const colors = ['#22C55E','#3B82F6','#D4AF37','#C060C0','#EF4444','#0EA5E9','#F97316']
+  let hash = 0
+  for (const c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash)
+  return colors[Math.abs(hash) % colors.length]
+}
+
+function initials(name = '') {
+  return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
+}
+
+function formatPrice(cents) {
+  return (cents / 100).toFixed(2).replace('.', ',')
+}
+
+function formatTime(iso) {
+  const d = new Date(iso)
+  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+}
+
+function formatDate(iso) {
+  const d = new Date(iso)
+  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb']
+  const months = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez']
+  return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]}`
+}
 
 // ─── Icons ───────────────────────────────────────────────────────────────────
 
@@ -55,37 +89,34 @@ const VEHICLE_LABELS = { carro: 'Carro', van: 'Van', onibus: 'Ônibus' }
 // ─── Ride Card ───────────────────────────────────────────────────────────────
 
 function RideCard({ ride, onReserve, onDetails }) {
-  const hasMemberPrice = !!ride.priceMember
+  const hasMemberPrice = ride.memberPrice != null && ride.memberPrice !== ride.price
 
   return (
     <article
-      className={`${styles.rideCard} ${ride.isOfficial ? styles.rideCardOfficial : ''}`}
-      aria-label={`Carona com ${ride.name}, ${VEHICLE_LABELS[ride.vehicle]}, R$${ride.price}`}
+      className={`${styles.rideCard} ${ride.groupName ? styles.rideCardOfficial : ''}`}
+      aria-label={`Viagem com ${ride.driverName}, ${VEHICLE_LABELS[ride.vehicle]}, R$${formatPrice(ride.price)}`}
     >
-      {/* Official top border accent */}
-      {ride.isOfficial && <div className={styles.officialAccent} aria-hidden="true" />}
+      {ride.groupName && <div className={styles.officialAccent} aria-hidden="true" />}
 
-      {/* Card header */}
       <div className={styles.cardHeader}>
         <div className={styles.driverRow}>
-          <div className={styles.avatar} style={{ background: ride.avatarBg }}>
-            {ride.initials}
+          <div className={styles.avatar} style={{ background: avatarColor(ride.driverName) }}>
+            {initials(ride.driverName)}
           </div>
           <div className={styles.driverInfo}>
-            <span className={styles.driverName}>{ride.name}</span>
+            <span className={styles.driverName}>{ride.driverName}</span>
             <span className={styles.rating}>
-              <span className={styles.star}>★</span> {ride.rating}
+              {ride.driverHandle && <span style={{ color: 'var(--color-text-tertiary)', fontSize: 10 }}>@{ride.driverHandle}</span>}
             </span>
           </div>
         </div>
-        {ride.isOfficial && (
+        {ride.groupName && (
           <div className={styles.officialBadge} aria-label="Caravana oficial">
-            <span>★ Oficial</span>
+            <span>★ {ride.groupName}</span>
           </div>
         )}
       </div>
 
-      {/* Info grid */}
       <div className={styles.infoGrid}>
         <div className={styles.infoItem}>
           <span className={styles.infoIcon}><VehicleIcon type={ride.vehicle} /></span>
@@ -95,46 +126,45 @@ function RideCard({ ride, onReserve, onDetails }) {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.infoIcon}>
             <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
           </svg>
-          <span className={styles.infoText}>{ride.departure}</span>
+          <span className={styles.infoText}>{formatTime(ride.departureTime)}</span>
         </div>
         <div className={styles.infoItem}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.infoIcon}>
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
           </svg>
-          <span className={styles.infoText}>{ride.neighborhood}</span>
+          <span className={styles.infoText}>{ride.bairro || ride.meetPoint}</span>
         </div>
         <div className={styles.infoItem}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.infoIcon}>
             <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
           </svg>
           <span className={`${styles.infoText} ${styles.vagasText}`}>
-            {ride.vagas} {ride.vagas === 1 ? 'vaga' : 'vagas'}
+            {ride.availableSeats} {ride.availableSeats === 1 ? 'vaga' : 'vagas'}
           </span>
         </div>
       </div>
 
-      {/* Distance pill */}
-      <div className={styles.distancePill}>
-        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-        </svg>
-        <span>{ride.distanceKm} km de você</span>
-      </div>
+      {ride.zona && (
+        <div className={styles.distancePill}>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Zona {ride.zona}</span>
+        </div>
+      )}
 
-      {/* Divider */}
       <div className={styles.divider} />
 
-      {/* Price block */}
       <div className={styles.priceBlock}>
         {hasMemberPrice ? (
           <div className={styles.memberPricing}>
             <div>
               <span className={styles.priceLabel}>Membros</span>
-              <span className={styles.priceMember}>R$ {ride.priceMember}</span>
+              <span className={styles.priceMember}>R$ {formatPrice(ride.memberPrice)}</span>
             </div>
             <div>
               <span className={styles.priceLabel}>Não membros</span>
-              <span className={styles.priceNonMember}>R$ {ride.priceNonMember}</span>
+              <span className={styles.priceNonMember}>R$ {formatPrice(ride.price)}</span>
             </div>
             <button className={styles.assineLink} aria-label="Assinar grupo para pagar menos">
               Assine e pague menos →
@@ -142,27 +172,27 @@ function RideCard({ ride, onReserve, onDetails }) {
           </div>
         ) : (
           <div className={styles.singlePricing}>
-            <span className={styles.priceMain}>R$ {ride.price}</span>
+            <span className={styles.priceMain}>R$ {formatPrice(ride.price)}</span>
             <span className={styles.perPerson}>por pessoa</span>
           </div>
         )}
       </div>
 
-      {/* Actions */}
       <div className={styles.cardActions}>
         <button
           className={styles.btnDetails}
           onClick={() => onDetails?.(ride)}
-          aria-label={`Ver detalhes de ${ride.name}`}
+          aria-label={`Ver detalhes de ${ride.driverName}`}
         >
           Detalhes
         </button>
         <button
           className={styles.btnReserve}
           onClick={() => onReserve?.(ride)}
-          aria-label={`Reservar carona com ${ride.name}`}
+          disabled={ride.availableSeats === 0}
+          aria-label={`Reservar viagem com ${ride.driverName}`}
         >
-          Reservar
+          {ride.availableSeats === 0 ? 'Lotada' : 'Reservar'}
         </button>
       </div>
     </article>
@@ -178,18 +208,18 @@ function HighlightCard({ ride, onReserve }) {
       role="button"
       tabIndex={0}
       onClick={() => onReserve?.(ride)}
-      aria-label={`${ride.name}, R$${ride.price}, ${ride.vagas} vagas`}
+      aria-label={`${ride.driverName}, R$${formatPrice(ride.price)}, ${ride.availableSeats} vagas`}
     >
-      <div className={styles.hlAvatar} style={{ background: ride.avatarBg }}>
-        {ride.initials}
+      <div className={styles.hlAvatar} style={{ background: avatarColor(ride.driverName) }}>
+        {initials(ride.driverName)}
       </div>
-      <div className={styles.hlName}>{ride.name}</div>
-      <div className={styles.hlPrice}>R$ {ride.price}</div>
+      <div className={styles.hlName}>{ride.driverName}</div>
+      <div className={styles.hlPrice}>R$ {formatPrice(ride.price)}</div>
       <div className={styles.hlMeta}>
         <VehicleIcon type={ride.vehicle} />
-        <span>{ride.vagas}v</span>
+        <span>{ride.availableSeats}v</span>
       </div>
-      <div className={styles.hlDist}>{ride.distanceKm} km</div>
+      {ride.bairro && <div className={styles.hlDist}>{ride.bairro}</div>}
     </div>
   )
 }
@@ -216,10 +246,10 @@ function EmptyState({ onOffer }) {
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(34,197,94,0.3)" strokeWidth="1.2">
         <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
       </svg>
-      <p className={styles.emptyTitle}>Nenhuma carona encontrada</p>
+      <p className={styles.emptyTitle}>Nenhuma viagem encontrada</p>
       <p className={styles.emptySub}>Que tal criar uma oferta para outros torcedores?</p>
       <button className={styles.btnOffer} onClick={onOffer}>
-        + Oferecer carona
+        + Oferecer viagem
       </button>
     </div>
   )
@@ -230,19 +260,80 @@ function EmptyState({ onOffer }) {
 export default function VamosComigoScreen() {
   const navigate    = useNavigate()
   const toast       = useToast()
+  const { user }    = useUser()
   const { isRideFav, toggleRide } = useFavorites()
   const { banner, loading: gameLoading } = useGame()
+  const token = user?.token
 
-  const gameBanner = banner ?? NEXT_GAME_BANNER
+  const gameBanner = banner ?? { home: '...', away: '...', date: '...', time: '...', stadium: '...' }
 
+  const [rides,        setRides]        = useState([])
   const [activeFilter, setActiveFilter] = useState('todos')
   const [search,       setSearch]       = useState('')
-  const [loading]                       = useState(false)
+  const [loading,      setLoading]      = useState(true)
+  const [reserving,    setReserving]    = useState(null)   // ID da viagem sendo reservada
   const [userLocation,  setUserLocation]  = useState(null)
   const [locationLabel, setLocationLabel] = useState('Obtendo localização...')
   const [mapVisible,    setMapVisible]    = useState(false)
 
-  // Localização real
+  // ── Carregar viagens reais da API ────────────────────────────────────────
+  const loadRides = useCallback(async () => {
+    try {
+      setLoading(true)
+      const params = new URLSearchParams()
+      if (activeFilter === 'carro')  params.set('vehicle', 'carro')
+      if (activeFilter === 'van')    params.set('vehicle', 'van')
+      if (activeFilter === 'onibus') params.set('vehicle', 'onibus')
+      if (user?.team) params.set('team', user.team)
+
+      const res = await fetch(`${API_URL}/rides?${params}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setRides(data.rides || [])
+      }
+    } catch (err) {
+      console.error('[VamosComigoScreen] load error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }, [activeFilter, token, user?.team])
+
+  useEffect(() => { loadRides() }, [loadRides])
+
+  // ── Reservar vaga ──────────────────────────────────────────────────────────
+  const handleReserve = async (ride) => {
+    if (!token) {
+      toast.error('Faça login para reservar')
+      return
+    }
+    if (reserving) return
+
+    setReserving(ride._id)
+    try {
+      const res = await fetch(`${API_URL}/rides/${ride._id}/reserve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(data.message || 'Reserva confirmada!')
+        loadRides() // recarregar para atualizar vagas
+      } else {
+        toast.error(data.error || 'Erro ao reservar')
+      }
+    } catch {
+      toast.error('Erro de conexão ao reservar')
+    } finally {
+      setReserving(null)
+    }
+  }
+
+  // ── Localização real ──────────────────────────────────────────────────────
   useEffect(() => {
     if (!navigator.geolocation) { setLocationLabel('Localização indisponível'); return }
     navigator.geolocation.getCurrentPosition(
@@ -265,23 +356,27 @@ export default function VamosComigoScreen() {
     )
   }, [])
 
+  // ── Filtrar e buscar ──────────────────────────────────────────────────────
   const filteredRides = useMemo(() => {
-    let rides = filterRides(RIDES, activeFilter)
+    let result = [...rides]
     if (search.trim()) {
       const q = search.toLowerCase()
-      rides = rides.filter(
+      result = result.filter(
         r =>
-          r.name.toLowerCase().includes(q) ||
-          r.neighborhood.toLowerCase().includes(q) ||
-          VEHICLE_LABELS[r.vehicle].toLowerCase().includes(q)
+          r.driverName?.toLowerCase().includes(q) ||
+          r.bairro?.toLowerCase().includes(q) ||
+          r.meetPoint?.toLowerCase().includes(q) ||
+          r.game?.homeTeam?.toLowerCase().includes(q) ||
+          r.game?.awayTeam?.toLowerCase().includes(q) ||
+          VEHICLE_LABELS[r.vehicle]?.toLowerCase().includes(q)
       )
     }
-    return sortRides(rides)
-  }, [activeFilter, search])
+    return result
+  }, [rides, search])
 
   const highlights = useMemo(
-    () => sortRides(RIDES).slice(0, 5),
-    []
+    () => [...rides].slice(0, 5),
+    [rides]
   )
 
   return (
@@ -332,7 +427,7 @@ export default function VamosComigoScreen() {
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por bairro, time ou ofertante..."
             className={styles.searchInput}
-            aria-label="Buscar caronas"
+            aria-label="Buscar viagens"
           />
           {search && (
             <button
@@ -375,14 +470,14 @@ export default function VamosComigoScreen() {
             </span>
           </div>
           <div className={styles.gameBannerCount}>
-            <span className={styles.countNum}>{RIDES.length}</span>
-            <span className={styles.countLabel}>caronas</span>
+            <span className={styles.countNum}>{rides.length}</span>
+            <span className={styles.countLabel}>viagens</span>
           </div>
         </div>
 
         {/* Section title */}
         <div className={styles.sectionHeader}>
-          <span className={styles.sectionTitle}>Ofertas próximas</span>
+          <span className={styles.sectionTitle}>Ofertas disponíveis</span>
           <span className={styles.sectionCount}>
             {filteredRides.length} {filteredRides.length === 1 ? 'oferta' : 'ofertas'}
           </span>
@@ -394,15 +489,15 @@ export default function VamosComigoScreen() {
             {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
           </div>
         ) : filteredRides.length === 0 ? (
-          <EmptyState onOffer={() => toast.info("Em breve: oferecer carona!")} />
+          <EmptyState onOffer={() => toast.info("Em breve: criar viagem!")} />
         ) : (
           <div className={styles.carousel} role="list">
             {filteredRides.map(ride => (
               <RideCard
-                key={ride.id}
+                key={ride._id}
                 ride={ride}
-                onReserve={r => toast.success(`Reserva de carona com ${r.name} confirmada!`)}
-                onDetails={() => navigate(ROUTES.VAMOS_COMIGO)}
+                onReserve={handleReserve}
+                onDetails={() => toast.info('Detalhes em breve!')}
               />
             ))}
             {/* Offer ride card */}
@@ -412,7 +507,7 @@ export default function VamosComigoScreen() {
                 <line x1="12" y1="8" x2="12" y2="16"/>
                 <line x1="8" y1="12" x2="16" y2="12"/>
               </svg>
-              <p className={styles.offerCardTitle}>Oferecer carona</p>
+              <p className={styles.offerCardTitle}>Oferecer viagem</p>
               <p className={styles.offerCardSub}>Ganhe dinheiro indo ao jogo</p>
               <button className={styles.btnOffer}>Criar oferta</button>
             </div>
@@ -420,20 +515,24 @@ export default function VamosComigoScreen() {
         )}
 
         {/* Highlights section */}
-        <div className={styles.sectionHeader} style={{ marginTop: 4 }}>
-          <span className={styles.sectionTitle}>Caronas em destaque</span>
-          <button className={styles.sectionLink}>Ver todas</button>
-        </div>
+        {highlights.length > 0 && (
+          <>
+            <div className={styles.sectionHeader} style={{ marginTop: 4 }}>
+              <span className={styles.sectionTitle}>Viagens em destaque</span>
+              <button className={styles.sectionLink}>Ver todas</button>
+            </div>
 
-        <div className={styles.highlights} role="list">
-          {highlights.map(ride => (
-            <HighlightCard
-              key={ride.id}
-              ride={ride}
-              onReserve={r => toast.success(`Reserva com ${r.name} confirmada!`)}
-            />
-          ))}
-        </div>
+            <div className={styles.highlights} role="list">
+              {highlights.map(ride => (
+                <HighlightCard
+                  key={ride._id}
+                  ride={ride}
+                  onReserve={handleReserve}
+                />
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Offer CTA */}
         <div className={styles.ctaBanner}>
@@ -456,7 +555,7 @@ export default function VamosComigoScreen() {
         <div className={styles.mapaOverlay} onClick={() => setMapVisible(false)}>
           <div className={styles.mapaSheet} onClick={e => e.stopPropagation()}>
             <div className={styles.mapaHeader}>
-              <span className={styles.mapaTitle}>Caronas no mapa</span>
+              <span className={styles.mapaTitle}>Viagens no mapa</span>
               <button className={styles.mapaClose} onClick={() => setMapVisible(false)}>✕</button>
             </div>
             <div className={styles.mapaWrap}>
@@ -479,9 +578,19 @@ export default function VamosComigoScreen() {
                     <Popup>📍 Você está aqui</Popup>
                   </Marker>
                 )}
+                {filteredRides
+                  .filter(r => r.meetCoords?.lat && r.meetCoords?.lng)
+                  .map(r => (
+                    <Marker key={r._id} position={[r.meetCoords.lat, r.meetCoords.lng]} icon={rideIcon}>
+                      <Popup>
+                        {r.driverName} • {VEHICLE_LABELS[r.vehicle]} • R$ {formatPrice(r.price)}
+                      </Popup>
+                    </Marker>
+                  ))
+                }
               </MapContainer>
             </div>
-            <p className={styles.mapaHint}>{filteredRides.length} carona{filteredRides.length !== 1 ? 's' : ''} disponível{filteredRides.length !== 1 ? 'is' : ''}</p>
+            <p className={styles.mapaHint}>{filteredRides.length} viagen{filteredRides.length !== 1 ? 's' : ''} disponíve{filteredRides.length !== 1 ? 'is' : 'l'}</p>
           </div>
         </div>
       )}
