@@ -489,7 +489,7 @@ export default function VamosComigoScreen() {
             {[1, 2, 3].map(i => <SkeletonCard key={i} />)}
           </div>
         ) : filteredRides.length === 0 ? (
-          <EmptyState onOffer={() => toast.info("Em breve: criar viagem!")} />
+          <EmptyState onOffer={() => navigate(ROUTES.CRIAR_VIAGEM)} />
         ) : (
           <div className={styles.carousel} role="list">
             {filteredRides.map(ride => (
@@ -509,7 +509,7 @@ export default function VamosComigoScreen() {
               </svg>
               <p className={styles.offerCardTitle}>Oferecer viagem</p>
               <p className={styles.offerCardSub}>Ganhe dinheiro indo ao jogo</p>
-              <button className={styles.btnOffer}>Criar oferta</button>
+              <button className={styles.btnOffer} onClick={() => navigate(ROUTES.CRIAR_VIAGEM)}>Criar oferta</button>
             </div>
           </div>
         )}
@@ -545,7 +545,7 @@ export default function VamosComigoScreen() {
               <p className={styles.ctaSub}>Divida o custo com outros torcedores</p>
             </div>
           </div>
-          <button className={styles.ctaBtn}>Oferecer</button>
+          <button className={styles.ctaBtn} onClick={() => navigate(ROUTES.CRIAR_VIAGEM)}>Oferecer</button>
         </div>
 
       </div>
