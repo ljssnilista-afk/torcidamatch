@@ -89,7 +89,8 @@ export default function CriarViagemScreen() {
   const [meetPoint,   setMeetPoint]   = useState('')
   const [bairro,      setBairro]      = useState(user?.bairro || '')
   const [zona,        setZona]        = useState(user?.zona || '')
-  const [departureTime, setDepartureTime] = useState('')
+  const [departureHour,   setDepartureHour]   = useState('14')
+  const [departureMinute, setDepartureMinute] = useState('00')
 
   // Submit
   const [submitting, setSubmitting] = useState(false)
@@ -172,7 +173,7 @@ export default function CriarViagemScreen() {
   const canNext = () => {
     if (step === 0) return !!selectedGame
     if (step === 1) return !!vehicle && seats >= 1
-    if (step === 2) return !!price && !!meetPoint && !!departureTime
+    if (step === 2) return !!price && !!meetPoint
     return false
   }
 
@@ -191,6 +192,10 @@ export default function CriarViagemScreen() {
     setSubmitting(true)
 
     try {
+      // Combinar data do jogo com horário de saída escolhido
+      const gameDate = new Date(selectedGame.rawDate)
+      gameDate.setHours(parseInt(departureHour), parseInt(departureMinute), 0, 0)
+
       const body = {
         vehicle,
         totalSeats: seats,
@@ -199,7 +204,7 @@ export default function CriarViagemScreen() {
         meetPoint,
         bairro,
         zona,
-        departureTime: new Date(departureTime).toISOString(),
+        departureTime: gameDate.toISOString(),
         game: {
           homeTeam: selectedGame.homeTeam,
           awayTeam: selectedGame.awayTeam,
@@ -416,12 +421,38 @@ export default function CriarViagemScreen() {
             </div>
 
             <label className={styles.fieldLabel}>Horário de saída</label>
-            <input
-              type="datetime-local"
-              value={departureTime}
-              onChange={e => setDepartureTime(e.target.value)}
-              className={styles.textInput}
-            />
+            <div className={styles.timePickerRow}>
+              <div className={styles.timeCol}>
+                <label className={styles.timeLabel}>Hora</label>
+                <select
+                  value={departureHour}
+                  onChange={e => setDepartureHour(e.target.value)}
+                  className={styles.timeSelect}
+                >
+                  {Array.from({ length: 24 }, (_, i) => (
+                    <option key={i} value={String(i).padStart(2, '0')}>
+                      {String(i).padStart(2, '0')}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <span className={styles.timeSep}>:</span>
+              <div className={styles.timeCol}>
+                <label className={styles.timeLabel}>Min</label>
+                <select
+                  value={departureMinute}
+                  onChange={e => setDepartureMinute(e.target.value)}
+                  className={styles.timeSelect}
+                >
+                  {['00','15','30','45'].map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+              <span className={styles.timePreview}>
+                Saída às {departureHour}:{departureMinute} no dia do jogo
+              </span>
+            </div>
 
             {/* Resumo */}
             <div className={styles.summary}>
