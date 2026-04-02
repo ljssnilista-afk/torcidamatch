@@ -279,10 +279,34 @@ export default function PerfilScreen() {
   const [cropSaving,   setCropSaving]   = useState(false)
   const [photo,        setPhoto]        = useState(user?.photo || null)
 
+  // 📊 NOVO — stats reais do MongoDB
+  const [stats,       setStats]       = useState({ grupos: 0, viagensOferecidas: 0, viagensFeitas: 0 })
+  const [atividades,  setAtividades]  = useState([])
+
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 500)
     return () => clearTimeout(t)
   }, [])
+
+  // 📊 NOVO — buscar stats reais ao carregar
+  useEffect(() => {
+    async function loadStats() {
+      if (!user?.token) return
+      try {
+        const res = await fetch(`${API_URL}/profile/me/stats`, {
+          headers: { Authorization: `Bearer ${user.token}` },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setStats(data.stats || {})
+          setAtividades(data.atividades || [])
+        }
+      } catch (err) {
+        console.warn('[PerfilScreen] stats error:', err.message)
+      }
+    }
+    loadStats()
+  }, [user?.token])
 
   // Sincroniza foto se o contexto mudar (ex: após login)
   useEffect(() => {
@@ -348,10 +372,10 @@ export default function PerfilScreen() {
   const email       = user?.email       ?? ''
   const memberSince = user?.memberSince ?? new Date().toISOString()
 
-  const stats = [
-    { id: 'grupos',  icon: 'users',    label: 'Grupos',            value: user?.grupos ?? 0,            color: 'green' },
-    { id: 'offered', icon: 'car-give', label: 'Viagens ofertadas', value: user?.viagensOferecidas ?? 0, color: 'green' },
-    { id: 'taken',   icon: 'car-take', label: 'Viagens feitas',    value: user?.viagensFeitas ?? 0,     color: 'blue'  },
+  const statCards = [
+    { id: 'grupos',  icon: 'users',    label: 'Grupos',            value: stats.grupos ?? 0,            color: 'green' },
+    { id: 'offered', icon: 'car-give', label: 'Viagens ofertadas', value: stats.viagensOferecidas ?? 0, color: 'green' },
+    { id: 'taken',   icon: 'car-take', label: 'Viagens feitas',    value: stats.viagensFeitas ?? 0,     color: 'blue'  },
   ]
 
   const location = [bairro, zona].filter(Boolean).join(', ')
@@ -406,7 +430,7 @@ export default function PerfilScreen() {
 
             {/* Stats */}
             <div className={styles.statsGrid}>
-              {stats.map(s => (
+              {statCards.map(s => (
                 <div key={s.id} className={styles.statCard}>
                   <div className={`${styles.statIcon} ${s.color === 'blue' ? styles.statIconBlue : styles.statIconGreen}`}>
                     {ICONS[s.icon]}
@@ -443,18 +467,39 @@ export default function PerfilScreen() {
               <div className={styles.sectionHeader}>
                 <span className={styles.sectionTitle}>Atividades recentes</span>
               </div>
-              <div className={styles.emptyActivity}>
-                <div className={styles.emptyActivityIcon}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-                  </svg>
+              {atividades.length === 0 ? (
+                <div className={styles.emptyActivity}>
+                  <div className={styles.emptyActivityIcon}>
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                    </svg>
+                  </div>
+                  <p className={styles.emptyActivityText}>Nenhuma atividade recente</p>
+                  <p className={styles.emptyActivitySub}>Explore grupos e viagens para começar sua jornada!</p>
+                  <button className={styles.exploreBtn} onClick={() => navigate(ROUTES.GRUPOS)}>
+                    Explorar grupos
+                  </button>
                 </div>
-                <p className={styles.emptyActivityText}>Nenhuma atividade recente</p>
-                <p className={styles.emptyActivitySub}>Explore grupos e viagens para começar sua jornada!</p>
-                <button className={styles.exploreBtn} onClick={() => navigate(ROUTES.GRUPOS)}>
-                  Explorar grupos
-                </button>
-              </div>
+              ) : (
+                <div className={styles.activityList}>
+                  {atividades.map((a, i) => (
+                    <div key={i} className={styles.activityItem}>
+                      <div className={`${styles.activityDot} ${a.role === 'motorista' ? styles.activityDotGreen : styles.activityDotBlue}`} />
+                      <div className={styles.activityContent}>
+                        <span className={styles.activityText}>
+                          {a.role === 'motorista' ? 'Ofereceu viagem' : 'Viajou com'}{' '}
+                          {a.role === 'passageiro' ? a.driverName : ''}{' '}
+                          para {a.game?.homeTeam} × {a.game?.awayTeam}
+                        </span>
+                        <span className={styles.activityMeta}>
+                          {a.vehicle === 'carro' ? '🚗' : a.vehicle === 'van' ? '🚐' : '🚌'}{' '}
+                          {a.status === 'completed' ? 'Concluída' : a.status === 'open' ? 'Aberta' : a.status === 'cancelled' ? 'Cancelada' : a.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Configurações rápidas */}

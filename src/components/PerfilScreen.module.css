@@ -1153,3 +1153,53 @@
   accent-color: var(--color-brand);
   height: 3px;
 }
+
+/* ─── Activity list (real data) ──────────────────────────────────────────── */
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--color-surface-2);
+  border-radius: 14px;
+  border: 0.5px solid var(--color-border);
+  overflow: hidden;
+}
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+.activityItem:last-child {
+  border-bottom: none;
+}
+.activityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.activityDotGreen {
+  background: var(--color-brand);
+}
+.activityDotBlue {
+  background: #3B82F6;
+}
+.activityContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.activityText {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.activityMeta {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
