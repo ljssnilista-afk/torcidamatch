@@ -22,6 +22,14 @@ function formatGameTime(iso) {
 }
 function fmt(d) { return d.toISOString().split('T')[0] }
 
+// Mapa de apiId por time — para filtrar jogos do time certo (ex: Botafogo-RJ vs Botafogo-SP)
+const TEAM_API_IDS = {
+  'Botafogo':     1958,
+  'Flamengo':     5981,
+  'Fluminense':   1961,
+  'Vasco da Gama':1974,
+}
+
 // ─── Vehicle SVGs ───────────────────────────────────────────────────────────
 function CarSVG({ active }) {
   const c = active ? '#22C55E' : 'rgba(255,255,255,0.35)'
@@ -152,7 +160,17 @@ export default function CriarViagemScreen() {
       try {
         const today = new Date(); const in60d = new Date(today); in60d.setDate(today.getDate() + 60)
         const data = await fetchEvents({ team: user?.team || 'Botafogo', dateFrom: fmt(today), dateTo: fmt(in60d), status: 'notstarted' })
-        const sorted = (data.results ?? []).sort((a, b) => new Date(a.event_date) - new Date(b.event_date)).slice(0, 10).map(ev => ({
+        const expectedApiId = TEAM_API_IDS[user?.team] || null
+        const filtered = (data.results ?? []).filter(ev => {
+          // Se temos o apiId do time, filtrar para só mostrar jogos desse time exato
+          if (expectedApiId) {
+            const homeApiId = ev.home_team_obj?.api_id
+            const awayApiId = ev.away_team_obj?.api_id
+            return homeApiId === expectedApiId || awayApiId === expectedApiId
+          }
+          return true
+        })
+        const sorted = filtered.sort((a, b) => new Date(a.event_date) - new Date(b.event_date)).slice(0, 10).map(ev => ({
           homeTeam: ev.home_team, awayTeam: ev.away_team, date: formatGameDate(ev.event_date), time: formatGameTime(ev.event_date),
           rawDate: ev.event_date, stadium: ev.venue || 'A confirmar', league: ev.league?.name || '', _raw: ev,
         }))
