@@ -7,9 +7,20 @@
 
 html, body, #root {
   height: 100%;
-  background: linear-gradient(145deg, #212121 0%, #1a1a1a 100%);
+  background: #1a1a1a;
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 🔧 Fix mobile overscroll white flash */
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+#root {
+  overflow: auto;
+  position: fixed;
+  inset: 0;
 }
 
 button {
