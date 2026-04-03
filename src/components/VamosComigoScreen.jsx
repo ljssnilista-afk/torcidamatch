@@ -106,6 +106,7 @@ function RideCard({ ride, onReserve, onDetails }) {
           <div className={styles.driverInfo}>
             <span className={styles.driverName}>{ride.driverName}</span>
             <span className={styles.rating}>
+              {ride.shareCode && <span style={{ fontFamily: 'monospace', fontSize: 9, color: 'var(--color-brand)', opacity: 0.7, marginRight: 4 }}>{ride.shareCode}</span>}
               {ride.driverHandle && <span style={{ color: 'var(--color-text-tertiary)', fontSize: 10 }}>@{ride.driverHandle}</span>}
             </span>
           </div>
@@ -368,6 +369,7 @@ export default function VamosComigoScreen() {
           r.meetPoint?.toLowerCase().includes(q) ||
           r.game?.homeTeam?.toLowerCase().includes(q) ||
           r.game?.awayTeam?.toLowerCase().includes(q) ||
+          r.shareCode?.toLowerCase().includes(q) ||
           VEHICLE_LABELS[r.vehicle]?.toLowerCase().includes(q)
       )
     }

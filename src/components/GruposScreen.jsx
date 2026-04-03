@@ -97,7 +97,7 @@ function MyGroupBanner({ group, onAccess }) {
           <canvas ref={canvasRef} width={56} height={56} className={styles.mgCanvas}/>
         </div>
         <div className={styles.mgInfo}>
-          <p className={styles.mgName}>{group.name}</p>
+          <p className={styles.mgName}>{group.name} {group.code && <span style={{ fontFamily: 'monospace', fontSize: 10, opacity: 0.4 }}>#{group.code}</span>}</p>
           <p className={styles.mgMeta}>{group.location} • {group.members}/{group.maxMembers} membros</p>
           <p className={styles.mgNext}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -209,8 +209,11 @@ export default function DetalhesViagemScreen() {
 
   const handleShare = () => {
     const link = `https://torcidamatch.vercel.app/vamos-comigo/${ride._id}`
-    navigator.clipboard?.writeText(link)
-    toast.success('Link copiado!')
+    const text = ride.shareCode
+      ? `Viagem ${ride.shareCode} — ${ride.game.homeTeam} × ${ride.game.awayTeam}\n${link}`
+      : link
+    navigator.clipboard?.writeText(text)
+    toast.success(ride.shareCode ? `Código ${ride.shareCode} copiado!` : 'Link copiado!')
   }
 
   const handleEdit = async (updates) => {
@@ -259,6 +262,7 @@ export default function DetalhesViagemScreen() {
         {/* Status + role */}
         <div className={styles.statusRow}>
           <span className={styles.statusBadge} style={{ background: `${st.color}15`, color: st.color, borderColor: `${st.color}40` }}>{st.label}</span>
+          {ride.shareCode && <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: 'var(--color-brand)', background: 'rgba(34,197,94,0.08)', padding: '4px 10px', borderRadius: 8, border: '0.5px solid rgba(34,197,94,0.2)' }}>{ride.shareCode}</span>}
           {isDriver && <span className={styles.roleBadge} style={{ color: '#22C55E', background: 'rgba(34,197,94,0.1)' }}>Você é o motorista</span>}
           {myReservation && !isDriver && <span className={styles.roleBadge} style={{ color: '#3B82F6', background: 'rgba(59,130,246,0.1)' }}>Você tem reserva</span>}
         </div>

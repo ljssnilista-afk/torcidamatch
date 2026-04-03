@@ -46,6 +46,7 @@ function GrupoHeader({ grupo, membersCount, onMenu, onBack }) {
       <div className={styles.headerInfo}>
         <span className={styles.headerName}>{grupo?.name ?? '...'}</span>
         <span className={styles.headerMeta}>
+          {grupo?.code && <span style={{ fontFamily: 'monospace', opacity: 0.5, marginRight: 4 }}>#{grupo.code}</span>}
           {membersCount} {membersCount === 1 ? 'membro' : 'membros'}
           {grupo?.team ? ` • ${grupo.team}` : ''}
         </span>
@@ -176,7 +177,9 @@ function MembersModal({ members, leaderId, onClose, onInvite }) {
 // ─── Modal de convite ─────────────────────────────────────────────────────────
 function InviteModal({ grupo, onClose }) {
   const toast = useToast()
-  const link = `https://torcidamatch.vercel.app/grupos/entrar/${grupo?._id}`
+  const link = grupo?.code
+    ? `https://torcidamatch.vercel.app/join/${grupo.code}`
+    : `https://torcidamatch.vercel.app/grupos/entrar/${grupo?._id}`
 
   const copy = () => {
     navigator.clipboard?.writeText(link)
