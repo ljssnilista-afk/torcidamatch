@@ -65,7 +65,8 @@ export const ROUTES = {
   VAMOS_COMIGO:  '/vamos-comigo',
   CRIAR_VIAGEM:  '/vamos-comigo/criar',
   DETALHE_VIAGEM:'/vamos-comigo/:id',
-  FAVORITOS:     '/favoritos',
+  FUI:           '/fui',
+  FAVORITOS:     '/fui',   // alias para compatibilidade
   PERFIL:        '/perfil',
   NOTIFICATIONS: '/notificacoes',
 }
@@ -75,7 +76,7 @@ export const NAV_ITEMS = [
   { id: 'home',        route: ROUTES.HOME,         label: 'Início',       icon: 'home' },
   { id: 'grupos',      route: ROUTES.GRUPOS,        label: 'Grupos',       icon: 'users' },
   { id: 'vamocomigo',  route: ROUTES.VAMOS_COMIGO,  label: 'Vamos Comigo', icon: 'bus' },
-  { id: 'favoritos',   route: ROUTES.FAVORITOS,     label: 'Favoritos',    icon: 'heart' },
+  { id: 'fui',          route: ROUTES.FUI,           label: 'Fui!',         icon: 'check-circle' },
   { id: 'perfil',      route: ROUTES.PERFIL,        label: 'Perfil',       icon: 'user' },
 ]
 
