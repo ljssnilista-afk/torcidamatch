@@ -497,7 +497,7 @@ export default function VamosComigoScreen() {
                 key={ride._id}
                 ride={ride}
                 onReserve={handleReserve}
-                onDetails={() => toast.info('Detalhes em breve!')}
+                onDetails={r => navigate(`/vamos-comigo/${r._id}`)}
               />
             ))}
             {/* Offer ride card */}

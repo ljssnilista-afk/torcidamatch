@@ -11,6 +11,7 @@ const CriarGrupoScreen     = lazy(() => import('../components/CriarGrupoScreen')
 const GrupoScreen          = lazy(() => import('../components/GrupoScreen'))
 const VamosComigoScreen    = lazy(() => import('../components/VamosComigoScreen'))
 const CriarViagemScreen    = lazy(() => import('../components/CriarViagemScreen'))
+const DetalhesViagemScreen = lazy(() => import('../components/DetalhesViagemScreen'))
 const FavoritosScreen      = lazy(() => import('../components/FavoritosScreen'))
 const PerfilScreen         = lazy(() => import('../components/PerfilScreen'))
 const NotificationsScreen  = lazy(() => import('../components/NotificationsScreen'))
@@ -52,6 +53,7 @@ export default function AppRouter() {
           <Route path={ROUTES.GRUPO_DETAIL}   element={<GrupoScreen />} />
           <Route path={ROUTES.VAMOS_COMIGO}   element={<VamosComigoScreen />} />
           <Route path={ROUTES.CRIAR_VIAGEM}  element={<CriarViagemScreen />} />
+          <Route path={ROUTES.DETALHE_VIAGEM} element={<DetalhesViagemScreen />} />
           <Route path={ROUTES.FAVORITOS}      element={<FavoritosScreen />} />
           <Route path={ROUTES.PERFIL}         element={<PerfilScreen />} />
           <Route path={ROUTES.NOTIFICATIONS}  element={<NotificationsScreen />} />

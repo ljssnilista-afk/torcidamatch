@@ -64,6 +64,7 @@ export const ROUTES = {
   GRUPO_DETAIL:  '/grupos/:id',
   VAMOS_COMIGO:  '/vamos-comigo',
   CRIAR_VIAGEM:  '/vamos-comigo/criar',
+  DETALHE_VIAGEM:'/vamos-comigo/:id',
   FAVORITOS:     '/favoritos',
   PERFIL:        '/perfil',
   NOTIFICATIONS: '/notificacoes',
