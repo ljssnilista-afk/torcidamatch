@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 14px 10px;
+  margin: 0 0 10px;
   padding: 0 14px;
   height: 42px;
   background: rgba(255,255,255,0.05);
@@ -19,6 +19,11 @@
   border-radius: 12px;
   transition: border-color 0.15s;
   flex-shrink: 0;
+}
+
+.filtersWrap {
+  margin: 0 -14px;
+  padding: 0 14px;
 }
 .searchWrap:focus-within {
   border-color: rgba(34,197,94,0.35);
