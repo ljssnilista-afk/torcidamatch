@@ -39,6 +39,112 @@ const VEHICLE_MAP = { carro: { icon: '🚗', label: 'Carro' }, van: { icon: '�
 const STATUS_MAP = { open: { label: 'Aberta', color: '#22C55E' }, full: { label: 'Lotada', color: '#D4AF37' }, in_progress: { label: 'Em andamento', color: '#3B82F6' }, completed: { label: 'Concluída', color: '#22C55E' }, cancelled: { label: 'Cancelada', color: '#EF4444' } }
 const PASS_STATUS = { reserved: 'Reservado', paid: 'Pago', confirmed: 'Confirmou', cancelled: 'Cancelou' }
 
+// ─── Countdown hook ─────────────────────────────────────────────────────────
+function useCountdown(targetDate) {
+  const [timeLeft, setTimeLeft] = useState('')
+  const [urgent, setUrgent] = useState(false)
+
+  useEffect(() => {
+    if (!targetDate) return
+    function calc() {
+      const now = new Date(), target = new Date(targetDate)
+      const diff = target - now
+      if (diff <= 0) { setTimeLeft('Iniciado'); setUrgent(true); return }
+      const days = Math.floor(diff / 86400000)
+      const hrs = Math.floor((diff % 86400000) / 3600000)
+      const mins = Math.floor((diff % 3600000) / 60000)
+      if (days > 0) setTimeLeft(`${days}d ${hrs}h`)
+      else if (hrs > 0) setTimeLeft(`${hrs}h ${mins}m`)
+      else setTimeLeft(`${mins} min`)
+      setUrgent(diff < 3600000) // < 1 hora
+    }
+    calc()
+    const interval = setInterval(calc, 60000)
+    return () => clearInterval(interval)
+  }, [targetDate])
+
+  return { timeLeft, urgent }
+}
+
+// ─── Edit Modal ─────────────────────────────────────────────────────────────
+function EditModal({ ride, onSave, onClose, loading }) {
+  const [meetPoint, setMeetPoint] = useState(ride.meetPoint || '')
+  const [bairro, setBairro] = useState(ride.bairro || '')
+  const [zona, setZona] = useState(ride.zona || '')
+  const [price, setPrice] = useState(String((ride.price || 0) / 100))
+  const [memberPrice, setMemberPrice] = useState(ride.memberPrice != null ? String(ride.memberPrice / 100) : '')
+  const [seats, setSeats] = useState(ride.totalSeats)
+  const [hour, setHour] = useState(String(new Date(ride.departureTime).getHours()).padStart(2,'0'))
+  const [minute, setMinute] = useState(String(new Date(ride.departureTime).getMinutes()).padStart(2,'0'))
+
+  const maxSeats = { carro: 4, van: 15, onibus: 50 }[ride.vehicle] || 4
+  const activeCount = ride.passengers?.filter(p => p.status !== 'cancelled').length || 0
+
+  const handleSave = () => {
+    const gameDate = new Date(ride.departureTime)
+    gameDate.setHours(parseInt(hour), parseInt(minute), 0, 0)
+    onSave({
+      meetPoint, bairro, zona,
+      price: Math.round(parseFloat(price || 0) * 100),
+      memberPrice: memberPrice ? Math.round(parseFloat(memberPrice) * 100) : null,
+      totalSeats: seats,
+      departureTime: gameDate.toISOString(),
+    })
+  }
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.editSheet} onClick={e => e.stopPropagation()}>
+        <div className={styles.modalHandle} />
+        <div className={styles.editHeader}>
+          <button className={styles.editCancelBtn} onClick={onClose}>Cancelar</button>
+          <span className={styles.editTitle}>Editar viagem</span>
+          <button className={styles.editSaveBtn} onClick={handleSave} disabled={loading}>{loading ? '...' : 'Salvar'}</button>
+        </div>
+        <div className={styles.editBody}>
+          <label className={styles.editLabel}>Ponto de encontro</label>
+          <input type="text" value={meetPoint} onChange={e => setMeetPoint(e.target.value)} className={styles.editInput} />
+
+          <div className={styles.editRow}>
+            <div style={{ flex: 1 }}><label className={styles.editLabel}>Bairro</label><input type="text" value={bairro} onChange={e => setBairro(e.target.value)} className={styles.editInput} /></div>
+            <div style={{ flex: 1 }}><label className={styles.editLabel}>Zona</label>
+              <select value={zona} onChange={e => setZona(e.target.value)} className={styles.editInput}>
+                <option value="">Selecione</option><option value="Sul">Zona Sul</option><option value="Norte">Zona Norte</option><option value="Oeste">Zona Oeste</option><option value="Centro">Centro</option>
+              </select>
+            </div>
+          </div>
+
+          <label className={styles.editLabel}>Preço por vaga (R$)</label>
+          <input type="number" min="0" step="0.50" value={price} onChange={e => setPrice(e.target.value)} className={styles.editInput} />
+
+          {ride.groupName && (
+            <><label className={styles.editLabel}>Preço membros (R$)</label>
+            <input type="number" min="0" step="0.50" value={memberPrice} onChange={e => setMemberPrice(e.target.value)} className={styles.editInput} /></>
+          )}
+
+          <label className={styles.editLabel}>Vagas (mín. {activeCount} por passageiros confirmados)</label>
+          <div className={styles.editSeats}>
+            <button onClick={() => setSeats(Math.max(activeCount || 1, seats - 1))} disabled={seats <= (activeCount || 1)}>−</button>
+            <span>{seats}</span>
+            <button onClick={() => setSeats(Math.min(maxSeats, seats + 1))} disabled={seats >= maxSeats}>+</button>
+          </div>
+
+          <label className={styles.editLabel}>Horário de saída</label>
+          <div className={styles.editTimeRow}>
+            <select value={hour} onChange={e => setHour(e.target.value)} className={styles.editTimeSelect}>
+              {Array.from({ length: 24 }, (_, i) => <option key={i} value={String(i).padStart(2,'0')}>{String(i).padStart(2,'0')}</option>)}
+            </select>
+            <span className={styles.editTimeSep}>:</span>
+            <select value={minute} onChange={e => setMinute(e.target.value)} className={styles.editTimeSelect}>
+              {['00','15','30','45'].map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ConfirmModal({ title, message, confirmLabel, danger, onConfirm, onCancel, loading }) {
   return (
     <div className={styles.modalOverlay} onClick={onCancel}>
@@ -68,6 +174,8 @@ export default function DetalhesViagemScreen() {
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
   const [modal, setModal] = useState(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editLoading, setEditLoading] = useState(false)
 
   const isDriver = ride && String(ride.driver) === String(user?.id)
   const myReservation = ride?.passengers?.find(p => String(p.user) === String(user?.id) && p.status !== 'cancelled')
@@ -75,6 +183,9 @@ export default function DetalhesViagemScreen() {
   const availableSeats = ride ? ride.totalSeats - activePassengers.length : 0
   const occupancyPct = ride ? ((activePassengers.length / ride.totalSeats) * 100) : 0
   const isPast = ride ? new Date(ride.departureTime) < new Date() : false
+
+  // Countdown
+  const { timeLeft, urgent } = useCountdown(ride?.departureTime)
 
   const loadRide = useCallback(async () => {
     try {
@@ -100,6 +211,20 @@ export default function DetalhesViagemScreen() {
     const link = `https://torcidamatch.vercel.app/vamos-comigo/${ride._id}`
     navigator.clipboard?.writeText(link)
     toast.success('Link copiado!')
+  }
+
+  const handleEdit = async (updates) => {
+    setEditLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/rides/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates),
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success(data.message || 'Viagem atualizada!'); setEditOpen(false); loadRide() }
+      else toast.error(data.error)
+    } catch { toast.error('Erro de conexão') } finally { setEditLoading(false) }
   }
 
   if (loading) return (
@@ -137,6 +262,22 @@ export default function DetalhesViagemScreen() {
           {isDriver && <span className={styles.roleBadge} style={{ color: '#22C55E', background: 'rgba(34,197,94,0.1)' }}>Você é o motorista</span>}
           {myReservation && !isDriver && <span className={styles.roleBadge} style={{ color: '#3B82F6', background: 'rgba(59,130,246,0.1)' }}>Você tem reserva</span>}
         </div>
+
+        {/* Countdown + edit */}
+        {ride.status !== 'cancelled' && ride.status !== 'completed' && (
+          <div className={styles.countdownRow}>
+            <div className={`${styles.countdownBadge} ${urgent ? styles.countdownUrgent : ''}`}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <span>{timeLeft || '...'}</span>
+            </div>
+            {isDriver && (
+              <button className={styles.editBtn} onClick={() => setEditOpen(true)}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Editar
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Game card — premium */}
         <div className={styles.gameCard}>
@@ -312,6 +453,11 @@ export default function DetalhesViagemScreen() {
       {modal?.type === 'cancelReservation' && <ConfirmModal title="Desistir da reserva" message="Você será reembolsado automaticamente (simulado)." confirmLabel="Sim, desistir" danger onConfirm={() => doAction(`${API_URL}/rides/${id}/cancel-reservation`, 'DELETE')} onCancel={() => setModal(null)} loading={actionLoading} />}
       {modal?.type === 'confirmDriver' && <ConfirmModal title="Confirmar viagem" message="Confirme que a viagem aconteceu. Quando todos os passageiros também confirmarem, o pagamento será liberado." confirmLabel="Confirmar" onConfirm={() => doAction(`${API_URL}/rides/${id}/confirm/driver`)} onCancel={() => setModal(null)} loading={actionLoading} />}
       {modal?.type === 'confirmPassenger' && <ConfirmModal title="Confirmar viagem" message="Confirme que você participou desta viagem." confirmLabel="Confirmar" onConfirm={() => doAction(`${API_URL}/rides/${id}/confirm/passenger`)} onCancel={() => setModal(null)} loading={actionLoading} />}
+
+      {/* Edit modal */}
+      {editOpen && ride && (
+        <EditModal ride={ride} onSave={handleEdit} onClose={() => setEditOpen(false)} loading={editLoading} />
+      )}
     </div>
   )
 }
