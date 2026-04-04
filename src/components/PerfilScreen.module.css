@@ -534,6 +534,127 @@
   margin-top: -2px;
 }
 
+/* ─── Settings Panel (engrenagem) ────────────────────────────────────────── */
+.settingsSheet {
+  width: 100%;
+  max-height: 80vh;
+  background: var(--color-surface-1);
+  border-radius: 20px 20px 0 0;
+  border-top: 0.5px solid var(--color-border-2);
+  overflow-y: auto;
+  animation: slideUp 0.22s ease;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.settingsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-1);
+  z-index: 1;
+}
+.settingsTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.settingsClose {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  color: var(--color-text-tertiary);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.settingsList {
+  padding: 0 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.settingsItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  transition: background 0.15s;
+  width: 100%;
+  text-align: left;
+}
+.settingsItem:hover {
+  background: var(--color-surface-2);
+}
+.settingsItemIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand);
+  flex-shrink: 0;
+}
+.settingsItemIconDanger {
+  color: var(--color-danger);
+  background: var(--color-danger-dim);
+}
+.settingsItemLabel {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.settingsItemDanger .settingsItemLabel {
+  color: var(--color-danger);
+}
+.settingsItemValue {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+.settingsItemChevron {
+  color: var(--color-text-tertiary);
+  display: flex;
+}
+
+/* Theme toggle switch */
+.themeToggle {
+  margin-left: auto;
+}
+.themeToggleTrack {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  background: var(--color-surface-3);
+  border-radius: 12px;
+  transition: background 0.25s ease;
+}
+.themeToggleOn {
+  background: var(--color-brand);
+}
+.themeToggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+.themeToggleOn .themeToggleThumb {
+  transform: translateX(18px);
+}
+
 /* ─── Settings overlay / bottom sheet ──────────────────────────────────────── */
 .settingsOverlay {
   position: absolute;
