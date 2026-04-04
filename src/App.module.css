@@ -3,22 +3,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #212121 0%, #1a1a1a 100%);
+  background: var(--color-bg);
   padding: 20px 0;
+  transition: background 0.25s ease;
 }
 
 .phone {
   width: 100%;
   max-width: var(--phone-max-width);
   height: var(--phone-height);
-  background: linear-gradient(180deg, #212121 0%, #1a1a1a 100%);
+  background: var(--color-bg);
   border-radius: 30px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.95);
   position: relative;
+  transition: background 0.25s ease;
 }
 
 /* On small screens, go full height */

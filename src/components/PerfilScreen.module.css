@@ -527,6 +527,12 @@
   justify-content: center;
   color: var(--color-brand);
 }
+.themeIndicator {
+  font-size: 14px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: -2px;
+}
 
 /* ─── Settings overlay / bottom sheet ──────────────────────────────────────── */
 .settingsOverlay {

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
+import { useTheme } from '../context/ThemeContext'
 import { SETTINGS_SECTIONS } from '../data/perfilData'
 import styles from './PerfilScreen.module.css'
 
@@ -271,6 +272,7 @@ export default function PerfilScreen() {
   const navigate = useNavigate()
   const { user, updateUser, logout } = useUser()
   const toast = useToast()
+  const { isDark, toggleTheme } = useTheme()
 
   const [loading,      setLoading]      = useState(true)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -504,6 +506,25 @@ export default function PerfilScreen() {
 
             {/* Configurações rápidas */}
             <div className={styles.quickSettings}>
+              {/* Theme toggle */}
+              <button
+                className={styles.quickSettingsBtn}
+                onClick={toggleTheme}
+                aria-label="Alternar tema"
+              >
+                <span className={styles.quickSettingsIcon}>
+                  {isDark ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                  )}
+                </span>
+                <span>{isDark ? 'Modo Claro' : 'Modo Escuro'}</span>
+                <span className={styles.themeIndicator} style={{ background: isDark ? 'var(--color-surface-3)' : 'var(--color-brand-dim)' }}>
+                  {isDark ? '🌙' : '☀️'}
+                </span>
+              </button>
+
               {[
                 { icon: 'bell',   label: 'Notificações' },
                 { icon: 'lock',   label: 'Privacidade' },
