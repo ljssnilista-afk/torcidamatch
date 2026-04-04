@@ -36,7 +36,7 @@ export default function HomeScreen() {
         {/* Banner de notícias em tempo real */}
         <NewsBanner />
 
-        {/* Barra de dia de jogo → Vamos Comigo */}
+        {/* Barra de dia de jogo → Vamos Comigo! */}
         <NotificationBar />
 
         {/* Barra de busca */}

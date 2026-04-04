@@ -75,7 +75,7 @@ export const ROUTES = {
 export const NAV_ITEMS = [
   { id: 'home',        route: ROUTES.HOME,         label: 'Início',       icon: 'home' },
   { id: 'grupos',      route: ROUTES.GRUPOS,        label: 'Grupos',       icon: 'users' },
-  { id: 'vamocomigo',  route: ROUTES.VAMOS_COMIGO,  label: 'Vamos Comigo', icon: 'bus' },
+  { id: 'vamocomigo',  route: ROUTES.VAMOS_COMIGO,  label: 'Vamos Comigo!', icon: 'bus' },
   { id: 'fui',          route: ROUTES.FUI,           label: 'Fui!',         icon: 'check-circle' },
   { id: 'perfil',      route: ROUTES.PERFIL,        label: 'Perfil',       icon: 'user' },
 ]
