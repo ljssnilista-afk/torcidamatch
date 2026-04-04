@@ -48,12 +48,16 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  display: inline-block;
+  display: inline-flex;          /* muda de inline-block para inline-flex */
+  align-items: center;          /* centraliza verticalmente */
+  justify-content: center;      /* centraliza horizontalmente */
   line-height: 1;
+  height: 22px;                 /* mesma altura dos ícones SVG */
+  width: 22px;                  /* mesma largura dos ícones SVG */
 }
 
 /* Para o estado ativo (se quiser manter o gradiente ou usar cor sólida) */
 .itemActive .matchText {
   background: none;
-  color: var(--color-brand); /* ou #22C55E */
+  color: var(--color-brand);
 }
