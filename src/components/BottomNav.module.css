@@ -3,7 +3,8 @@
   background: var(--color-bg);
   border-top: 0.5px solid var(--color-border);
   display: flex;
-  padding: 8px 0 18px;
+  padding: 6px 0;
+  padding-bottom: max(6px, env(safe-area-inset-bottom, 6px));
 }
 .item {
   display: flex;
@@ -38,25 +39,5 @@
   color: var(--color-brand);
 }
 .itemActive .label {
-  color: var(--color-brand);
-}
-.matchText {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #22C55E, #0d5428);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  display: inline-flex;          /* muda de inline-block para inline-flex */
-  align-items: center;          /* centraliza verticalmente */
-  justify-content: center;      /* centraliza horizontalmente */
-  line-height: 1;
-  height: 22px;                 /* mesma altura dos ícones SVG */
-}
-
-/* Para o estado ativo (se quiser manter o gradiente ou usar cor sólida) */
-.itemActive .matchText {
-  background: none;
   color: var(--color-brand);
 }

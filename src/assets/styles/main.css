@@ -5,6 +5,11 @@
   padding: 0;
 }
 
+/* Safe area support for iOS */
+@supports (padding: env(safe-area-inset-bottom)) {
+  html { --safe-bottom: env(safe-area-inset-bottom); }
+}
+
 html, body, #root {
   height: 100%;
   background: var(--color-bg);
