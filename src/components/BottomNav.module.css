@@ -53,7 +53,6 @@
   justify-content: center;      /* centraliza horizontalmente */
   line-height: 1;
   height: 22px;                 /* mesma altura dos ícones SVG */
-  width: 22px;                  /* mesma largura dos ícones SVG */
 }
 
 /* Para o estado ativo (se quiser manter o gradiente ou usar cor sólida) */
