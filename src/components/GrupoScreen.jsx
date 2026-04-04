@@ -144,15 +144,15 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
       const img = new Image()
       img.onload = () => {
         const canvas = document.createElement('canvas')
-        canvas.width = 300
-        canvas.height = 300
+        canvas.width = 600
+        canvas.height = 600
         const ctx = canvas.getContext('2d')
         // Center crop
         const size = Math.min(img.width, img.height)
         const sx = (img.width - size) / 2
         const sy = (img.height - size) / 2
-        ctx.drawImage(img, sx, sy, size, size, 0, 0, 300, 300)
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 600, 600)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
         setPhotoPreview(dataUrl)
         setPhotoData(dataUrl)
       }
@@ -196,7 +196,7 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
               <button className={styles.photoUploadBtn} onClick={() => fileRef.current?.click()}>
                 {photoPreview ? 'Trocar foto' : 'Adicionar foto'}
               </button>
-              <span className={styles.photoUploadHint}>JPEG ou PNG, máx 300KB</span>
+              <span className={styles.photoUploadHint}>JPEG ou PNG, máx 800KB</span>
               {photoPreview && (
                 <button className={styles.photoRemoveBtn} onClick={() => { setPhotoPreview(null); setPhotoData('') }}>
                   Remover

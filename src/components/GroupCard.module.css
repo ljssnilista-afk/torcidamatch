@@ -1,13 +1,12 @@
 .card {
-  /* scroll-snap-align removed — HomeScreen no longer uses snap */
   border-radius: var(--radius-card);
   position: relative;
   overflow: hidden;
   margin-bottom: 12px;
   cursor: pointer;
-  height: 72vh;
-  max-height: 580px;
-  min-height: 460px;
+  height: 48vh;
+  max-height: 380px;
+  min-height: 300px;
   flex-shrink: 0;
   border: 0.5px solid rgba(255, 255, 255, 0.05);
   transition: box-shadow var(--transition), border-color var(--transition);
