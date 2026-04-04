@@ -112,6 +112,97 @@ function EmptyChat({ onInvite }) {
 }
 
 // ─── Menu de opções ───────────────────────────────────────────────────────────
+// ─── Modal de edição do grupo (líder) ─────────────────────────────────────────
+function EditGroupModal({ grupo, onSave, onClose, loading }) {
+  const [fields, setFields] = useState({
+    name: grupo.name || '',
+    description: grupo.description || '',
+    bairro: grupo.bairro || '',
+    zona: grupo.zona || '',
+    meetPoint: grupo.meetPoint || '',
+    privacy: grupo.privacy || 'public',
+    approvalRequired: grupo.approvalRequired || false,
+  })
+
+  const set = f => e => setFields(p => ({ ...p, [f]: typeof e === 'object' ? e.target.value : e }))
+
+  return (
+    <div className={styles.menuOverlay} onClick={onClose}>
+      <div className={styles.editSheet} onClick={e => e.stopPropagation()}>
+        <div className={styles.menuHandle}/>
+        <div className={styles.editHeader}>
+          <button className={styles.editCancelBtn} onClick={onClose}>Cancelar</button>
+          <span className={styles.editTitle}>Editar grupo</span>
+          <button className={styles.editSaveBtn} onClick={() => onSave(fields)} disabled={loading}>{loading ? '...' : 'Salvar'}</button>
+        </div>
+        <div className={styles.editBody}>
+          <label className={styles.editLabel}>Nome do grupo</label>
+          <input type="text" value={fields.name} onChange={set('name')} maxLength={50} className={styles.editInput} />
+
+          <label className={styles.editLabel}>Descrição</label>
+          <textarea value={fields.description} onChange={set('description')} maxLength={140} rows={3} className={styles.editInput} style={{ resize: 'none' }} />
+
+          <label className={styles.editLabel}>Ponto de encontro</label>
+          <input type="text" value={fields.meetPoint} onChange={set('meetPoint')} className={styles.editInput} placeholder="Ex: Praça dos Bancários" />
+
+          <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ flex: 1 }}>
+              <label className={styles.editLabel}>Bairro</label>
+              <input type="text" value={fields.bairro} onChange={set('bairro')} className={styles.editInput} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label className={styles.editLabel}>Zona</label>
+              <select value={fields.zona} onChange={set('zona')} className={styles.editInput}>
+                <option value="">Selecione</option>
+                <option value="Sul">Zona Sul</option>
+                <option value="Norte">Zona Norte</option>
+                <option value="Oeste">Zona Oeste</option>
+                <option value="Centro">Centro</option>
+              </select>
+            </div>
+          </div>
+
+          <label className={styles.editLabel}>Privacidade</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['public', 'private'].map(p => (
+              <button
+                key={p}
+                onClick={() => setFields(prev => ({ ...prev, privacy: p }))}
+                style={{
+                  flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                  background: fields.privacy === p ? 'var(--color-brand-dim)' : 'var(--color-surface-2)',
+                  color: fields.privacy === p ? 'var(--color-brand)' : 'var(--color-text-tertiary)',
+                  border: `0.5px solid ${fields.privacy === p ? 'var(--color-brand)' : 'var(--color-border)'}`,
+                }}
+              >
+                {p === 'public' ? '🌐 Público' : '🔒 Privado'}
+              </button>
+            ))}
+          </div>
+
+          {fields.privacy === 'private' && (
+            <>
+              <label className={styles.editLabel}>Aprovação de entrada</label>
+              <button
+                onClick={() => setFields(prev => ({ ...prev, approvalRequired: !prev.approvalRequired }))}
+                style={{
+                  padding: '10px 14px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                  background: fields.approvalRequired ? 'var(--color-brand-dim)' : 'var(--color-surface-2)',
+                  color: fields.approvalRequired ? 'var(--color-brand)' : 'var(--color-text-tertiary)',
+                  border: `0.5px solid ${fields.approvalRequired ? 'var(--color-brand)' : 'var(--color-border)'}`,
+                  textAlign: 'left',
+                }}
+              >
+                {fields.approvalRequired ? '✅ Aprovação manual' : '⚡ Entrada automática'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function OptionsMenu({ onClose, onInvite, onMembers, onEdit, onLeave, isLeader }) {
   return (
     <div className={styles.menuOverlay} onClick={onClose}>
@@ -222,6 +313,8 @@ export default function GrupoScreen() {
   const [showMenu,   setShowMenu]   = useState(false)
   const [showMembers,setShowMembers]= useState(false)
   const [showInvite, setShowInvite] = useState(false)
+  const [showEdit,   setShowEdit]   = useState(false)
+  const [editLoading,setEditLoading]= useState(false)
   const [wsReady,    setWsReady]    = useState(false)
 
   const bottomRef = useRef(null)
@@ -346,6 +439,26 @@ export default function GrupoScreen() {
     }
   }
 
+  // ── Editar grupo (líder) ──────────────────────────────────────────────────
+  const handleEditGroup = async (updates) => {
+    setEditLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/grupos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(updates),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(data.message || 'Grupo atualizado!')
+        setGrupo(data.group)
+        setShowEdit(false)
+      } else {
+        toast.error(data.error)
+      }
+    } catch { toast.error('Erro de conexão') } finally { setEditLoading(false) }
+  }
+
   if (loading) return (
     <div className={styles.screen}>
       <div className={styles.skeletonHeader}/>
@@ -419,7 +532,7 @@ export default function GrupoScreen() {
           onClose={() => setShowMenu(false)}
           onInvite={() => { setShowMenu(false); setShowInvite(true) }}
           onMembers={() => { setShowMenu(false); setShowMembers(true) }}
-          onEdit={() => toast.info('Edição em breve!')}
+          onEdit={() => { setShowMenu(false); setShowEdit(true) }}
           onLeave={leaveGroup}
         />
       )}
@@ -435,6 +548,14 @@ export default function GrupoScreen() {
         <InviteModal
           grupo={grupo}
           onClose={() => setShowInvite(false)}
+        />
+      )}
+      {showEdit && grupo && (
+        <EditGroupModal
+          grupo={grupo}
+          onSave={handleEditGroup}
+          onClose={() => setShowEdit(false)}
+          loading={editLoading}
         />
       )}
     </div>
