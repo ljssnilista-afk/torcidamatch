@@ -55,7 +55,7 @@ const BottomNav = memo(function BottomNav() {
             onClick={() => navigate(item.route)}
           >
             <span className={styles.icon}>
-              {item.id === 'vamos' ? (
+              {item.id === 'vamocomigo' ? (
                 <span className={styles.matchText}>MATCH</span>
               ) : (
                 NAV_ICONS[item.icon]
