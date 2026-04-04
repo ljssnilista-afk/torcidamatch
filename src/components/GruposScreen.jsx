@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Filters from './Filters'
-import GruposListaCard from './GruposLista'
-import { drawThumb } from '../utils/canvasHelpers'
+import GroupCard from './GroupCard'
 import { ROUTES } from '../utils/constants'
 import { useGame } from '../context/GameContext'
 import { useUser } from '../context/UserContext'
@@ -70,46 +69,6 @@ function MapaReal({ grupos, userLocation, onClose }) {
           </MapContainer>
         </div>
         <p className={styles.mapaHint}>{grupos.length} grupo{grupos.length !== 1 ? 's' : ''} encontrado{grupos.length !== 1 ? 's' : ''}</p>
-      </div>
-    </div>
-  )
-}
-
-// ─── My Group Banner ──────────────────────────────────────────────────────────
-function MyGroupBanner({ group, onAccess }) {
-  const canvasRef = useRef(null)
-  useEffect(() => {
-    const raf = requestAnimationFrame(() =>
-      requestAnimationFrame(() => drawThumb(canvasRef.current, {
-        c0: '#0a180a', c1: '#050d05',
-        crowd: ['255,255,255','0,0,0','34,197,94'],
-        glow: 'rgba(34,197,94,0.25)', accent: 'rgba(34,197,94,0.5)',
-      }))
-    )
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  return (
-    <div className={styles.myGroupBanner}>
-      <div className={styles.mgLabel}>Meu grupo</div>
-      <div className={styles.mgContent}>
-        <div className={styles.mgThumb}>
-          <canvas ref={canvasRef} width={56} height={56} className={styles.mgCanvas}/>
-        </div>
-        <div className={styles.mgInfo}>
-          <p className={styles.mgName}>{group.name} {group.code && <span style={{ fontFamily: 'monospace', fontSize: 10, opacity: 0.4 }}>#{group.code}</span>}</p>
-          <p className={styles.mgMeta}>{group.location} • {group.members}/{group.maxMembers} membros</p>
-          <p className={styles.mgNext}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
-            </svg>
-            Próxima caravana: {group.nextCaravana}
-          </p>
-        </div>
-        <div className={styles.mgActions}>
-          <button className={styles.btnManage}>Gerenciar</button>
-          <button className={styles.btnSecondary} onClick={onAccess}>Ver grupo</button>
-        </div>
       </div>
     </div>
   )
@@ -209,15 +168,20 @@ export default function GruposScreen() {
 
   const toCardFormat = g => ({
     id: g._id, name: g.name,
-    location: `${g.bairro} • ${g.zona}`,
-    distance: '', distanceKm: 0,
+    team: g.team || user?.team || 'Botafogo',
+    region: g.bairro || '',
+    distance: g.zona ? `Zona ${g.zona}` : '',
     members: g.members?.length || 1, maxMembers: g.maxMembers || 100,
-    rating: null, ratingCount: 0, mensalidade: null,
-    badges: [{ type: g.privacy === 'private' ? 'silver' : 'green',
-               label: g.privacy === 'private' ? '🔒 Privado' : '🌐 Público' }],
+    rating: null, ratingCount: 0,
+    meetPoint: g.meetPoint || '',
+    canvasVariant: Math.floor(Math.random() * 3),
+    badge: g.privacy === 'private' ? 'silver' : null,
+    badgeLabel: g.privacy === 'private' ? '🔒 Privado' : '',
     actionLabel: 'Ver grupo', actionVariant: 'brand',
-    thumbVariant: 'green', zone: g.zona?.toLowerCase().replace(' ','-') || 'todos',
-    type: 'misto', _raw: g,
+    zone: g.zona?.toLowerCase().replace(' ','-') || 'todos',
+    code: g.code || null,
+    photo: g.photo || null,
+    _raw: g,
   })
 
   const filterGroups = gs => activeFilter === 'todos' ? gs : gs.filter(g => g.zone === activeFilter || g.type === activeFilter)
@@ -286,11 +250,10 @@ export default function GruposScreen() {
               <div className={styles.dividerLine}/>
               <span className={styles.dividerCount}>1 grupo</span>
             </div>
-            <MyGroupBanner
-              group={{ id: meuGrupo._id, name: meuGrupo.name, location: meuGrupo.bairro,
-                members: meuGrupo.members?.length || 1, maxMembers: meuGrupo.maxMembers || 100,
-                rating: null, nextCaravana: 'Em breve' }}
-              onAccess={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
+            <GroupCard
+              group={toCardFormat(meuGrupo)}
+              onDetails={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
+              onAction={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
             />
           </>
         )}
@@ -313,9 +276,10 @@ export default function GruposScreen() {
               <span className={styles.dividerCount}>{filtered.length} grupos</span>
             </div>
             {filtered.map(g => (
-              <GruposListaCard
+              <GroupCard
                 key={g.id} group={g}
-                onClick={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
+                onDetails={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
+                onAction={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
               />
             ))}
           </>
