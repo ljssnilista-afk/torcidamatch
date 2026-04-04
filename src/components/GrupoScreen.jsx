@@ -40,9 +40,13 @@ function GrupoHeader({ grupo, membersCount, onMenu, onBack }) {
           <path d="M19 12H5M12 5l-7 7 7 7"/>
         </svg>
       </button>
-      <div className={styles.headerAvatar} style={{ background: bg }}>
-        {initials(grupo?.name)}
-      </div>
+      {grupo?.photo ? (
+        <img src={grupo.photo} alt={grupo.name} className={styles.headerPhoto} />
+      ) : (
+        <div className={styles.headerAvatar} style={{ background: bg }}>
+          {initials(grupo?.name)}
+        </div>
+      )}
       <div className={styles.headerInfo}>
         <span className={styles.headerName}>{grupo?.name ?? '...'}</span>
         <span className={styles.headerMeta}>
@@ -123,8 +127,45 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
     privacy: grupo.privacy || 'public',
     approvalRequired: grupo.approvalRequired || false,
   })
+  const [photoPreview, setPhotoPreview] = useState(grupo.photo || null)
+  const [photoData, setPhotoData] = useState(null) // base64 to send
+  const fileRef = useRef(null)
 
   const set = f => e => setFields(p => ({ ...p, [f]: typeof e === 'object' ? e.target.value : e }))
+
+  // Compress and resize photo
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    e.target.value = ''
+
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = 300
+        canvas.height = 300
+        const ctx = canvas.getContext('2d')
+        // Center crop
+        const size = Math.min(img.width, img.height)
+        const sx = (img.width - size) / 2
+        const sy = (img.height - size) / 2
+        ctx.drawImage(img, sx, sy, size, size, 0, 0, 300, 300)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8)
+        setPhotoPreview(dataUrl)
+        setPhotoData(dataUrl)
+      }
+      img.src = ev.target.result
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleSave = () => {
+    const updates = { ...fields }
+    if (photoData) updates.photo = photoData
+    onSave(updates)
+  }
 
   return (
     <div className={styles.menuOverlay} onClick={onClose}>
@@ -133,9 +174,38 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
         <div className={styles.editHeader}>
           <button className={styles.editCancelBtn} onClick={onClose}>Cancelar</button>
           <span className={styles.editTitle}>Editar grupo</span>
-          <button className={styles.editSaveBtn} onClick={() => onSave(fields)} disabled={loading}>{loading ? '...' : 'Salvar'}</button>
+          <button className={styles.editSaveBtn} onClick={handleSave} disabled={loading}>{loading ? '...' : 'Salvar'}</button>
         </div>
         <div className={styles.editBody}>
+          {/* Photo upload */}
+          <label className={styles.editLabel}>Foto do grupo</label>
+          <div className={styles.photoUploadRow}>
+            <div className={styles.photoPreview} onClick={() => fileRef.current?.click()}>
+              {photoPreview ? (
+                <img src={photoPreview} alt="Foto do grupo" className={styles.photoPreviewImg} />
+              ) : (
+                <div className={styles.photoPlaceholder}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                    <circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+              )}
+            </div>
+            <div className={styles.photoUploadInfo}>
+              <button className={styles.photoUploadBtn} onClick={() => fileRef.current?.click()}>
+                {photoPreview ? 'Trocar foto' : 'Adicionar foto'}
+              </button>
+              <span className={styles.photoUploadHint}>JPEG ou PNG, máx 300KB</span>
+              {photoPreview && (
+                <button className={styles.photoRemoveBtn} onClick={() => { setPhotoPreview(null); setPhotoData('') }}>
+                  Remover
+                </button>
+              )}
+            </div>
+            <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoSelect} style={{ display: 'none' }} />
+          </div>
+
           <label className={styles.editLabel}>Nome do grupo</label>
           <input type="text" value={fields.name} onChange={set('name')} maxLength={50} className={styles.editInput} />
 

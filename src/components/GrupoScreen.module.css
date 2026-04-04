@@ -42,6 +42,13 @@
   color: #fff;
   flex-shrink: 0;
 }
+.headerPhoto {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
 .headerInfo {
   flex: 1;
   display: flex;
@@ -406,6 +413,58 @@
   transition: background 0.15s;
 }
 .inviteBtn:hover { background: rgba(34,197,94,0.14); }
+
+/* ─── Photo upload ───────────────────────────────────────────────────────── */
+.photoUploadRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.photoPreview {
+  width: 64px;
+  height: 64px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 0.5px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+.photoPreviewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary);
+}
+.photoUploadInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.photoUploadBtn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brand);
+  text-align: left;
+}
+.photoUploadHint {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+.photoRemoveBtn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-danger);
+  text-align: left;
+  margin-top: 2px;
+}
 
 /* ─── Edit group modal ───────────────────────────────────────────────────── */
 .editSheet {
