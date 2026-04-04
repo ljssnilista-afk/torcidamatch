@@ -32,3 +32,7 @@ pnpm-debug.log*
 # OS
 .DS_Store
 Thumbs.db
+
+# Arquivos do Capacitor (opcional, se não quiser versionar)
+android/
+ios/
