@@ -114,3 +114,179 @@ button:active {
   --color-text-secondary: rgba(0, 0, 0, 0.55);
   --color-text-tertiary: rgba(0, 0, 0, 0.35);
 }
+
+/* ─── Light Mode Global Overrides ─── */
+/* Fix hardcoded dark colors in CSS modules (borders, backgrounds, shadows) */
+[data-theme="light"] {
+  color-scheme: light;
+}
+
+/* Hardcoded #333 borders → light equivalent */
+[data-theme="light"] [class*="Card"],
+[data-theme="light"] [class*="card"],
+[data-theme="light"] [class*="Sheet"],
+[data-theme="light"] [class*="sheet"],
+[data-theme="light"] [class*="rideCard"],
+[data-theme="light"] [class*="groupCard"],
+[data-theme="light"] [class*="gameCard"],
+[data-theme="light"] [class*="statCard"],
+[data-theme="light"] [class*="detailsGrid"],
+[data-theme="light"] [class*="passengersList"],
+[data-theme="light"] [class*="financeCard"],
+[data-theme="light"] [class*="priceCard"],
+[data-theme="light"] [class*="ticket"],
+[data-theme="light"] [class*="driverCard"],
+[data-theme="light"] [class*="activityList"],
+[data-theme="light"] [class*="ratingCard"],
+[data-theme="light"] [class*="summary"],
+[data-theme="light"] [class*="profileCard"],
+[data-theme="light"] [class*="quickSettings"],
+[data-theme="light"] [class*="section"] > div,
+[data-theme="light"] [class*="priceRow"],
+[data-theme="light"] [class*="textInput"],
+[data-theme="light"] [class*="editInput"],
+[data-theme="light"] [class*="searchBar"],
+[data-theme="light"] [class*="searchWrap"],
+[data-theme="light"] [class*="locationBar"],
+[data-theme="light"] [class*="timeSelect"],
+[data-theme="light"] [class*="vehicleBtn"],
+[data-theme="light"] [class*="seatsBtn"],
+[data-theme="light"] [class*="statPill"],
+[data-theme="light"] [class*="mgContent"],
+[data-theme="light"] [class*="miniMap"] {
+  border-color: var(--color-border) !important;
+}
+
+/* Hardcoded rgba(255,255,255,...) backgrounds → light equivalents */
+[data-theme="light"] [class*="chip"]:not([class*="Active"]),
+[data-theme="light"] [class*="filterBtn"],
+[data-theme="light"] [class*="backBtn"],
+[data-theme="light"] [class*="shareBtn"],
+[data-theme="light"] [class*="menuBtn"],
+[data-theme="light"] [class*="gearBtn"],
+[data-theme="light"] [class*="editIconBtn"] {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Hardcoded dark modal/sheet backgrounds */
+[data-theme="light"] [class*="Overlay"] > div,
+[data-theme="light"] [class*="overlay"] > div,
+[data-theme="light"] [class*="Sheet"],
+[data-theme="light"] [class*="sheet"] {
+  background: var(--color-surface-1) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Skeleton shimmer for light mode */
+[data-theme="light"] [class*="skeleton"],
+[data-theme="light"] [class*="Skeleton"],
+[data-theme="light"] [class*="skLine"],
+[data-theme="light"] [class*="skBlock"],
+[data-theme="light"] [class*="skHeader"],
+[data-theme="light"] [class*="skBtn"],
+[data-theme="light"] [class*="skelLine"],
+[data-theme="light"] [class*="skelAvatar"],
+[data-theme="light"] [class*="skelStat"] {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Fix game banner gradient for light mode */
+[data-theme="light"] [class*="gameBanner"] {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
+  border-color: rgba(26, 158, 72, 0.2) !important;
+}
+
+/* Fix game card glow backgrounds */
+[data-theme="light"] [class*="gameCard"] {
+  background: var(--color-surface-1) !important;
+}
+[data-theme="light"] [class*="gameCardSelected"] {
+  background: rgba(26, 158, 72, 0.06) !important;
+  border-color: var(--color-brand) !important;
+}
+
+/* Fix bottom nav */
+[data-theme="light"] nav[class*="nav"] {
+  background: var(--color-surface-1) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Fix dividers */
+[data-theme="light"] [class*="divider"],
+[data-theme="light"] [class*="Divider"] {
+  background: var(--color-border) !important;
+}
+
+/* Fix CTA banners */
+[data-theme="light"] [class*="ctaBanner"],
+[data-theme="light"] [class*="gameBanner"] {
+  border-color: rgba(26, 158, 72, 0.15) !important;
+}
+
+/* Fix avatar backgrounds in light mode */
+[data-theme="light"] [class*="avatarOnline"] {
+  border-color: var(--color-surface-1) !important;
+}
+
+/* Fix canvas/stadium cards */
+[data-theme="light"] [class*="GroupCard"],
+[data-theme="light"] [class*="groupCard"] canvas {
+  opacity: 0.9;
+}
+
+/* Fix hardcoded white text on colored backgrounds (keep white) */
+[data-theme="light"] [class*="avatar"]:not([class*="avatarWrap"]):not([class*="avatarPhoto"]) {
+  color: #fff !important;
+}
+
+/* Fix hover shadows */
+[data-theme="light"] [class*="Card"]:hover,
+[data-theme="light"] [class*="card"]:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Fix occupancy/progress bars */
+[data-theme="light"] [class*="occBar"],
+[data-theme="light"] [class*="seatsBar"],
+[data-theme="light"] [class*="stepLine"] {
+  background: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Fix countdown badge in light mode */
+[data-theme="light"] [class*="countdownBadge"] {
+  background: rgba(26, 158, 72, 0.08) !important;
+  border-color: rgba(26, 158, 72, 0.2) !important;
+}
+
+/* Fix settings panel */
+[data-theme="light"] [class*="settingsItem"]:hover {
+  background: var(--color-surface-2) !important;
+}
+[data-theme="light"] [class*="settingsItemIcon"] {
+  background: var(--color-surface-2) !important;
+}
+[data-theme="light"] [class*="themeToggleTrack"] {
+  background: var(--color-surface-3) !important;
+}
+
+/* Fix select elements */
+[data-theme="light"] select {
+  background: var(--color-surface-2) !important;
+  color: var(--color-text-primary) !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Fix modal overlay */
+[data-theme="light"] [class*="Overlay"],
+[data-theme="light"] [class*="overlay"] {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Fix crop modal */
+[data-theme="light"] [class*="cropSheet"],
+[data-theme="light"] [class*="editSheet"],
+[data-theme="light"] [class*="settingsSheet"],
+[data-theme="light"] [class*="modalSheet"] {
+  background: var(--color-surface-1) !important;
+}
