@@ -40,3 +40,20 @@
 .itemActive .label {
   color: var(--color-brand);
 }
+.matchText {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #22C55E, #0d5428);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Para o estado ativo (se quiser manter o gradiente ou usar cor sólida) */
+.itemActive .matchText {
+  background: none;
+  color: var(--color-brand); /* ou #22C55E */
+}
