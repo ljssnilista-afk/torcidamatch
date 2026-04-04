@@ -1,43 +1,46 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 const UserContext = createContext(null)
+const STORAGE_KEY = 'tm-user'
 
-const INITIAL_USER = {
-  id:          'user-bianca',
-  initials:    'BR',
-  name:        'Bianca Rodrigues',
-  handle:      '@biancard23',
-  age:         23,
-  team:        'Botafogo',
-  teamEmoji:   '⚫⚪',
-  bio:         'Torcedora apaixonada pelo Fogão! ⚫⚪ Presente em todos os jogos desde 2015.',
-  location:    'Copacabana, RJ',
-  memberSince: '2023',
-  isOwn:       true,
-  myGroupId:   'copa-fogo',
-  email:       '',
+function loadStoredUser() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed?.token && parsed?.id) return parsed
+    }
+  } catch {}
+  return null
 }
 
 export function UserProvider({ children }) {
-  const [user,       setUser]       = useState(INITIAL_USER)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [user, setUser] = useState(() => loadStoredUser() || {})
+  const [isLoggedIn, setIsLoggedIn] = useState(() => !!loadStoredUser()?.token)
+
+  // Persist to localStorage whenever user changes
+  useEffect(() => {
+    if (isLoggedIn && user?.token) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+    }
+  }, [user, isLoggedIn])
 
   const updateUser = (patch) => setUser((prev) => ({ ...prev, ...patch }))
 
   const login = (userData = {}) => {
-    // Backend retorna _id (MongoDB) — normaliza para id
     const normalized = {
       ...userData,
       id: userData._id || userData.id,
     }
-    console.log('[UserContext] login id:', normalized.id) // debug
-    updateUser(normalized)
+    setUser(normalized)
     setIsLoggedIn(true)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized))
   }
 
   const logout = () => {
-    setUser(INITIAL_USER)
+    setUser({})
     setIsLoggedIn(false)
+    localStorage.removeItem(STORAGE_KEY)
   }
 
   return (
@@ -47,7 +50,6 @@ export function UserProvider({ children }) {
   )
 }
 
-/** Hook to consume user context */
 export function useUser() {
   const ctx = useContext(UserContext)
   if (!ctx) throw new Error('useUser must be used inside <UserProvider>')
