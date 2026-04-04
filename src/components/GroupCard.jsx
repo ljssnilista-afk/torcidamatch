@@ -60,7 +60,11 @@ export default function GroupCard({ group, onDetails, onAction }) {
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
-      <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
+      {group.photo ? (
+        <img src={group.photo} alt={group.name} className={styles.groupPhoto} />
+      ) : (
+        <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
+      )}
       <div className={styles.overlay} aria-hidden="true" />
 
       {/* Share button */}
