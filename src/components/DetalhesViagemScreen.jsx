@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
@@ -176,6 +176,12 @@ export default function DetalhesViagemScreen() {
   const [modal, setModal] = useState(null)
   const [editOpen, setEditOpen] = useState(false)
   const [editLoading, setEditLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('details') // 'details' | 'chat'
+  const [messages, setMessages] = useState([])
+  const [chatText, setChatText] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const wsRef = useRef(null)
+  const chatEndRef = useRef(null)
 
   const isDriver = ride && String(ride.driver) === String(user?.id)
   const myReservation = ride?.passengers?.find(p => String(p.user) === String(user?.id) && p.status !== 'cancelled')
@@ -186,6 +192,61 @@ export default function DetalhesViagemScreen() {
 
   // Countdown
   const { timeLeft, urgent } = useCountdown(ride?.departureTime)
+
+  // Can this user access chat?
+  const canChat = ride && (isDriver || (myReservation && ['paid', 'confirmed'].includes(myReservation.status)))
+
+  // ── Load chat messages ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!canChat || !token || activeTab !== 'chat') return
+    async function loadMessages() {
+      setChatLoading(true)
+      try {
+        const res = await fetch(`${API_URL}/rides/${id}/messages`, { headers: { Authorization: `Bearer ${token}` } })
+        if (res.ok) { const data = await res.json(); setMessages(data.messages || []) }
+      } catch {} finally { setChatLoading(false) }
+    }
+    loadMessages()
+  }, [canChat, token, id, activeTab])
+
+  // ── WebSocket for real-time chat ──────────────────────────────────────
+  useEffect(() => {
+    if (!canChat || !token || activeTab !== 'chat') return
+    const wsUrl = API_URL.replace('/api', '').replace('http', 'ws')
+    const ws = new WebSocket(`${wsUrl}/ws/rides/${id}?token=${token}`)
+    wsRef.current = ws
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        if (data.type === 'ride-message' && data.message) {
+          setMessages(prev => [...prev, data.message])
+        }
+      } catch {}
+    }
+    ws.onerror = () => {}
+    ws.onclose = () => {}
+
+    return () => { ws.close() }
+  }, [canChat, token, id, activeTab])
+
+  // Auto-scroll chat
+  useEffect(() => {
+    if (activeTab === 'chat') chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, activeTab])
+
+  const sendMessage = async () => {
+    const text = chatText.trim()
+    if (!text || !token) return
+    setChatText('')
+    try {
+      await fetch(`${API_URL}/rides/${id}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ text }),
+      })
+    } catch { toast.error('Erro ao enviar mensagem') }
+  }
 
   const loadRide = useCallback(async () => {
     try {
@@ -283,6 +344,22 @@ export default function DetalhesViagemScreen() {
           </div>
         )}
 
+        {/* Tab navigation */}
+        {canChat && (
+          <div className={styles.tabRow}>
+            <button className={`${styles.tabBtn} ${activeTab === 'details' ? styles.tabBtnActive : ''}`} onClick={() => setActiveTab('details')}>
+              Detalhes
+            </button>
+            <button className={`${styles.tabBtn} ${activeTab === 'chat' ? styles.tabBtnActive : ''}`} onClick={() => setActiveTab('chat')}>
+              💬 Chat
+              {messages.length > 0 && <span className={styles.tabBadge}>{messages.length}</span>}
+            </button>
+          </div>
+        )}
+
+        {/* ─── Tab: Details ─── */}
+        {activeTab === 'details' && (
+          <>
         {/* Game card — premium */}
         <div className={styles.gameCard}>
           <div className={styles.gameGlow} />
@@ -402,11 +479,66 @@ export default function DetalhesViagemScreen() {
           </div>
         )}
 
+        </>
+        )}
+
+        {/* ─── Tab: Chat ─── */}
+        {activeTab === 'chat' && canChat && (
+          <div className={styles.chatContainer}>
+            {chatLoading ? (
+              <div className={styles.chatLoading}>Carregando mensagens...</div>
+            ) : messages.length === 0 ? (
+              <div className={styles.chatEmpty}>
+                <span style={{ fontSize: 32 }}>💬</span>
+                <p>Nenhuma mensagem ainda</p>
+                <p style={{ fontSize: 11, color: 'var(--color-text-tertiary)' }}>Comece a conversa com o motorista e passageiros!</p>
+              </div>
+            ) : (
+              <div className={styles.chatMessages}>
+                {messages.map((msg, i) => {
+                  const isMine = String(msg.sender) === String(user?.id)
+                  const isSystem = msg.type === 'system'
+                  return isSystem ? (
+                    <div key={i} className={styles.chatSystem}>{msg.text}</div>
+                  ) : (
+                    <div key={i} className={`${styles.chatBubble} ${isMine ? styles.chatBubbleMine : styles.chatBubbleOther}`}>
+                      {!isMine && <span className={styles.chatSender}>{msg.senderName}</span>}
+                      <p className={styles.chatText}>{msg.text}</p>
+                      <span className={styles.chatTime}>
+                        {new Date(msg.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  )
+                })}
+                <div ref={chatEndRef} />
+              </div>
+            )}
+          </div>
+        )}
+
         <div style={{ height: 100 }} />
       </div>
 
-      {/* Bottom actions */}
-      {ride.status !== 'cancelled' && ride.status !== 'completed' && (
+      {/* Chat input bar */}
+      {activeTab === 'chat' && canChat && (
+        <div className={styles.chatInputBar}>
+          <input
+            type="text"
+            value={chatText}
+            onChange={e => setChatText(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }}
+            placeholder="Mensagem..."
+            className={styles.chatInput}
+            maxLength={1000}
+          />
+          <button className={styles.chatSendBtn} onClick={sendMessage} disabled={!chatText.trim()}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+          </button>
+        </div>
+      )}
+
+      {/* Bottom actions (only on details tab) */}
+      {activeTab === 'details' && ride.status !== 'cancelled' && ride.status !== 'completed' && (
         <div className={styles.bottomBar}>
           {isDriver && (
             <div className={styles.actionRow}>
