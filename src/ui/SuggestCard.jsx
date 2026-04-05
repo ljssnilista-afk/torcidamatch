@@ -56,3 +56,4 @@ export default function SuggestCard({ suggestion, onCreate }) {
     </div>
   )
 }
+

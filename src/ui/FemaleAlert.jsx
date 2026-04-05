@@ -24,3 +24,4 @@ export default function FemaleAlert({ alert, onCreate }) {
     </section>
   )
 }
+

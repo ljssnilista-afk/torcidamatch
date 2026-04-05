@@ -139,3 +139,4 @@ export default function NextGame({ game, onCta, loading }) {
     </section>
   )
 }
+

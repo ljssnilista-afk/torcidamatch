@@ -75,3 +75,4 @@ function Header({ onSearch, onNotification }) {
 }
 
 export default memo(Header)
+

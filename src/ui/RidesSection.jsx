@@ -77,3 +77,4 @@ export default function RidesSection({ rides, title, onViewAll }) {
     </section>
   )
 }
+

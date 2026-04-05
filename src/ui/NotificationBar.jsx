@@ -27,3 +27,4 @@ export default function NotificationBar({ text, onClick }) {
     </button>
   )
 }
+

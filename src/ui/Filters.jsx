@@ -35,3 +35,4 @@ export default function Filters({ filters, defaultActive, onChange }) {
     </nav>
   )
 }
+

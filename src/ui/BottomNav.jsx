@@ -76,3 +76,4 @@ const BottomNav = memo(function BottomNav() {
 
 export default BottomNav
 
+

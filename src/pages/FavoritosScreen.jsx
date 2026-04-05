@@ -392,3 +392,4 @@ export default function FavoritosScreen() {
     </div>
   )
 }
+

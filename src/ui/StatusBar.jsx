@@ -44,3 +44,4 @@ const StatusBar = memo(function StatusBar() {
 })
 
 export default StatusBar
+

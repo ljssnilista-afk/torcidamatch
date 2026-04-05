@@ -4,17 +4,17 @@ import { ROUTES } from '../utils/constants'
 import styles from './AppRouter.module.css'
 
 // ─── Lazy-loaded screens ──────────────────────────────────────────────────────
-const LoginScreen          = lazy(() => import('../components/LoginScreen'))
-const HomeScreen           = lazy(() => import('../components/HomeScreen'))
-const GruposScreen         = lazy(() => import('../components/GruposScreen'))
-const CriarGrupoScreen     = lazy(() => import('../components/CriarGrupoScreen'))
-const GrupoScreen          = lazy(() => import('../components/GrupoScreen'))
-const VamosComigoScreen    = lazy(() => import('../components/VamosComigoScreen'))
-const CriarViagemScreen    = lazy(() => import('../components/CriarViagemScreen'))
-const DetalhesViagemScreen = lazy(() => import('../components/DetalhesViagemScreen'))
-const FuiScreen            = lazy(() => import('../components/FuiScreen'))
-const PerfilScreen         = lazy(() => import('../components/PerfilScreen'))
-const NotificationsScreen  = lazy(() => import('../components/NotificationsScreen'))
+const LoginScreen          = lazy(() => import('../pages/LoginScreen'))
+const HomeScreen           = lazy(() => import('../pages/HomeScreen'))
+const GruposScreen         = lazy(() => import('../pages/GruposScreen'))
+const CriarGrupoScreen     = lazy(() => import('../pages/CriarGrupoScreen'))
+const GrupoScreen          = lazy(() => import('../pages/GrupoScreen'))
+const VamosComigoScreen    = lazy(() => import('../pages/VamosComigoScreen'))
+const CriarViagemScreen    = lazy(() => import('../pages/CriarViagemScreen'))
+const DetalhesViagemScreen = lazy(() => import('../pages/DetalhesViagemScreen'))
+const FuiScreen            = lazy(() => import('../pages/FuiScreen'))
+const PerfilScreen         = lazy(() => import('../pages/PerfilScreen'))
+const NotificationsScreen  = lazy(() => import('../pages/NotificationsScreen'))
 
 // ─── Screen skeleton shown while lazy chunk loads ────────────────────────────
 function ScreenSkeleton() {
