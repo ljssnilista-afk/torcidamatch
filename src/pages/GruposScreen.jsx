@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Filters from './Filters'
-import GroupCard from './GroupCard'
+import Filters from '../ui/Filters'
+import GroupCard from '../ui/GroupCard'
 import { ROUTES } from '../utils/constants'
 import { useGame } from '../context/GameContext'
 import { useUser } from '../context/UserContext'
@@ -345,4 +345,5 @@ export default function GruposScreen() {
     </div>
   )
 }
+
 
