@@ -128,14 +128,17 @@ export default function FuiScreen() {
   const [ridesAsDriver, setRidesAsDriver] = useState([])
   const [ridesAsPassenger, setRidesAsPassenger] = useState([])
   const [groups, setGroups] = useState([])
+  const [invites, setInvites] = useState([])
+  const [inviteLoading, setInviteLoading] = useState(false)
 
   // ── Load data ─────────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
     if (!token) { setLoading(false); return }
     try {
-      const [ridesRes, gruposRes] = await Promise.all([
+      const [ridesRes, gruposRes, invitesRes] = await Promise.all([
         fetch(`${API_URL}/rides/mine`, { headers: { Authorization: `Bearer ${token}` } }),
         fetch(`${API_URL}/grupos`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_URL}/invites/mine`, { headers: { Authorization: `Bearer ${token}` } }),
       ])
 
       if (ridesRes.ok) {
@@ -145,11 +148,14 @@ export default function FuiScreen() {
       }
       if (gruposRes.ok) {
         const data = await gruposRes.json()
-        // Filtrar apenas grupos que o usuário participa
         const myGroups = (data.groups || []).filter(g =>
           g.members?.some?.(m => String(m._id || m) === String(user?.id))
         )
         setGroups(myGroups)
+      }
+      if (invitesRes.ok) {
+        const data = await invitesRes.json()
+        setInvites(data.invites || [])
       }
     } catch (err) {
       console.error('[FuiScreen]', err)
@@ -159,6 +165,22 @@ export default function FuiScreen() {
   }, [token, user?.id])
 
   useEffect(() => { loadData() }, [loadData])
+
+  // ── Accept/Reject invite ──────────────────────────────────────────────
+  const handleInvite = async (inviteId, action) => {
+    setInviteLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/invites/${inviteId}/${action}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(data.message)
+        setInvites(prev => prev.filter(i => i._id !== inviteId))
+        loadData() // refresh groups/rides
+      } else toast.error(data.error)
+    } catch { toast.error('Erro de conexão') } finally { setInviteLoading(false) }
+  }
 
   // ── Derived data ──────────────────────────────────────────────────────
   const now = new Date()
@@ -228,6 +250,9 @@ export default function FuiScreen() {
           >
             <span className={styles.tabIcon}>{t.icon}</span>
             <span>{t.label}</span>
+            {t.id === 'convites' && invites.length > 0 && (
+              <span className={styles.tabBadge}>{invites.length}</span>
+            )}
           </button>
         ))}
       </div>
@@ -277,7 +302,33 @@ export default function FuiScreen() {
 
         {/* Convites */}
         {tab === 'convites' && (
-          <EmptyTab icon="📩" title="Nenhum convite pendente" sub="Convites para grupos e viagens aparecerão aqui." />
+          invites.length === 0 ? (
+            <EmptyTab icon="📩" title="Nenhum convite pendente" sub="Convites para grupos e viagens aparecerão aqui." />
+          ) : (
+            <div className={styles.list}>
+              {invites.map(inv => (
+                <div key={inv._id} className={styles.inviteCard}>
+                  <div className={styles.inviteTop}>
+                    <span className={styles.inviteType}>{inv.type === 'group' ? '👥' : '🚗'}</span>
+                    <div className={styles.inviteInfo}>
+                      <span className={styles.inviteName}>{inv.targetName}</span>
+                      <span className={styles.inviteSender}>Convite de {inv.senderName}</span>
+                      {inv.message && <span className={styles.inviteMsg}>"{inv.message}"</span>}
+                    </div>
+                    <span className={styles.inviteTypeBadge}>{inv.type === 'group' ? 'Grupo' : 'Viagem'}</span>
+                  </div>
+                  <div className={styles.inviteActions}>
+                    <button className={styles.inviteReject} onClick={() => handleInvite(inv._id, 'reject')} disabled={inviteLoading}>
+                      Recusar
+                    </button>
+                    <button className={styles.inviteAccept} onClick={() => handleInvite(inv._id, 'accept')} disabled={inviteLoading}>
+                      Aceitar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         )}
 
         {/* Favoritos */}
