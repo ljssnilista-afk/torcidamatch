@@ -1330,3 +1330,15 @@
   font-size: 11px;
   color: var(--color-text-tertiary);
 }
+.dollarIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-brand, #22C55E);
+  color: #000;
+  font-weight: bold;
+  font-size: 20px;
+  border-radius: 50%;
+}
