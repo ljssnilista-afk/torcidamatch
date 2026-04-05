@@ -265,7 +265,7 @@ export default function PerfilScreen() {
 
   const statCards = [
     { id: 'grupos', icon: 'users', label: 'Grupos', value: stats.grupos ?? 0, color: 'green' },
-    { id: 'offered', icon: 'dollar', label: 'Viagens ofertadas', value: stats.viagensOferecidas ?? 0, color: 'green' },
+    { id: 'offered', icon: 'car-give', label: 'Viagens ofertadas', value: stats.viagensOferecidas ?? 0, color: 'green' },
     { id: 'taken', icon: 'car-take', label: 'Viagens feitas', value: stats.viagensFeitas ?? 0, color: 'blue' },
   ]
 
@@ -310,17 +310,12 @@ export default function PerfilScreen() {
 
             {/* Stats */}
             <div className={styles.statsGrid}>
-              {statCards.map(card => (
-               <div key={card.id} className={styles.statCard}>
-                 <div className={styles.statIcon}>
-                  {card.icon === 'dollar' ? (
-                    <span className={styles.dollarIcon}>$</span>
-                  ) : (
-                    <Icon name={card.icon} />
-                  )}
-                 </div>
-                 <span className={styles.statLabel}>{card.label}</span>
-                 <strong className={styles.statValue}>{card.value}</strong>
+              {statCards.map(s => (
+                <div key={s.id} className={styles.statCard}>
+                  <div className={`${styles.statIcon} ${s.color === 'blue' ? styles.statIconBlue : styles.statIconGreen}`}>{ICONS[s.icon]}</div>
+                  {s.value > 0 ? <span className={styles.statValue}>{s.value}</span> : <span className={styles.statValueEmpty}>—</span>}
+                  <span className={styles.statLabel}>{s.label}</span>
+                  {s.value === 0 && <span className={styles.statHint}>Participe para pontuar</span>}
                 </div>
               ))}
             </div>
