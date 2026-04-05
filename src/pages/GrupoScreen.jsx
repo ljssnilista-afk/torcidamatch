@@ -327,7 +327,7 @@ function OptionsMenu({ onClose, onInvite, onMembers, onEdit, onLeave, isLeader }
 }
 
 // ─── Modal de membros ─────────────────────────────────────────────────────────
-function MembersModal({ members, leaderId, onClose, onInvite }) {
+function MembersModal({ members, pendingMembers, leaderId, isLeader, onClose, onInvite, onApprove, onReject, actionLoading }) {
   return (
     <div className={styles.menuOverlay} onClick={onClose}>
       <div className={styles.membersSheet} onClick={e => e.stopPropagation()}>
@@ -336,6 +336,33 @@ function MembersModal({ members, leaderId, onClose, onInvite }) {
           <span className={styles.membersTitle}>Membros ({members.length})</span>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
+
+        {/* Pending members (leader only) */}
+        {isLeader && pendingMembers?.length > 0 && (
+          <div className={styles.pendingSection}>
+            <span className={styles.pendingSectionTitle}>⏳ Pendentes ({pendingMembers.length})</span>
+            {pendingMembers.map(p => (
+              <div key={String(p.user)} className={styles.pendingRow}>
+                <div className={styles.memberAvatar} style={{ background: avatarColor(p.name || '?') }}>
+                  {initials(p.name || '?')}
+                </div>
+                <div className={styles.memberInfo}>
+                  <span className={styles.memberName}>{p.name}</span>
+                  <span className={styles.pendingStatus}>
+                    {p.status === 'pendingApproval' ? '🔔 Aguardando aprovação' : '💳 Aguardando pagamento'}
+                  </span>
+                </div>
+                {p.status === 'pendingApproval' && (
+                  <div className={styles.pendingActions}>
+                    <button className={styles.rejectBtn} onClick={() => onReject(p.user)} disabled={actionLoading}>✕</button>
+                    <button className={styles.approveBtn} onClick={() => onApprove(p.user)} disabled={actionLoading}>✓</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className={styles.membersList}>
           {members.map(m => (
             <div key={m._id} className={styles.memberRow}>
@@ -411,6 +438,7 @@ export default function GrupoScreen() {
   const [showEdit,   setShowEdit]   = useState(false)
   const [editLoading,setEditLoading]= useState(false)
   const [wsReady,    setWsReady]    = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   const bottomRef = useRef(null)
   const wsRef     = useRef(null)
@@ -554,6 +582,31 @@ export default function GrupoScreen() {
     } catch { toast.error('Erro de conexão') } finally { setEditLoading(false) }
   }
 
+  // ── Aprovar/rejeitar membro (líder) ───────────────────────────────────────
+  const handleApproveMember = async (userId) => {
+    setActionLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/grupos/${id}/approve/${userId}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success(data.message); loadGrupo() }
+      else toast.error(data.error)
+    } catch { toast.error('Erro de conexão') } finally { setActionLoading(false) }
+  }
+
+  const handleRejectMember = async (userId) => {
+    setActionLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/grupos/${id}/reject/${userId}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success(data.message); loadGrupo() }
+      else toast.error(data.error)
+    } catch { toast.error('Erro de conexão') } finally { setActionLoading(false) }
+  }
+
   if (loading) return (
     <div className={styles.screen}>
       <div className={styles.skeletonHeader}/>
@@ -634,9 +687,14 @@ export default function GrupoScreen() {
       {showMembers && (
         <MembersModal
           members={members}
+          pendingMembers={grupo?.pendingMembers || []}
           leaderId={grupo?.leader?._id || grupo?.leader}
+          isLeader={isLeader}
           onClose={() => setShowMembers(false)}
           onInvite={() => { setShowMembers(false); setShowInvite(true) }}
+          onApprove={handleApproveMember}
+          onReject={handleRejectMember}
+          actionLoading={actionLoading}
         />
       )}
       {showInvite && (
@@ -656,4 +714,3 @@ export default function GrupoScreen() {
     </div>
   )
 }
-

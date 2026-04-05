@@ -120,7 +120,7 @@ export default function FuiScreen() {
   const navigate = useNavigate()
   const toast = useToast()
   const { user } = useUser()
-  const { favoriteGroups, favoriteRides } = useFavorites()
+  const { favGroups, favRides, toggleGroup, toggleRide } = useFavorites()
   const token = user?.token
 
   const [tab, setTab] = useState('proximas')
@@ -333,7 +333,44 @@ export default function FuiScreen() {
 
         {/* Favoritos */}
         {tab === 'favoritos' && (
-          <EmptyTab icon="⭐" title="Nenhum favorito salvo" sub="Salve grupos e viagens para acessar rapidamente." btnLabel="Explorar viagens" onBtn={() => navigate(ROUTES.VAMOS_COMIGO)} />
+          favGroups.length === 0 && favRides.length === 0 ? (
+            <EmptyTab icon="⭐" title="Nenhum favorito salvo" sub="Toque no ❤️ em grupos e viagens para salvar aqui." btnLabel="Explorar viagens" onBtn={() => navigate(ROUTES.VAMOS_COMIGO)} />
+          ) : (
+            <div className={styles.list}>
+              {favGroups.length > 0 && (
+                <>
+                  <span className={styles.favSection}>👥 Grupos favoritos</span>
+                  {favGroups.map(g => (
+                    <div key={g.id || g._id} className={styles.favCard}>
+                      <div className={styles.favInfo} onClick={() => navigate(`/grupos/${g.id || g._id}`)}>
+                        <span className={styles.favName}>{g.name}</span>
+                        <span className={styles.favMeta}>{g.team} {g.bairro ? `• ${g.bairro}` : ''} {g.code ? `#${g.code}` : ''}</span>
+                      </div>
+                      <button className={styles.favRemoveBtn} onClick={() => { toggleGroup(g); toast.success(`${g.name} removido dos favoritos`) }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                      </button>
+                    </div>
+                  ))}
+                </>
+              )}
+              {favRides.length > 0 && (
+                <>
+                  <span className={styles.favSection}>🚗 Viagens favoritas</span>
+                  {favRides.map(r => (
+                    <div key={r.id || r._id} className={styles.favCard}>
+                      <div className={styles.favInfo} onClick={() => navigate(`/vamos-comigo/${r.id || r._id}`)}>
+                        <span className={styles.favName}>{r.homeTeam} × {r.awayTeam}</span>
+                        <span className={styles.favMeta}>{r.driverName} {r.shareCode ? `• ${r.shareCode}` : ''} {r.price ? `• R$ ${(r.price/100).toFixed(2).replace('.',',')}` : ''}</span>
+                      </div>
+                      <button className={styles.favRemoveBtn} onClick={() => { toggleRide(r); toast.success('Viagem removida dos favoritos') }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                      </button>
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          )
         )}
 
         <div style={{ height: 80 }} />
@@ -348,4 +385,3 @@ export default function FuiScreen() {
     </div>
   )
 }
-

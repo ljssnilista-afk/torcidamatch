@@ -1,78 +1,94 @@
-import { createContext, useContext, useState, useCallback } from 'react'
-import { FAVORITE_GROUPS, FAVORITE_RIDES } from '../data/favoritosData'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 const FavoritesContext = createContext(null)
+const STORAGE_KEY = 'tm-favorites'
+
+function loadStored() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored) return JSON.parse(stored)
+  } catch {}
+  return { groups: [], rides: [] }
+}
+
+function saveToStorage(groups, rides) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ groups, rides }))
+  } catch {}
+}
 
 export function FavoritesProvider({ children }) {
-  // Store sets of IDs for O(1) lookup
-  const [favGroupIds, setFavGroupIds]   = useState(() => new Set(FAVORITE_GROUPS.map((g) => g.id)))
-  const [favRideIds,  setFavRideIds]    = useState(() => new Set(FAVORITE_RIDES.map((r) => r.id)))
+  const [favGroups, setFavGroups] = useState(() => loadStored().groups)
+  const [favRides, setFavRides] = useState(() => loadStored().rides)
 
-  // Full objects (so screens can render without extra data fetching)
-  const [favGroups, setFavGroups] = useState(FAVORITE_GROUPS)
-  const [favRides,  setFavRides]  = useState(FAVORITE_RIDES)
+  // Persist whenever favorites change
+  useEffect(() => {
+    saveToStorage(favGroups, favRides)
+  }, [favGroups, favRides])
 
   // ── Groups ──────────────────────────────────────────────────────────────────
-  const isGroupFav = useCallback((id) => favGroupIds.has(id), [favGroupIds])
+  const isGroupFav = useCallback((id) => favGroups.some(g => g.id === id || g._id === id), [favGroups])
 
   const addGroup = useCallback((group) => {
-    setFavGroupIds((prev) => new Set([...prev, group.id]))
-    setFavGroups((prev) => prev.some((g) => g.id === group.id) ? prev : [...prev, group])
+    const gId = group.id || group._id
+    setFavGroups(prev => {
+      if (prev.some(g => (g.id || g._id) === gId)) return prev
+      return [...prev, { id: gId, _id: gId, name: group.name, team: group.team, bairro: group.bairro || group.region, photo: group.photo, code: group.code }]
+    })
   }, [])
 
   const removeGroup = useCallback((id) => {
-    setFavGroupIds((prev) => { const s = new Set(prev); s.delete(id); return s })
-    setFavGroups((prev) => prev.filter((g) => g.id !== id))
+    setFavGroups(prev => prev.filter(g => g.id !== id && g._id !== id))
   }, [])
 
   const toggleGroup = useCallback((group) => {
-    if (favGroupIds.has(group.id)) removeGroup(group.id)
+    const gId = group.id || group._id
+    if (favGroups.some(g => (g.id || g._id) === gId)) removeGroup(gId)
     else addGroup(group)
-  }, [favGroupIds, addGroup, removeGroup])
+  }, [favGroups, addGroup, removeGroup])
 
   // ── Rides ───────────────────────────────────────────────────────────────────
-  const isRideFav = useCallback((id) => favRideIds.has(id), [favRideIds])
+  const isRideFav = useCallback((id) => favRides.some(r => r.id === id || r._id === id), [favRides])
 
   const addRide = useCallback((ride) => {
-    setFavRideIds((prev) => new Set([...prev, ride.id]))
-    setFavRides((prev) => prev.some((r) => r.id === ride.id) ? prev : [...prev, ride])
+    const rId = ride.id || ride._id
+    setFavRides(prev => {
+      if (prev.some(r => (r.id || r._id) === rId)) return prev
+      return [...prev, {
+        id: rId, _id: rId,
+        homeTeam: ride.game?.homeTeam || ride.homeTeam,
+        awayTeam: ride.game?.awayTeam || ride.awayTeam,
+        driverName: ride.driverName,
+        price: ride.price,
+        shareCode: ride.shareCode,
+        vehicle: ride.vehicle,
+      }]
+    })
   }, [])
 
   const removeRide = useCallback((id) => {
-    setFavRideIds((prev) => { const s = new Set(prev); s.delete(id); return s })
-    setFavRides((prev) => prev.filter((r) => r.id !== id))
+    setFavRides(prev => prev.filter(r => r.id !== id && r._id !== id))
   }, [])
 
   const toggleRide = useCallback((ride) => {
-    if (favRideIds.has(ride.id)) removeRide(ride.id)
+    const rId = ride.id || ride._id
+    if (favRides.some(r => (r.id || r._id) === rId)) removeRide(rId)
     else addRide(ride)
-  }, [favRideIds, addRide, removeRide])
+  }, [favRides, addRide, removeRide])
 
   const totalCount = favGroups.length + favRides.length
 
   return (
     <FavoritesContext.Provider value={{
-      // State
-      favGroups,
-      favRides,
-      totalCount,
-      // Group actions
-      isGroupFav,
-      addGroup,
-      removeGroup,
-      toggleGroup,
-      // Ride actions
-      isRideFav,
-      addRide,
-      removeRide,
-      toggleRide,
+      favGroups, favRides, totalCount,
+      isGroupFav, addGroup, removeGroup, toggleGroup,
+      isRideFav, addRide, removeRide, toggleRide,
     }}>
       {children}
     </FavoritesContext.Provider>
   )
 }
 
-/** Hook to consume favorites context */
 export function useFavorites() {
   const ctx = useContext(FavoritesContext)
   if (!ctx) throw new Error('useFavorites must be used inside <FavoritesProvider>')
