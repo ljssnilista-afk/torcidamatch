@@ -126,6 +126,7 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
     meetPoint: grupo.meetPoint || '',
     privacy: grupo.privacy || 'public',
     approvalRequired: grupo.approvalRequired || false,
+    groupType: grupo.groupType || 'misto',
   })
   const [photoPreview, setPhotoPreview] = useState(grupo.photo || null)
   const [photoData, setPhotoData] = useState(null) // base64 to send
@@ -267,6 +268,30 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
               </button>
             </>
           )}
+
+          <label className={styles.editLabel}>Tipo do grupo</label>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {[
+              { id: 'misto',      label: '🏟️ Misto' },
+              { id: 'organizada', label: '🔥 Organizada' },
+              { id: 'familia',    label: '👪 Família' },
+              { id: 'feminino',   label: '♀️ Feminino' },
+              { id: 'jovem',      label: '⚡ Jovem' },
+            ].map(t => (
+              <button
+                key={t.id}
+                onClick={() => setFields(prev => ({ ...prev, groupType: t.id }))}
+                style={{
+                  padding: '8px 14px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+                  background: fields.groupType === t.id ? 'var(--color-brand-dim)' : 'var(--color-surface-2)',
+                  color: fields.groupType === t.id ? 'var(--color-brand)' : 'var(--color-text-tertiary)',
+                  border: `0.5px solid ${fields.groupType === t.id ? 'var(--color-brand)' : 'var(--color-border)'}`,
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

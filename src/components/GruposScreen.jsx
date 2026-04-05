@@ -81,6 +81,7 @@ export default function GruposScreen() {
 
   const [mapVisible,    setMapVisible]    = useState(false)
   const [activeFilter,  setActiveFilter]  = useState('todos')
+  const [search,        setSearch]        = useState('')
   const [grupos,        setGrupos]        = useState([])
   const [meuGrupo,      setMeuGrupo]      = useState(null)
   const [loading,       setLoading]       = useState(true)
@@ -166,6 +167,9 @@ export default function GruposScreen() {
     load()
   }, [user])
 
+  const ZONA_MAP = { 'Sul': 'zona-sul', 'Norte': 'zona-norte', 'Oeste': 'zona-oeste', 'Centro': 'centro', 'Niterói': 'niteroi' }
+  const TYPE_FILTERS = ['organizada', 'familia', 'feminino', 'jovem']
+
   const toCardFormat = g => ({
     id: g._id, name: g.name,
     team: g.team || user?.team || 'Botafogo',
@@ -178,15 +182,39 @@ export default function GruposScreen() {
     badge: g.privacy === 'private' ? 'silver' : null,
     badgeLabel: g.privacy === 'private' ? '🔒 Privado' : '',
     actionLabel: 'Ver grupo', actionVariant: 'brand',
-    zone: g.zona?.toLowerCase().replace(' ','-') || 'todos',
+    zone: ZONA_MAP[g.zona] || 'todos',
+    groupType: g.groupType || '',
     code: g.code || null,
     photo: g.photo || null,
     _raw: g,
   })
 
-  const filterGroups = gs => activeFilter === 'todos' ? gs : gs.filter(g => g.zone === activeFilter || g.type === activeFilter)
-  const filtered     = filterGroups(grupos.map(toCardFormat))
-  const totalCount   = filtered.length + (meuGrupo ? 1 : 0)
+  const allCards = grupos.map(toCardFormat)
+
+  const filtered = allCards.filter(g => {
+    // Filtro de zona ou tipo
+    if (activeFilter !== 'todos') {
+      if (TYPE_FILTERS.includes(activeFilter)) {
+        if (g.groupType !== activeFilter) return false
+      } else {
+        if (g.zone !== activeFilter) return false
+      }
+    }
+    // Filtro de busca
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      return (
+        g.name.toLowerCase().includes(q) ||
+        g.region.toLowerCase().includes(q) ||
+        g.team.toLowerCase().includes(q) ||
+        (g.meetPoint || '').toLowerCase().includes(q) ||
+        (g.code || '').includes(q)
+      )
+    }
+    return true
+  })
+
+  const totalCount = filtered.length + (meuGrupo ? 1 : 0)
 
   return (
     <div className={styles.screen}>
@@ -221,7 +249,8 @@ export default function GruposScreen() {
 
         <div className={styles.searchBar}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 3.5 3.5"/></svg>
-          <input type="text" placeholder="Buscar por nome ou bairro..." className={styles.searchInput}/>
+          <input type="text" placeholder="Buscar por nome ou bairro..." className={styles.searchInput} value={search} onChange={e => setSearch(e.target.value)} />
+          {search && <button className={styles.searchClear} onClick={() => setSearch('')}>✕</button>}
         </div>
 
         <Filters filters={GRUPOS_FILTERS} onChange={setActiveFilter}/>
