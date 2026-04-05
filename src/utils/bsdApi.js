@@ -59,6 +59,14 @@ export async function fetchEvents({ team, dateFrom, dateTo, league, status } = {
   return apiFetch('/events/', params)
 }
 
+// ─── Mapa de apiId dos times do RJ (para filtrar homônimos) ──────────────────
+export const TEAM_API_IDS = {
+  'Botafogo':      1958,
+  'Flamengo':      5981,
+  'Fluminense':    1961,
+  'Vasco da Gama': 1974,
+}
+
 /** Busca o próximo jogo de um time */
 export async function fetchNextGame(teamName) {
   const today = new Date()
@@ -74,8 +82,20 @@ export async function fetchNextGame(teamName) {
     status:   'notstarted',
   })
 
+  const expectedApiId = TEAM_API_IDS[teamName] || null
+
+  // Filtrar para só mostrar jogos do time correto (ex: Botafogo-RJ, não Botafogo-SP)
+  const filtered = (data.results ?? []).filter(ev => {
+    if (expectedApiId) {
+      const homeApiId = ev.home_team_obj?.api_id
+      const awayApiId = ev.away_team_obj?.api_id
+      return homeApiId === expectedApiId || awayApiId === expectedApiId
+    }
+    return true
+  })
+
   // Ordena por data e pega o primeiro
-  const sorted = (data.results ?? []).sort(
+  const sorted = filtered.sort(
     (a, b) => new Date(a.event_date) - new Date(b.event_date)
   )
   return sorted[0] ?? null

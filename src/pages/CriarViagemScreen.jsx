@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
-import { fetchEvents, teamLogoUrl } from '../utils/bsdApi'
+import { fetchEvents, teamLogoUrl, TEAM_API_IDS } from '../utils/bsdApi'
 import { ROUTES } from '../utils/constants'
 import styles from './CriarViagemScreen.module.css'
 
@@ -21,14 +21,6 @@ function formatGameTime(iso) {
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
 }
 function fmt(d) { return d.toISOString().split('T')[0] }
-
-// Mapa de apiId por time — para filtrar jogos do time certo (ex: Botafogo-RJ vs Botafogo-SP)
-const TEAM_API_IDS = {
-  'Botafogo':     1958,
-  'Flamengo':     5981,
-  'Fluminense':   1961,
-  'Vasco da Gama':1974,
-}
 
 // ─── Vehicle SVGs ───────────────────────────────────────────────────────────
 function CarSVG({ active }) {
@@ -346,4 +338,3 @@ export default function CriarViagemScreen() {
     </div>
   )
 }
-

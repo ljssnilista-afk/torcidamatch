@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
-import { teamLogoUrl } from '../utils/bsdApi'
+import { teamLogoUrl, TEAM_API_IDS } from '../utils/bsdApi'
 import { ROUTES } from '../utils/constants'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -23,8 +23,6 @@ const meetIcon = new L.DivIcon({
 const API_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
   : '/torcida-api/api'
-
-const TEAM_API_IDS = { 'Botafogo': 1958, 'Flamengo': 5981, 'Fluminense': 1961, 'Vasco da Gama': 1974 }
 
 function formatPrice(c) { return (c / 100).toFixed(2).replace('.', ',') }
 function formatDate(iso) {
@@ -597,4 +595,3 @@ export default function DetalhesViagemScreen() {
     </div>
   )
 }
-
