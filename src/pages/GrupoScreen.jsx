@@ -418,6 +418,164 @@ function InviteModal({ grupo, onClose }) {
   )
 }
 
+// ─── Vista de visitante (não-membro) ─────────────────────────────────────────
+function GuestView({ grupo, members, joinStatus, onJoin }) {
+  const isPrivate = grupo?.privacy === 'private'
+
+  const typeLabels = {
+    misto:      '🏟️ Misto',
+    organizada: '🔥 Organizada',
+    familia:    '👪 Família',
+    feminino:   '♀️ Feminino',
+    jovem:      '⚡ Jovem',
+  }
+
+  return (
+    <div className={styles.guestWrap}>
+      {/* Info scrollável */}
+      <div className={styles.guestScroll}>
+
+        {/* Badges de tipo / privacidade */}
+        <div className={styles.guestBadges}>
+          <span className={`${styles.guestBadge} ${isPrivate ? styles.guestBadgePrivate : styles.guestBadgePublic}`}>
+            {isPrivate ? (
+              <><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg> Privado</>
+            ) : (
+              <><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg> Público</>
+            )}
+          </span>
+          {grupo?.groupType && (
+            <span className={styles.guestBadge}>{typeLabels[grupo.groupType] ?? grupo.groupType}</span>
+          )}
+          {grupo?.zona && (
+            <span className={styles.guestBadge}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {grupo.zona}
+            </span>
+          )}
+        </div>
+
+        {/* Estatísticas */}
+        <div className={styles.guestStats}>
+          <div className={styles.guestStat}>
+            <span className={styles.guestStatVal}>{members.length || grupo?.membersCount || '—'}</span>
+            <span className={styles.guestStatLabel}>membros</span>
+          </div>
+          {grupo?.rating > 0 && (
+            <div className={styles.guestStat}>
+              <span className={styles.guestStatVal}>⭐ {Number(grupo.rating).toFixed(1)}</span>
+              <span className={styles.guestStatLabel}>avaliação</span>
+            </div>
+          )}
+          {grupo?.team && (
+            <div className={styles.guestStat}>
+              <span className={styles.guestStatVal}>{grupo.team}</span>
+              <span className={styles.guestStatLabel}>time</span>
+            </div>
+          )}
+        </div>
+
+        {/* Descrição */}
+        {grupo?.description && (
+          <div className={styles.guestSection}>
+            <span className={styles.guestSectionLabel}>Sobre o grupo</span>
+            <p className={styles.guestDescription}>{grupo.description}</p>
+          </div>
+        )}
+
+        {/* Ponto de encontro */}
+        {grupo?.meetPoint && (
+          <div className={styles.guestMeet}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>{grupo.meetPoint}</span>
+          </div>
+        )}
+
+        {/* Preview dos membros */}
+        {members.length > 0 && (
+          <div className={styles.guestSection}>
+            <span className={styles.guestSectionLabel}>Membros</span>
+            <div className={styles.guestMembersRow}>
+              {members.slice(0, 5).map(m => (
+                <div
+                  key={m._id}
+                  className={styles.guestMemberAvatar}
+                  style={{ background: avatarColor(m.name) }}
+                  title={m.name}
+                >
+                  {initials(m.name)}
+                </div>
+              ))}
+              {members.length > 5 && (
+                <div className={styles.guestMemberMore}>+{members.length - 5}</div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Área de chat bloqueada */}
+        <div className={styles.lockedChat}>
+          <div className={styles.lockedBubble} style={{ alignSelf: 'flex-start', width: '60%' }}/>
+          <div className={styles.lockedBubble} style={{ alignSelf: 'flex-end',   width: '45%' }}/>
+          <div className={styles.lockedBubble} style={{ alignSelf: 'flex-start', width: '70%' }}/>
+          <div className={styles.lockedOverlay}>
+            <div className={styles.lockIconWrap}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </div>
+            <p className={styles.lockTitle}>Chat exclusivo para membros</p>
+            <p className={styles.lockSub}>Entre no grupo para conversar com a torcida</p>
+          </div>
+        </div>
+      </div>
+
+      {/* CTA fixo no rodapé */}
+      <div className={styles.joinBar}>
+        {joinStatus === 'pending' ? (
+          <div className={styles.joinPendingBox}>
+            <div className={styles.joinPendingIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+            </div>
+            <div>
+              <p className={styles.joinPendingTitle}>Solicitação enviada!</p>
+              <p className={styles.joinPendingSub}>Aguardando aprovação do líder</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {isPrivate && grupo?.subscriptionPrice > 0 && (
+              <p className={styles.joinPrice}>
+                R$ {Number(grupo.subscriptionPrice).toFixed(2)}<span>/mês</span>
+              </p>
+            )}
+            <button
+              className={styles.joinBtn}
+              onClick={onJoin}
+              disabled={joinStatus === 'requesting'}
+            >
+              {joinStatus === 'requesting' ? (
+                <><span className={styles.joinSpinner}/> Aguarde...</>
+              ) : isPrivate ? (
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Assinar grupo</>
+              ) : (
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20,6 9,17 4,12"/></svg> Entrar no Grupo</>
+              )}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── Tela principal ───────────────────────────────────────────────────────────
 export default function GrupoScreen() {
   const { id }       = useParams()
@@ -439,12 +597,18 @@ export default function GrupoScreen() {
   const [editLoading,setEditLoading]= useState(false)
   const [wsReady,    setWsReady]    = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
+  const [joinStatus, setJoinStatus] = useState(null) // null | 'requesting' | 'pending'
 
   const bottomRef = useRef(null)
   const wsRef     = useRef(null)
   const token     = user?.token
 
   const isLeader = grupo?.leader === user?.id || grupo?.leader?._id === user?.id
+
+  // Verifica se o usuário logado é membro (ou líder)
+  const isMember = isLeader || members.some(m =>
+    (m._id && m._id === user?.id) || m === user?.id
+  )
 
   // ── Carregar grupo e mensagens ─────────────────────────────────────────────
   const loadGrupo = useCallback(async () => {
@@ -466,6 +630,52 @@ export default function GrupoScreen() {
   }, [id, token])
 
   useEffect(() => { loadGrupo() }, [loadGrupo])
+
+  // ── Detectar solicitação pendente já existente ────────────────────────────
+  useEffect(() => {
+    if (!grupo || !user) return
+    const alreadyPending = grupo.pendingMembers?.some(
+      p => String(p.user) === String(user.id)
+    )
+    if (alreadyPending) setJoinStatus('pending')
+  }, [grupo, user])
+
+  // ── Entrar no grupo ────────────────────────────────────────────────────────
+  const handleJoin = async () => {
+    if (!user) {
+      toast.error('Faça login para entrar no grupo')
+      return
+    }
+    if (grupo?.privacy === 'private') {
+      // Placeholder: fluxo de pagamento ainda não implementado
+      toast.success('Em breve: assinatura do grupo 💳')
+      return
+    }
+    setJoinStatus('requesting')
+    try {
+      const res = await fetch(`${API_URL}/grupos/${id}/solicitar`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        if (grupo?.approvalRequired) {
+          setJoinStatus('pending')
+          toast.success(data.message || 'Solicitação enviada!')
+        } else {
+          toast.success(data.message || 'Você entrou no grupo!')
+          setJoinStatus(null)
+          await loadGrupo()
+        }
+      } else {
+        toast.error(data.error || 'Erro ao solicitar entrada')
+        setJoinStatus(null)
+      }
+    } catch {
+      toast.error('Erro de conexão')
+      setJoinStatus(null)
+    }
+  }
 
   // ── WebSocket ──────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -618,63 +828,75 @@ export default function GrupoScreen() {
 
   return (
     <div className={styles.screen}>
-      {/* Header */}
+      {/* Header — sempre visível */}
       <GrupoHeader
         grupo={grupo}
         membersCount={members.length || 1}
         onBack={() => navigate(ROUTES.GRUPOS)}
-        onMenu={() => setShowMenu(true)}
+        onMenu={() => isMember ? setShowMenu(true) : null}
       />
 
-      {/* Status WS */}
-      {!wsReady && (
-        <div className={styles.wsStatus}>
-          <span className={styles.wsDot}/>
-          Conectando ao chat...
-        </div>
+      {isMember ? (
+        <>
+          {/* Status WS */}
+          {!wsReady && (
+            <div className={styles.wsStatus}>
+              <span className={styles.wsDot}/>
+              Conectando ao chat...
+            </div>
+          )}
+
+          {/* Área de mensagens */}
+          <div className={styles.chatArea}>
+            {messages.length === 0
+              ? <EmptyChat onInvite={() => setShowInvite(true)} />
+              : messages.map(msg => (
+                  <MessageBubble
+                    key={msg._id}
+                    msg={msg}
+                    isOwn={msg.senderId === user?.id}
+                  />
+                ))
+            }
+            <div ref={bottomRef}/>
+          </div>
+
+          {/* Campo de digitação */}
+          <div className={styles.inputArea}>
+            <textarea
+              className={styles.msgInput}
+              placeholder="Digite sua mensagem..."
+              value={text}
+              onChange={e => setText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+              aria-label="Digite sua mensagem"
+            />
+            <button
+              className={`${styles.sendBtn} ${text.trim() ? styles.sendBtnActive : ''}`}
+              onClick={sendMessage}
+              disabled={!text.trim() || sending}
+              aria-label="Enviar mensagem"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22,2 15,22 11,13 2,9"/>
+              </svg>
+            </button>
+          </div>
+        </>
+      ) : (
+        /* Vista de visitante */
+        <GuestView
+          grupo={grupo}
+          members={members}
+          joinStatus={joinStatus}
+          onJoin={handleJoin}
+        />
       )}
 
-      {/* Área de mensagens */}
-      <div className={styles.chatArea}>
-        {messages.length === 0
-          ? <EmptyChat onInvite={() => setShowInvite(true)} />
-          : messages.map(msg => (
-              <MessageBubble
-                key={msg._id}
-                msg={msg}
-                isOwn={msg.senderId === user?.id}
-              />
-            ))
-        }
-        <div ref={bottomRef}/>
-      </div>
-
-      {/* Campo de digitação */}
-      <div className={styles.inputArea}>
-        <textarea
-          className={styles.msgInput}
-          placeholder="Digite sua mensagem..."
-          value={text}
-          onChange={e => setText(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={1}
-          aria-label="Digite sua mensagem"
-        />
-        <button
-          className={`${styles.sendBtn} ${text.trim() ? styles.sendBtnActive : ''}`}
-          onClick={sendMessage}
-          disabled={!text.trim() || sending}
-          aria-label="Enviar mensagem"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22,2 15,22 11,13 2,9"/>
-          </svg>
-        </button>
-      </div>
-
-      {/* Modais */}
-      {showMenu && (
+      {/* Modais — somente para membros */}
+      {isMember && showMenu && (
         <OptionsMenu
           isLeader={isLeader}
           onClose={() => setShowMenu(false)}
