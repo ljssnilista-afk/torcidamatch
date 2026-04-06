@@ -1,97 +1,86 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { useUser } from './UserContext'
 
 const NotificationsContext = createContext(null)
 
-// ─── Dados mockados ───────────────────────────────────────────────────────────
-const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    type: 'group_invite',
-    title: 'Convite para grupo',
-    message: 'Você foi convidado para o grupo "Fúria Jovem Tijuca"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),   // 5 min atrás
-    read: false,
-    actions: ['accept', 'decline'],
-    actionUrl: '/grupos/furia-jovem',
-  },
-  {
-    id: 2,
-    type: 'join_request',
-    title: 'Solicitação de entrada',
-    message: 'João Silva quer entrar no seu grupo "Copa-Fogo"',
-    timestamp: new Date(Date.now() - 1000 * 60 * 22).toISOString(),  // 22 min atrás
-    read: false,
-    actions: ['accept', 'decline'],
-    actionUrl: '/grupos/copa-fogo',
-  },
-  {
-    id: 3,
-    type: 'ride_booked',
-    title: 'Reserva de carona',
-    message: 'Mariana Costa reservou uma vaga na sua carona para Botafogo × Flamengo',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60).toISOString(),  // 1h atrás
-    read: false,
-    actions: ['details'],
-    actionUrl: '/vamos-comigo',
-  },
-  {
-    id: 4,
-    type: 'ride_reminder',
-    title: 'Lembrete de carona',
-    message: 'Sua carona para Botafogo × Vasco sai em 2 horas. Ponto: Av. Atlântica',
-    timestamp: new Date(Date.now() - 1000 * 60 * 90).toISOString(),  // 1h30 atrás
-    read: false,
-    actions: ['details'],
-    actionUrl: '/vamos-comigo',
-  },
-  {
-    id: 5,
-    type: 'rating',
-    title: 'Avaliação recebida',
-    message: 'Carlos Eduardo avaliou sua carona com ⭐ 5 estrelas!',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3h atrás
-    read: true,
-    actions: [],
-    actionUrl: '/perfil',
-  },
-  {
-    id: 6,
-    type: 'promo',
-    title: 'Nova caravana disponível',
-    message: 'Caravana oficial para o clássico Botafogo × Fluminense! Vagas limitadas.',
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5h atrás
-    read: true,
-    actions: ['details'],
-    actionUrl: '/grupos',
-  },
-]
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/torcida-api/api'
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
 export function NotificationsProvider({ children }) {
-  const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS)
+  const { user, isLoggedIn } = useUser()
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [notifications, setNotifications] = useState([])
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const token = user?.token
 
-  const markAsRead = (id) =>
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    )
+  // Fetch unread count
+  const fetchUnreadCount = useCallback(async () => {
+    if (!token) return
+    try {
+      const res = await fetch(`${API_URL}/notifications/unread-count`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setUnreadCount(data.count || 0)
+      }
+    } catch {}
+  }, [token])
 
-  const markAllAsRead = () =>
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  // Fetch all notifications
+  const fetchNotifications = useCallback(async () => {
+    if (!token) return
+    try {
+      const res = await fetch(`${API_URL}/notifications`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setNotifications(data.notifications || [])
+        setUnreadCount(data.notifications?.filter(n => !n.read).length || 0)
+      }
+    } catch {}
+  }, [token])
 
-  const dismiss = (id) =>
-    setNotifications((prev) => prev.filter((n) => n.id !== id))
+  // Mark as read
+  const markAsRead = useCallback(async (id) => {
+    if (!token) return
+    try {
+      await fetch(`${API_URL}/notifications/${id}/read`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      setNotifications(prev => prev.map(n => n._id === id ? { ...n, read: true } : n))
+      setUnreadCount(prev => Math.max(0, prev - 1))
+    } catch {}
+  }, [token])
 
-  const respond = (id, action) => {
-    // Futuramente: chamar API com accept/decline
-    dismiss(id)
-  }
+  // Mark all as read
+  const markAllAsRead = useCallback(async () => {
+    if (!token) return
+    try {
+      await fetch(`${API_URL}/notifications/read-all`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}` },
+      })
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+      setUnreadCount(0)
+    } catch {}
+  }, [token])
+
+  // Poll unread count every 30 seconds
+  useEffect(() => {
+    if (!isLoggedIn || !token) return
+    fetchUnreadCount()
+    const interval = setInterval(fetchUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [isLoggedIn, token, fetchUnreadCount])
 
   return (
-    <NotificationsContext.Provider
-      value={{ notifications, unreadCount, markAsRead, markAllAsRead, dismiss, respond }}
-    >
+    <NotificationsContext.Provider value={{
+      unreadCount, notifications,
+      fetchNotifications, fetchUnreadCount,
+      markAsRead, markAllAsRead,
+    }}>
       {children}
     </NotificationsContext.Provider>
   )
