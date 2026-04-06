@@ -646,22 +646,20 @@ export default function GrupoScreen() {
       toast.error('Faça login para entrar no grupo')
       return
     }
-    if (grupo?.privacy === 'private') {
-      // Placeholder: fluxo de pagamento ainda não implementado
-      toast.success('Em breve: assinatura do grupo 💳')
-      return
-    }
     setJoinStatus('requesting')
     try {
-      const res = await fetch(`${API_URL}/grupos/${id}/solicitar`, {
+      const res = await fetch(`${API_URL}/grupos/${id}/entrar`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
       if (res.ok) {
-        if (grupo?.approvalRequired) {
+        if (data.status === 'pendingApproval') {
           setJoinStatus('pending')
-          toast.success(data.message || 'Solicitação enviada!')
+          toast.success(data.message || 'Solicitação enviada ao líder!')
+        } else if (data.status === 'pendingPayment') {
+          setJoinStatus('pendingPayment')
+          toast.success(data.message || 'Pague a mensalidade para acessar o grupo')
         } else {
           toast.success(data.message || 'Você entrou no grupo!')
           setJoinStatus(null)
