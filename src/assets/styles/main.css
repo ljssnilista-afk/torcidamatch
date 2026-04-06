@@ -1,3 +1,6 @@
+/* ─── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&display=swap');
+
 /* ─── Global Resets ─── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -13,13 +16,14 @@
 html, body, #root {
   height: 100%;
   background: var(--color-bg);
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   overflow: hidden;
   position: fixed;
   width: 100%;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -30,103 +34,159 @@ html, body, #root {
 
 button {
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   border: none;
   background: none;
-  transition: transform 0.16s ease, opacity 0.16s ease;
+  transition: transform var(--transition), opacity var(--transition);
 }
 
 button:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
-/* ─── Design Tokens — Dark (padrão) ─── */
-:root, [data-theme="dark"] {
-  /* Backgrounds */
-  --color-bg: #1a1a1a;
-  --color-surface-1: #212121;
-  --color-surface-2: #2c2c2c;
-  --color-surface-3: #333333;
-  --color-border: rgba(255, 255, 255, 0.07);
-  --color-border-2: rgba(255, 255, 255, 0.12);
+input, select, textarea {
+  font-family: 'DM Sans', system-ui, sans-serif;
+}
 
-  /* Brand */
+/* ─── Design Tokens — Dark (padrão) ─────────────────────────────────────────── */
+:root, [data-theme="dark"] {
+  /* Backgrounds — deeper, richer darks */
+  --color-bg: #080808;
+  --color-surface-1: #0f0f0f;
+  --color-surface-2: #181818;
+  --color-surface-3: #222222;
+  --color-surface-4: #2a2a2a;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-2: rgba(255, 255, 255, 0.10);
+  --color-border-3: rgba(255, 255, 255, 0.16);
+
+  /* Brand green — vivid, electric */
   --color-brand: #22C55E;
-  --color-brand-light: #5BDF6A;
-  --color-brand-dark: #0d5428;
-  --color-brand-dim: rgba(34, 197, 94, 0.12);
-  --color-brand-glow: rgba(34, 197, 94, 0.35);
+  --color-brand-light: #4ADE80;
+  --color-brand-dark: #166534;
+  --color-brand-dim: rgba(34, 197, 94, 0.10);
+  --color-brand-glow: rgba(34, 197, 94, 0.30);
+  --color-brand-glow-lg: rgba(34, 197, 94, 0.15);
 
   /* Accents */
-  --color-gold: #D4AF37;
-  --color-gold-dim: rgba(212, 175, 55, 0.12);
-  --color-silver: #C8C8C8;
-  --color-silver-dim: rgba(200, 200, 200, 0.10);
-  --color-danger: #EF4444;
-  --color-danger-dim: rgba(239, 68, 68, 0.10);
-  --color-feminine: #C060C0;
-  --color-feminine-dim: rgba(192, 96, 192, 0.10);
+  --color-gold: #F0C040;
+  --color-gold-dim: rgba(240, 192, 64, 0.12);
+  --color-gold-glow: rgba(240, 192, 64, 0.25);
+  --color-silver: #D0D0D0;
+  --color-silver-dim: rgba(208, 208, 208, 0.10);
+  --color-danger: #F87171;
+  --color-danger-dim: rgba(248, 113, 113, 0.10);
+  --color-danger-glow: rgba(248, 113, 113, 0.25);
+  --color-feminine: #D080D8;
+  --color-feminine-dim: rgba(208, 128, 216, 0.10);
 
   /* Text */
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: rgba(255, 255, 255, 0.62);
-  --color-text-tertiary: rgba(255, 255, 255, 0.35);
+  --color-text-primary: #F2F2F2;
+  --color-text-secondary: rgba(242, 242, 242, 0.55);
+  --color-text-tertiary: rgba(242, 242, 242, 0.30);
+  --color-text-quaternary: rgba(242, 242, 242, 0.18);
+
+  /* Elevation — shadow system */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.7), 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 0 0.5px rgba(255, 255, 255, 0.05);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 0 0.5px rgba(255, 255, 255, 0.06);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.95), 0 0 0 0.5px rgba(255, 255, 255, 0.07);
+  --shadow-brand: 0 4px 20px rgba(34, 197, 94, 0.30), 0 0 8px rgba(34, 197, 94, 0.15);
+  --shadow-gold: 0 4px 20px rgba(240, 192, 64, 0.25), 0 0 8px rgba(240, 192, 64, 0.12);
+
+  /* Glass */
+  --glass-bg: rgba(15, 15, 15, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(16px) saturate(180%);
+  --glass-blur-sm: blur(8px) saturate(160%);
 
   /* Layout */
-  --radius-card: 20px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  --radius-xs: 6px;
-  --radius-chip: 18px;
+  --radius-card: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --radius-chip: 20px;
+  --radius-pill: 100px;
 
   /* Transitions */
-  --transition: 0.16s ease;
+  --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   /* Phone shell */
   --phone-max-width: 390px;
   --phone-height: 920px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
 }
 
-/* ─── Design Tokens — Light ─── */
+/* ─── Design Tokens — Light ─────────────────────────────────────────────────── */
 [data-theme="light"] {
   /* Backgrounds */
-  --color-bg: #F5F5F0;
-  --color-surface-1: #FFFFFF;
-  --color-surface-2: #F0EDE8;
+  --color-bg: #F0EDE8;
+  --color-surface-1: #FAFAF8;
+  --color-surface-2: #F2EFE9;
   --color-surface-3: #E8E5E0;
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-2: rgba(0, 0, 0, 0.12);
+  --color-surface-4: #DDD9D2;
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-border-2: rgba(0, 0, 0, 0.11);
+  --color-border-3: rgba(0, 0, 0, 0.16);
 
   /* Brand */
-  --color-brand: #1A9E48;
+  --color-brand: #18A44A;
   --color-brand-light: #22C55E;
-  --color-brand-dark: #0d5428;
-  --color-brand-dim: rgba(26, 158, 72, 0.10);
-  --color-brand-glow: rgba(26, 158, 72, 0.20);
+  --color-brand-dark: #166534;
+  --color-brand-dim: rgba(24, 164, 74, 0.10);
+  --color-brand-glow: rgba(24, 164, 74, 0.20);
+  --color-brand-glow-lg: rgba(24, 164, 74, 0.10);
 
   /* Accents */
-  --color-gold: #B8941E;
-  --color-gold-dim: rgba(184, 148, 30, 0.10);
-  --color-silver: #666666;
-  --color-silver-dim: rgba(100, 100, 100, 0.08);
+  --color-gold: #C8941A;
+  --color-gold-dim: rgba(200, 148, 26, 0.10);
+  --color-gold-glow: rgba(200, 148, 26, 0.18);
+  --color-silver: #606060;
+  --color-silver-dim: rgba(96, 96, 96, 0.08);
   --color-danger: #DC2626;
   --color-danger-dim: rgba(220, 38, 38, 0.08);
-  --color-feminine: #A040A0;
-  --color-feminine-dim: rgba(160, 64, 160, 0.08);
+  --color-danger-glow: rgba(220, 38, 38, 0.15);
+  --color-feminine: #A040A8;
+  --color-feminine-dim: rgba(160, 64, 168, 0.08);
 
   /* Text */
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: rgba(0, 0, 0, 0.55);
-  --color-text-tertiary: rgba(0, 0, 0, 0.35);
+  --color-text-primary: #141414;
+  --color-text-secondary: rgba(20, 20, 20, 0.55);
+  --color-text-tertiary: rgba(20, 20, 20, 0.35);
+  --color-text-quaternary: rgba(20, 20, 20, 0.20);
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.10), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.09);
+  --shadow-brand: 0 4px 20px rgba(24, 164, 74, 0.20);
+  --shadow-gold: 0 4px 20px rgba(200, 148, 26, 0.18);
+
+  /* Glass */
+  --glass-bg: rgba(250, 250, 248, 0.80);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-blur: blur(16px) saturate(160%);
+  --glass-blur-sm: blur(8px) saturate(140%);
 }
 
-/* ─── Light Mode Global Overrides ─── */
-/* Fix hardcoded dark colors in CSS modules (borders, backgrounds, shadows) */
+/* ─── Global Light Mode Overrides ─────────────────────────────────────────── */
 [data-theme="light"] {
   color-scheme: light;
 }
 
-/* Hardcoded #333 borders → light equivalent */
 [data-theme="light"] [class*="Card"],
 [data-theme="light"] [class*="card"],
 [data-theme="light"] [class*="Sheet"],
@@ -162,7 +222,6 @@ button:active {
   border-color: var(--color-border) !important;
 }
 
-/* Hardcoded rgba(255,255,255,...) backgrounds → light equivalents */
 [data-theme="light"] [class*="chip"]:not([class*="Active"]),
 [data-theme="light"] [class*="filterBtn"],
 [data-theme="light"] [class*="backBtn"],
@@ -174,7 +233,6 @@ button:active {
   border-color: var(--color-border) !important;
 }
 
-/* Hardcoded dark modal/sheet backgrounds */
 [data-theme="light"] [class*="Overlay"] > div,
 [data-theme="light"] [class*="overlay"] > div,
 [data-theme="light"] [class*="Sheet"],
@@ -183,7 +241,6 @@ button:active {
   border-color: var(--color-border) !important;
 }
 
-/* Skeleton shimmer for light mode */
 [data-theme="light"] [class*="skeleton"],
 [data-theme="light"] [class*="Skeleton"],
 [data-theme="light"] [class*="skLine"],
@@ -196,75 +253,63 @@ button:active {
   background: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Fix game banner gradient for light mode */
 [data-theme="light"] [class*="gameBanner"] {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
-  border-color: rgba(26, 158, 72, 0.2) !important;
+  background: linear-gradient(135deg, #e6f4ec 0%, #f0f8f2 100%) !important;
+  border-color: rgba(24, 164, 74, 0.18) !important;
 }
 
-/* Fix game card glow backgrounds */
 [data-theme="light"] [class*="gameCard"] {
   background: var(--color-surface-1) !important;
 }
 [data-theme="light"] [class*="gameCardSelected"] {
-  background: rgba(26, 158, 72, 0.06) !important;
+  background: rgba(24, 164, 74, 0.06) !important;
   border-color: var(--color-brand) !important;
 }
 
-/* Fix bottom nav */
 [data-theme="light"] nav[class*="nav"] {
   background: var(--color-surface-1) !important;
   border-color: var(--color-border) !important;
 }
 
-/* Fix dividers */
 [data-theme="light"] [class*="divider"],
 [data-theme="light"] [class*="Divider"] {
   background: var(--color-border) !important;
 }
 
-/* Fix CTA banners */
 [data-theme="light"] [class*="ctaBanner"],
 [data-theme="light"] [class*="gameBanner"] {
-  border-color: rgba(26, 158, 72, 0.15) !important;
+  border-color: rgba(24, 164, 74, 0.14) !important;
 }
 
-/* Fix avatar backgrounds in light mode */
 [data-theme="light"] [class*="avatarOnline"] {
   border-color: var(--color-surface-1) !important;
 }
 
-/* Fix canvas/stadium cards */
 [data-theme="light"] [class*="GroupCard"],
 [data-theme="light"] [class*="groupCard"] canvas {
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
-/* Fix hardcoded white text on colored backgrounds (keep white) */
 [data-theme="light"] [class*="avatar"]:not([class*="avatarWrap"]):not([class*="avatarPhoto"]) {
   color: #fff !important;
 }
 
-/* Fix hover shadows */
 [data-theme="light"] [class*="Card"]:hover,
 [data-theme="light"] [class*="card"]:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* Fix occupancy/progress bars */
 [data-theme="light"] [class*="occBar"],
 [data-theme="light"] [class*="seatsBar"],
 [data-theme="light"] [class*="stepLine"] {
   background: rgba(0, 0, 0, 0.06) !important;
 }
 
-/* Fix countdown badge in light mode */
 [data-theme="light"] [class*="countdownBadge"] {
-  background: rgba(26, 158, 72, 0.08) !important;
-  border-color: rgba(26, 158, 72, 0.2) !important;
+  background: rgba(24, 164, 74, 0.08) !important;
+  border-color: rgba(24, 164, 74, 0.18) !important;
 }
 
-/* Fix settings panel */
 [data-theme="light"] [class*="settingsItem"]:hover {
   background: var(--color-surface-2) !important;
 }
@@ -275,23 +320,60 @@ button:active {
   background: var(--color-surface-3) !important;
 }
 
-/* Fix select elements */
 [data-theme="light"] select {
   background: var(--color-surface-2) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-border) !important;
 }
 
-/* Fix modal overlay */
 [data-theme="light"] [class*="Overlay"],
 [data-theme="light"] [class*="overlay"] {
-  background: rgba(0, 0, 0, 0.4) !important;
+  background: rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Fix crop modal */
 [data-theme="light"] [class*="cropSheet"],
 [data-theme="light"] [class*="editSheet"],
 [data-theme="light"] [class*="settingsSheet"],
 [data-theme="light"] [class*="modalSheet"] {
   background: var(--color-surface-1) !important;
+}
+
+/* ─── Global Animation Keyframes ─────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes brandPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+@keyframes dotBounce {
+  0%, 80%, 100% { transform: scale(0.65); opacity: 0.4; }
+  40%            { transform: scale(1);    opacity: 1; }
 }
