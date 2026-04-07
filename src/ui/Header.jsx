@@ -1,10 +1,12 @@
 import { memo, useState, useRef, useEffect } from 'react'
+import { useNotifications } from '../context/NotificationsContext'
 import styles from './Header.module.css'
 
 function Header({ onSearch, onNotification }) {
   const [searchOpen, setSearchOpen] = useState(false)
   const [query, setQuery] = useState('')
   const inputRef = useRef(null)
+  const { unreadCount } = useNotifications()
 
   // Foca o input assim que expande
   useEffect(() => {
@@ -65,7 +67,11 @@ function Header({ onSearch, onNotification }) {
                 <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 01-3.46 0" />
               </svg>
-              <span className={styles.notifDot} aria-hidden="true" />
+              {unreadCount > 0 && (
+                <span className={styles.notifBadge} aria-label={`${unreadCount} notificações não lidas`}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
           </div>
         </>
