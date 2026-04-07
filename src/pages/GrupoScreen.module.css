@@ -297,8 +297,20 @@
 }
 .menuItem:hover { background: rgba(255,255,255,0.05); }
 .menuItemDanger { color: #EF4444; }
+.menuItemHighlight { background: rgba(212,175,55,0.06); }
 .menuItemIcon { font-size: 18px; width: 24px; }
 .menuItem svg { margin-left: auto; color: var(--color-text-tertiary); }
+.menuBadge {
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  margin-left: 4px;
+}
 
 /* ─── Members modal ──────────────────────────────────────────────────────── */
 .membersHeader {

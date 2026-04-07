@@ -298,24 +298,26 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
   )
 }
 
-function OptionsMenu({ onClose, onInvite, onMembers, onEdit, onLeave, isLeader }) {
+function OptionsMenu({ onClose, onInvite, onMembers, onEdit, onLeave, isLeader, pendingCount, membersCount }) {
   return (
     <div className={styles.menuOverlay} onClick={onClose}>
       <div className={styles.menuSheet} onClick={e => e.stopPropagation()}>
         <div className={styles.menuHandle}/>
         {[
-          { icon: '👥', label: 'Ver membros',      action: onMembers },
+          ...(isLeader && pendingCount > 0 ? [{ icon: '🔔', label: `Solicitações (${pendingCount})`, action: onMembers, highlight: true }] : []),
+          { icon: '👥', label: `Ver membros (${membersCount})`, action: onMembers },
           { icon: '🔗', label: 'Convidar pessoas', action: onInvite  },
           ...(isLeader ? [{ icon: '✏️', label: 'Editar grupo', action: onEdit }] : []),
           { icon: '🚪', label: 'Sair do grupo',    action: onLeave, danger: true },
         ].map(item => (
           <button
             key={item.label}
-            className={`${styles.menuItem} ${item.danger ? styles.menuItemDanger : ''}`}
+            className={`${styles.menuItem} ${item.danger ? styles.menuItemDanger : ''} ${item.highlight ? styles.menuItemHighlight : ''}`}
             onClick={() => { onClose(); item.action?.() }}
           >
             <span className={styles.menuItemIcon}>{item.icon}</span>
             <span>{item.label}</span>
+            {item.highlight && <span className={styles.menuBadge}>{pendingCount}</span>}
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M9 18l6-6-6-6"/>
             </svg>
@@ -897,6 +899,8 @@ export default function GrupoScreen() {
       {isMember && showMenu && (
         <OptionsMenu
           isLeader={isLeader}
+          pendingCount={grupo?.pendingMembers?.length || 0}
+          membersCount={members.length}
           onClose={() => setShowMenu(false)}
           onInvite={() => { setShowMenu(false); setShowInvite(true) }}
           onMembers={() => { setShowMenu(false); setShowMembers(true) }}
