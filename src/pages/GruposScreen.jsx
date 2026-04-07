@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Filters from '../ui/Filters'
-import GroupCard from '../ui/GroupCard'
+import Filters from './Filters'
+import GroupCard from './GroupCard'
 import { ROUTES } from '../utils/constants'
 import { useGame } from '../context/GameContext'
 import { useUser } from '../context/UserContext'
@@ -83,7 +83,7 @@ export default function GruposScreen() {
   const [activeFilter,  setActiveFilter]  = useState('todos')
   const [search,        setSearch]        = useState('')
   const [grupos,        setGrupos]        = useState([])
-  const [meuGrupo,      setMeuGrupo]      = useState(null)
+  const [meusGrupos,    setMeusGrupos]    = useState([])
   const [loading,       setLoading]       = useState(true)
   const [userLocation,  setUserLocation]  = useState(null)
   const [locationLabel, setLocationLabel] = useState('Obtendo localização...')
@@ -152,13 +152,13 @@ export default function GruposScreen() {
             return false
           }
 
-          const meusGrupos = todos.filter(isMyGroup)
-          const meusIds    = new Set(meusGrupos.map(g => String(g._id)))
+          const meusGruposList = todos.filter(isMyGroup)
+          const meusIds    = new Set(meusGruposList.map(g => String(g._id)))
           const proximos   = todos.filter(g => !meusIds.has(String(g._id)))
 
-          console.log('[Grupos] meus:', meusGrupos.map(g=>g.name), '| proximos:', proximos.map(g=>g.name))
+          console.log('[Grupos] meus:', meusGruposList.map(g=>g.name), '| proximos:', proximos.map(g=>g.name))
 
-          setMeuGrupo(meusGrupos[0] || null)
+          setMeusGrupos(meusGruposList)
           setGrupos(proximos)
         }
       } catch (err) { console.warn(err) }
@@ -214,7 +214,7 @@ export default function GruposScreen() {
     return true
   })
 
-  const totalCount = filtered.length + (meuGrupo ? 1 : 0)
+  const totalCount = filtered.length + meusGrupos.length
 
   return (
     <div className={styles.screen}>
@@ -272,18 +272,21 @@ export default function GruposScreen() {
         </div>
 
         {/* ✅ Fix 4 — "Meus grupos" */}
-        {meuGrupo && (
+        {meusGrupos.length > 0 && (
           <>
             <div className={styles.sectionDivider}>
               <span className={styles.dividerTitle}>Meus grupos</span>
               <div className={styles.dividerLine}/>
-              <span className={styles.dividerCount}>1 grupo</span>
+              <span className={styles.dividerCount}>{meusGrupos.length} {meusGrupos.length === 1 ? 'grupo' : 'grupos'}</span>
             </div>
-            <GroupCard
-              group={toCardFormat(meuGrupo)}
-              onDetails={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
-              onAction={() => navigate(`/grupos/${meuGrupo._id}`, { state: { grupo: meuGrupo } })}
-            />
+            {meusGrupos.map(g => (
+              <GroupCard
+                key={g._id}
+                group={toCardFormat(g)}
+                onDetails={() => navigate(`/grupos/${g._id}`, { state: { grupo: g } })}
+                onAction={() => navigate(`/grupos/${g._id}`, { state: { grupo: g } })}
+              />
+            ))}
           </>
         )}
 
@@ -314,7 +317,7 @@ export default function GruposScreen() {
           </>
         )}
 
-        {!loading && filtered.length === 0 && !meuGrupo && (
+        {!loading && filtered.length === 0 && meusGrupos.length === 0 && (
           <div className={styles.emptyState}>
             <span className={styles.emptyIcon}>🏟️</span>
             <p className={styles.emptyTitle}>Nenhum grupo ainda</p>
@@ -337,7 +340,7 @@ export default function GruposScreen() {
       {/* Mapa real */}
       {mapVisible && (
         <MapaReal
-          grupos={[...grupos, ...(meuGrupo ? [meuGrupo] : [])]}
+          grupos={[...grupos, ...meusGrupos]}
           userLocation={userLocation}
           onClose={() => setMapVisible(false)}
         />
@@ -345,5 +348,3 @@ export default function GruposScreen() {
     </div>
   )
 }
-
-
