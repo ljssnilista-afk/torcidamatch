@@ -1,43 +1,70 @@
+/* ─── Header — Premium Dark Futuristic ──────────────────────────────────── */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px 10px;
+  padding: 14px 18px 12px;
   flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(8,12,8,0.95) 0%, rgba(8,12,8,0.7) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid rgba(34, 197, 94, 0.06);
+  position: relative;
+  z-index: 10;
 }
+
+/* Subtle green ambient glow at top */
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent);
+}
+
 .logo {
   display: flex;
   align-items: center;
 }
 .logoName {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 900;
   color: var(--color-text-primary);
   letter-spacing: -0.5px;
 }
 .logoName em {
   font-style: normal;
-  color: var(--color-brand);
+  background: linear-gradient(135deg, #22C55E 0%, #4ADE80 50%, #22C55E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 .actions {
   display: flex;
   gap: 8px;
 }
 .iconBtn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  border: 0.5px solid var(--color-border);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--metallic-light);
+  border: 0.5px solid var(--metallic-border);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   color: var(--color-silver);
-  transition: background var(--transition);
+  transition: all var(--transition);
+  backdrop-filter: blur(10px);
 }
 .iconBtn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.15);
+  color: var(--color-brand);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.08);
 }
 .notifDot {
   position: absolute;
@@ -48,6 +75,7 @@
   background: var(--color-brand);
   border-radius: 50%;
   border: 1.5px solid var(--color-bg);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
 }
 
 /* ─── Search bar expandida ───────────────────────────────────────────────── */
@@ -56,10 +84,10 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  animation: searchExpand 0.18s ease;
+  animation: searchExpand 0.2s ease;
 }
 @keyframes searchExpand {
-  from { opacity: 0; transform: scaleX(0.92); }
+  from { opacity: 0; transform: scaleX(0.95); }
   to   { opacity: 1; transform: scaleX(1); }
 }
 .searchIcon {
@@ -68,26 +96,22 @@
 }
 .searchInput {
   flex: 1;
-  height: 36px;
+  height: 38px;
   padding: 0 12px 0 4px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 0.5px solid var(--color-border-2);
-  border-radius: 10px;
+  background: var(--metallic-light);
+  border: 0.5px solid var(--metallic-border);
+  border-radius: var(--radius-sm);
   color: var(--color-text-primary);
   font-size: 14px;
-  font-family: 'Inter', sans-serif;
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
   -webkit-appearance: none;
 }
 .searchInput:focus {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.06), 0 0 16px rgba(34, 197, 94, 0.06);
 }
-.searchInput::placeholder {
-  color: var(--color-text-tertiary);
-}
-/* Remove o X nativo do input type=search */
+.searchInput::placeholder { color: var(--color-text-tertiary); }
 .searchInput::-webkit-search-cancel-button { display: none; }
 .searchCancelBtn {
   font-size: 13px;
@@ -118,4 +142,10 @@
   justify-content: center;
   border: 1.5px solid var(--color-bg);
   line-height: 1;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  animation: badgePulse 2s infinite;
+}
+@keyframes badgePulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+  50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.5); }
 }

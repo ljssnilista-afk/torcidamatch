@@ -10,16 +10,20 @@
   html { --safe-bottom: env(safe-area-inset-bottom); }
 }
 
+/* Import premium fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
 html, body, #root {
   height: 100%;
   background: var(--color-bg);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
   overflow: hidden;
   position: fixed;
   width: 100%;
-  transition: background 0.25s ease, color 0.25s ease;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -30,68 +34,80 @@ html, body, #root {
 
 button {
   cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
   border: none;
   background: none;
-  transition: transform 0.16s ease, opacity 0.16s ease;
+  transition: transform 0.14s ease, opacity 0.14s ease;
 }
 
 button:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
-/* ─── Design Tokens — Dark (padrão) ─── */
-:root, [data-theme="dark"] {
-  /* Backgrounds — deeper, richer */
-  --color-bg: #0d0d0d;
-  --color-surface-1: #161616;
-  --color-surface-2: #1e1e1e;
-  --color-surface-3: #282828;
-  --color-border: rgba(255, 255, 255, 0.06);
-  --color-border-2: rgba(255, 255, 255, 0.10);
+input, textarea, select {
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+}
 
-  /* Brand — more vibrant */
+/* ─── Design Tokens — Dark Premium (padrão) ─── */
+:root, [data-theme="dark"] {
+  /* Backgrounds — deep black with subtle green tint */
+  --color-bg: #080c08;
+  --color-surface-1: #0f1410;
+  --color-surface-2: #151d17;
+  --color-surface-3: #1c261e;
+  --color-border: rgba(34, 197, 94, 0.06);
+  --color-border-2: rgba(34, 197, 94, 0.12);
+
+  /* Brand — vibrant green */
   --color-brand: #22C55E;
   --color-brand-light: #4ADE80;
   --color-brand-dark: #0d5428;
-  --color-brand-dim: rgba(34, 197, 94, 0.10);
-  --color-brand-glow: rgba(34, 197, 94, 0.30);
+  --color-brand-dim: rgba(34, 197, 94, 0.08);
+  --color-brand-glow: rgba(34, 197, 94, 0.25);
 
-  /* Accents */
+  /* Metallic accents */
   --color-gold: #E8B923;
-  --color-gold-dim: rgba(232, 185, 35, 0.10);
-  --color-silver: #C8C8C8;
-  --color-silver-dim: rgba(200, 200, 200, 0.08);
+  --color-gold-dim: rgba(232, 185, 35, 0.08);
+  --color-silver: #A8B2A8;
+  --color-silver-dim: rgba(168, 178, 168, 0.06);
   --color-danger: #EF4444;
-  --color-danger-dim: rgba(239, 68, 68, 0.08);
+  --color-danger-dim: rgba(239, 68, 68, 0.06);
   --color-feminine: #C060C0;
-  --color-feminine-dim: rgba(192, 96, 192, 0.08);
+  --color-feminine-dim: rgba(192, 96, 192, 0.06);
+
+  /* Metallic surfaces */
+  --metallic-light: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+  --metallic-border: rgba(255, 255, 255, 0.07);
+  --metallic-shine: linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(34,197,94,0.02) 50%, rgba(232,185,35,0.06) 100%);
 
   /* Text */
-  --color-text-primary: #F5F5F5;
-  --color-text-secondary: rgba(255, 255, 255, 0.58);
-  --color-text-tertiary: rgba(255, 255, 255, 0.30);
+  --color-text-primary: #E8EDE9;
+  --color-text-secondary: rgba(232, 237, 233, 0.55);
+  --color-text-tertiary: rgba(232, 237, 233, 0.28);
 
   /* Glass */
-  --glass-bg: rgba(255, 255, 255, 0.04);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-blur: blur(16px);
+  --glass-bg: rgba(15, 20, 16, 0.75);
+  --glass-bg-strong: rgba(15, 20, 16, 0.9);
+  --glass-border: rgba(34, 197, 94, 0.08);
+  --glass-blur: blur(20px);
 
   /* Shadows */
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --shadow-brand: 0 4px 20px rgba(34, 197, 94, 0.15);
-  --shadow-gold: 0 4px 20px rgba(232, 185, 35, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-brand: 0 4px 24px rgba(34, 197, 94, 0.12);
+  --shadow-gold: 0 4px 20px rgba(232, 185, 35, 0.1);
+  --shadow-elevated: 0 8px 40px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3);
 
   /* Layout */
-  --radius-card: 20px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  --radius-xs: 6px;
-  --radius-chip: 20px;
+  --radius-card: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --radius-chip: 22px;
 
   /* Transitions */
   --transition: 0.18s ease;
-  --transition-slow: 0.35s ease;
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Phone shell */
   --phone-max-width: 390px;
@@ -100,44 +116,51 @@ button:active {
 
 /* ─── Design Tokens — Light ─── */
 [data-theme="light"] {
-  /* Backgrounds */
-  --color-bg: #F5F5F0;
+  --color-bg: #F2F5F0;
   --color-surface-1: #FFFFFF;
-  --color-surface-2: #F0EDE8;
-  --color-surface-3: #E8E5E0;
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-2: rgba(0, 0, 0, 0.12);
+  --color-surface-2: #EDF0EA;
+  --color-surface-3: #E3E8E0;
+  --color-border: rgba(0, 0, 0, 0.06);
+  --color-border-2: rgba(0, 0, 0, 0.10);
 
-  /* Brand */
   --color-brand: #1A9E48;
   --color-brand-light: #22C55E;
   --color-brand-dark: #0d5428;
-  --color-brand-dim: rgba(26, 158, 72, 0.10);
-  --color-brand-glow: rgba(26, 158, 72, 0.20);
+  --color-brand-dim: rgba(26, 158, 72, 0.08);
+  --color-brand-glow: rgba(26, 158, 72, 0.15);
 
-  /* Accents */
   --color-gold: #B8941E;
-  --color-gold-dim: rgba(184, 148, 30, 0.10);
+  --color-gold-dim: rgba(184, 148, 30, 0.08);
   --color-silver: #666666;
-  --color-silver-dim: rgba(100, 100, 100, 0.08);
+  --color-silver-dim: rgba(100, 100, 100, 0.06);
   --color-danger: #DC2626;
-  --color-danger-dim: rgba(220, 38, 38, 0.08);
+  --color-danger-dim: rgba(220, 38, 38, 0.06);
   --color-feminine: #A040A0;
-  --color-feminine-dim: rgba(160, 64, 160, 0.08);
+  --color-feminine-dim: rgba(160, 64, 160, 0.06);
 
-  /* Text */
+  --metallic-light: linear-gradient(135deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.01) 100%);
+  --metallic-border: rgba(0, 0, 0, 0.08);
+  --metallic-shine: linear-gradient(135deg, rgba(26,158,72,0.06) 0%, transparent 50%, rgba(184,148,30,0.04) 100%);
+
   --color-text-primary: #1A1A1A;
-  --color-text-secondary: rgba(0, 0, 0, 0.55);
-  --color-text-tertiary: rgba(0, 0, 0, 0.35);
+  --color-text-secondary: rgba(0, 0, 0, 0.5);
+  --color-text-tertiary: rgba(0, 0, 0, 0.3);
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-strong: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(0, 0, 0, 0.06);
+  --glass-blur: blur(20px);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-brand: 0 4px 16px rgba(26, 158, 72, 0.08);
+  --shadow-gold: 0 4px 16px rgba(184, 148, 30, 0.06);
+  --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* ─── Light Mode Global Overrides ─── */
-/* Fix hardcoded dark colors in CSS modules (borders, backgrounds, shadows) */
-[data-theme="light"] {
-  color-scheme: light;
-}
+[data-theme="light"] { color-scheme: light; }
 
-/* Hardcoded #333 borders → light equivalent */
 [data-theme="light"] [class*="Card"],
 [data-theme="light"] [class*="card"],
 [data-theme="light"] [class*="Sheet"],
@@ -173,7 +196,6 @@ button:active {
   border-color: var(--color-border) !important;
 }
 
-/* Hardcoded rgba(255,255,255,...) backgrounds → light equivalents */
 [data-theme="light"] [class*="chip"]:not([class*="Active"]),
 [data-theme="light"] [class*="filterBtn"],
 [data-theme="light"] [class*="backBtn"],
@@ -181,11 +203,10 @@ button:active {
 [data-theme="light"] [class*="menuBtn"],
 [data-theme="light"] [class*="gearBtn"],
 [data-theme="light"] [class*="editIconBtn"] {
-  background: rgba(0, 0, 0, 0.05) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
   border-color: var(--color-border) !important;
 }
 
-/* Hardcoded dark modal/sheet backgrounds */
 [data-theme="light"] [class*="Overlay"] > div,
 [data-theme="light"] [class*="overlay"] > div,
 [data-theme="light"] [class*="Sheet"],
@@ -194,115 +215,43 @@ button:active {
   border-color: var(--color-border) !important;
 }
 
-/* Skeleton shimmer for light mode */
 [data-theme="light"] [class*="skeleton"],
 [data-theme="light"] [class*="Skeleton"],
 [data-theme="light"] [class*="skLine"],
 [data-theme="light"] [class*="skBlock"],
-[data-theme="light"] [class*="skHeader"],
-[data-theme="light"] [class*="skBtn"],
 [data-theme="light"] [class*="skelLine"],
 [data-theme="light"] [class*="skelAvatar"],
 [data-theme="light"] [class*="skelStat"] {
-  background: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Fix game banner gradient for light mode */
-[data-theme="light"] [class*="gameBanner"] {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
-  border-color: rgba(26, 158, 72, 0.2) !important;
-}
-
-/* Fix game card glow backgrounds */
-[data-theme="light"] [class*="gameCard"] {
-  background: var(--color-surface-1) !important;
-}
-[data-theme="light"] [class*="gameCardSelected"] {
-  background: rgba(26, 158, 72, 0.06) !important;
-  border-color: var(--color-brand) !important;
-}
-
-/* Fix bottom nav */
 [data-theme="light"] nav[class*="nav"] {
   background: var(--color-surface-1) !important;
   border-color: var(--color-border) !important;
 }
 
-/* Fix dividers */
-[data-theme="light"] [class*="divider"],
-[data-theme="light"] [class*="Divider"] {
-  background: var(--color-border) !important;
+[data-theme="light"] [class*="Overlay"],
+[data-theme="light"] [class*="overlay"] {
+  background: rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Fix CTA banners */
-[data-theme="light"] [class*="ctaBanner"],
-[data-theme="light"] [class*="gameBanner"] {
-  border-color: rgba(26, 158, 72, 0.15) !important;
-}
-
-/* Fix avatar backgrounds in light mode */
-[data-theme="light"] [class*="avatarOnline"] {
-  border-color: var(--color-surface-1) !important;
-}
-
-/* Fix canvas/stadium cards */
-[data-theme="light"] [class*="GroupCard"],
-[data-theme="light"] [class*="groupCard"] canvas {
-  opacity: 0.9;
-}
-
-/* Fix hardcoded white text on colored backgrounds (keep white) */
-[data-theme="light"] [class*="avatar"]:not([class*="avatarWrap"]):not([class*="avatarPhoto"]) {
-  color: #fff !important;
-}
-
-/* Fix hover shadows */
-[data-theme="light"] [class*="Card"]:hover,
-[data-theme="light"] [class*="card"]:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Fix occupancy/progress bars */
 [data-theme="light"] [class*="occBar"],
 [data-theme="light"] [class*="seatsBar"],
 [data-theme="light"] [class*="stepLine"] {
-  background: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Fix countdown badge in light mode */
-[data-theme="light"] [class*="countdownBadge"] {
-  background: rgba(26, 158, 72, 0.08) !important;
-  border-color: rgba(26, 158, 72, 0.2) !important;
-}
-
-/* Fix settings panel */
-[data-theme="light"] [class*="settingsItem"]:hover {
-  background: var(--color-surface-2) !important;
-}
-[data-theme="light"] [class*="settingsItemIcon"] {
-  background: var(--color-surface-2) !important;
-}
-[data-theme="light"] [class*="themeToggleTrack"] {
-  background: var(--color-surface-3) !important;
-}
-
-/* Fix select elements */
 [data-theme="light"] select {
   background: var(--color-surface-2) !important;
   color: var(--color-text-primary) !important;
   border-color: var(--color-border) !important;
 }
 
-/* Fix modal overlay */
-[data-theme="light"] [class*="Overlay"],
-[data-theme="light"] [class*="overlay"] {
-  background: rgba(0, 0, 0, 0.4) !important;
+[data-theme="light"] [class*="avatar"]:not([class*="avatarWrap"]):not([class*="avatarPhoto"]) {
+  color: #fff !important;
 }
 
-/* Fix crop modal */
-[data-theme="light"] [class*="cropSheet"],
-[data-theme="light"] [class*="editSheet"],
-[data-theme="light"] [class*="settingsSheet"],
-[data-theme="light"] [class*="modalSheet"] {
-  background: var(--color-surface-1) !important;
+[data-theme="light"] [class*="Card"]:hover,
+[data-theme="light"] [class*="card"]:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
 }
