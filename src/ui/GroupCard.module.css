@@ -18,11 +18,38 @@
   border-color: rgba(34, 197, 94, 0.15);
   transform: translateY(-2px);
 }
-.canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.card:active {
+  transform: scale(0.985);
+  box-shadow: var(--shadow-card);
+  border-color: rgba(34, 197, 94, 0.1);
+}
+.card:active .overlay,
+.card:active .bottom,
+.card:active .top,
+.card:active .canvas,
+.card:active .shareBtn,
+.card:active .favBtn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto;
+}
+
+/* Prevent touch highlight issues on mobile */
+.card {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.canvas { 
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  will-change: auto;
+}
 .groupPhoto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .overlay {
   position: absolute; inset: 0;
   background: linear-gradient(0deg, rgba(8,12,8,0.98) 0%, rgba(8,12,8,0.7) 30%, rgba(8,12,8,0.2) 55%, transparent 100%);
+  will-change: auto;
 }
 
 /* Action buttons — glass pills */
@@ -64,7 +91,11 @@
 }
 
 /* Bottom content */
-.bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px 18px; z-index: 2; }
+.bottom { 
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px 18px; z-index: 2;
+  will-change: auto;
+  transform: translateZ(0); /* Force GPU layer to prevent disappearing */
+}
 .teamChip {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(0,0,0,0.5); border: 0.5px solid rgba(34,197,94,0.1);
