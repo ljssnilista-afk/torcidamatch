@@ -1,50 +1,27 @@
+/* ─── FemaleAlert — Premium Dark Futuristic ───────────────────────────────── */
 .card {
-  margin-bottom: 12px;
-  background: linear-gradient(135deg, #180818 0%, #0c000c 100%);
+  margin-bottom: 14px;
+  background: linear-gradient(135deg, rgba(192,96,192,0.04) 0%, rgba(8,12,8,0.9) 100%);
   border-radius: var(--radius-card);
-  border: 0.5px solid rgba(192, 96, 192, 0.2);
-  padding: 14px 16px;
+  border: 0.5px solid rgba(192,96,192,0.12);
+  padding: 16px 18px;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
-.row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
+.row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(192, 96, 192, 0.1);
-  border: 0.5px solid rgba(192, 96, 192, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: #C060C0;
+  width: 38px; height: 38px; border-radius: 12px;
+  background: rgba(192,96,192,0.08); border: 0.5px solid rgba(192,96,192,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; color: #C060C0;
 }
-.title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 2px;
-}
-.description {
-  font-size: 10px;
-  color: var(--color-text-secondary);
-  line-height: 1.45;
-}
+.title { font-size: 13px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 3px; }
+.description { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
 .btn {
-  width: 100%;
-  padding: 9px;
-  border-radius: 9px;
-  border: 0.5px solid rgba(192, 96, 192, 0.3);
-  background: rgba(192, 96, 192, 0.08);
-  color: #C060C0;
-  font-size: 11px;
-  font-weight: 700;
+  width: 100%; padding: 10px; border-radius: var(--radius-sm);
+  border: 0.5px solid rgba(192,96,192,0.2);
+  background: rgba(192,96,192,0.06);
+  color: #C060C0; font-size: 12px; font-weight: 700;
+  transition: all var(--transition);
 }
-.btn:hover {
-  background: rgba(192, 96, 192, 0.16);
-}
+.btn:hover { background: rgba(192,96,192,0.12); box-shadow: 0 0 16px rgba(192,96,192,0.08); }

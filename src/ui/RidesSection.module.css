@@ -1,119 +1,50 @@
+/* ─── RidesSection — Premium Dark Futuristic ──────────────────────────────── */
 .section {
-  margin-bottom: 12px;
-  background: var(--color-surface-1);
+  margin-bottom: 14px;
+  background: var(--glass-bg);
   border-radius: var(--radius-card);
-  border: 0.5px solid var(--color-border);
-  padding: 14px;
+  border: 0.5px solid var(--glass-border);
+  padding: 16px;
   flex-shrink: 0;
+  backdrop-filter: blur(8px);
 }
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-.title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-.link {
-  font-size: 10px;
-  color: rgba(34, 197, 94, 0.7);
-  font-weight: 500;
-}
+.header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+.title { font-size: 13px; font-weight: 700; color: var(--color-text-primary); letter-spacing: -0.2px; }
+.link { font-size: 11px; color: var(--color-brand); font-weight: 600; transition: opacity var(--transition); }
+.link:hover { opacity: 0.75; }
 .scroll {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  padding-bottom: 8px;
-  scroll-snap-type: x mandatory;
+  display: flex; gap: 10px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch; -ms-overflow-style: none;
+  scrollbar-width: none; padding-bottom: 4px; scroll-snap-type: x mandatory;
 }
-.scroll::-webkit-scrollbar {
-  display: none;
-}
+.scroll::-webkit-scrollbar { display: none; }
 .card {
-  flex-shrink: 0;
-  width: 150px;
-  scroll-snap-align: start;
-  background: var(--color-surface-2);
-  border-radius: 12px;
-  border: 0.5px solid var(--color-border);
-  padding: 10px 11px;
-  cursor: pointer;
-  transition: border-color var(--transition), transform var(--transition);
+  flex-shrink: 0; width: 155px; scroll-snap-align: start;
+  background: var(--metallic-light); border-radius: var(--radius-sm);
+  border: 0.5px solid var(--metallic-border); padding: 12px;
+  cursor: pointer; transition: all var(--transition); backdrop-filter: blur(8px);
 }
-.card:hover {
-  border-color: rgba(34, 197, 94, 0.2);
-  transform: translateY(-1px);
-}
-.top {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 6px;
-}
+.card:hover { border-color: rgba(34,197,94,0.2); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.top { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
 .avatar {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  font-weight: 700;
-  flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; font-weight: 700; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
-.name {
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  line-height: 1.2;
-}
-.vehicle {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 9px;
-  color: var(--color-text-secondary);
-  margin-bottom: 4px;
-}
-.price {
-  font-size: 15px;
-  font-weight: 800;
-  color: var(--color-brand);
-  letter-spacing: -0.4px;
-  margin-bottom: 2px;
-}
-.location {
-  font-size: 9px;
-  color: var(--color-text-secondary);
-}
+.name { font-size: 11px; font-weight: 600; color: var(--color-text-primary); line-height: 1.2; }
+.vehicle { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--color-text-tertiary); margin-bottom: 4px; }
+.price { font-size: 16px; font-weight: 800; color: var(--color-brand); letter-spacing: -0.4px; margin-bottom: 3px; }
+.location { font-size: 9px; color: var(--color-text-tertiary); }
 .badgeOficial {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(212, 175, 55, 0.1);
-  border: 0.5px solid rgba(212, 175, 55, 0.25);
-  border-radius: 4px;
-  padding: 2px 5px;
-  margin-top: 4px;
-  font-size: 8px;
-  font-weight: 600;
-  color: var(--color-gold);
+  display: inline-flex; align-items: center; gap: 2px;
+  background: var(--color-gold-dim); border: 0.5px solid rgba(232,185,35,0.2);
+  border-radius: 6px; padding: 3px 6px; margin-top: 6px;
+  font-size: 8px; font-weight: 700; color: var(--color-gold);
 }
 .badgeVagas {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  background: rgba(34, 197, 94, 0.08);
-  border-radius: 4px;
-  padding: 2px 5px;
-  margin-top: 4px;
-  font-size: 8px;
-  font-weight: 600;
-  color: var(--color-brand);
+  display: inline-flex; align-items: center; gap: 2px;
+  background: var(--color-brand-dim); border-radius: 6px;
+  padding: 3px 6px; margin-top: 6px;
+  font-size: 8px; font-weight: 700; color: var(--color-brand);
 }
