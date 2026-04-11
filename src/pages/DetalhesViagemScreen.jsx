@@ -364,7 +364,7 @@ export default function DetalhesViagemScreen() {
           <div className={styles.gameMatchup}>
             <div className={styles.gameTeam}>
               {homeApiId
-                ? <img src={teamLogoUrl(homeApiId)} alt="" className={styles.teamLogo} onError={e => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex') }} />
+                ? <img src={teamLogoUrl(homeApiId)} alt="" loading="lazy" className={styles.teamLogo} onError={e => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex') }} />
                 : null}
               <div className={styles.teamLogoFallback} style={{ display: homeApiId ? 'none' : 'flex' }}>{ride.game.homeTeam.slice(0,3).toUpperCase()}</div>
               <span className={styles.teamName}>{ride.game.homeTeam}</span>
@@ -372,7 +372,7 @@ export default function DetalhesViagemScreen() {
             <div className={styles.vsCircle}><span>VS</span></div>
             <div className={styles.gameTeam}>
               {awayApiId
-                ? <img src={teamLogoUrl(awayApiId)} alt="" className={styles.teamLogo} onError={e => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex') }} />
+                ? <img src={teamLogoUrl(awayApiId)} alt="" loading="lazy" className={styles.teamLogo} onError={e => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex') }} />
                 : null}
               <div className={styles.teamLogoFallback} style={{ display: awayApiId ? 'none' : 'flex' }}>{ride.game.awayTeam.slice(0,3).toUpperCase()}</div>
               <span className={styles.teamName}>{ride.game.awayTeam}</span>

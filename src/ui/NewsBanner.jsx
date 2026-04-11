@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { useUser } from '../context/UserContext'
 import styles from './NewsBanner.module.css'
 
@@ -51,7 +51,7 @@ function detectType(title = '') {
   return 'news'
 }
 
-export default function NewsBanner() {
+export default memo(function NewsBanner() {
   const { user } = useUser()
   const [news,    setNews]    = useState([])
   const [idx,     setIdx]     = useState(0)
@@ -157,5 +157,5 @@ export default function NewsBanner() {
       </div>
     </div>
   )
-}
+})
 

@@ -3,6 +3,24 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // Remover console.log e debugger em produção
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
+  build: {
+    // Code splitting manual — separa libs grandes em chunks dedicados
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'map-vendor': ['leaflet', 'react-leaflet'],
+          'crop-vendor': ['react-easy-crop'],
+        },
+      },
+    },
+    // Aumentar limite de aviso de chunk (opcional)
+    chunkSizeWarningLimit: 600,
+  },
   plugins: [
     react(),
     VitePWA({

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo } from 'react'
 import { drawGameBackground } from '../utils/canvasHelpers'
 import { teamLogoUrl } from '../utils/bsdApi'
 import styles from './NextGame.module.css'
@@ -50,6 +50,7 @@ function TeamShield({ team }) {
         <img
           src={teamLogoUrl(team.apiId)}
           alt={team.name}
+          loading="lazy"
           className={styles.teamLogo}
           onError={(e) => {
             // Se a imagem falhar, mostra a sigla
@@ -74,7 +75,7 @@ function TeamShield({ team }) {
 }
 
 // ─── Componente principal ─────────────────────────────────────────────────────
-export default function NextGame({ game, onCta, loading }) {
+export default memo(function NextGame({ game, onCta, loading }) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -138,5 +139,5 @@ export default function NextGame({ game, onCta, loading }) {
       </div>
     </section>
   )
-}
+})
 

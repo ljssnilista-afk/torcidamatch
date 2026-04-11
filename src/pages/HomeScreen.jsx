@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
@@ -29,6 +29,12 @@ export default function HomeScreen() {
   const displayGame = nextGame ?? NEXT_GAME
   const [search, setSearch] = useState('')
   const [mapGroup, setMapGroup] = useState(null)
+
+  // Memoizar callbacks para evitar re-render dos filhos com React.memo
+  const handleNavigateGrupos = useCallback(() => navigate(ROUTES.GRUPOS), [navigate])
+  const handleNavigateVamosComigo = useCallback(() => navigate(ROUTES.VAMOS_COMIGO), [navigate])
+  const handleGroupDetails = useCallback((group) => setMapGroup(group), [])
+  const handleGroupAction = useCallback(() => navigate(ROUTES.GRUPOS), [navigate])
 
   return (
     <div className={styles.screen}>
@@ -76,8 +82,8 @@ export default function HomeScreen() {
           <GroupCard
             key={group.id}
             group={group}
-            onDetails={() => setMapGroup(group)}
-            onAction={() => navigate(ROUTES.GRUPOS)}
+            onDetails={handleGroupDetails}
+            onAction={handleGroupAction}
           />
         ))}
 
@@ -100,7 +106,7 @@ export default function HomeScreen() {
               <SuggestCard
                 key={s.id}
                 suggestion={s}
-                onCreate={() => navigate(ROUTES.GRUPOS)}
+                onCreate={handleNavigateGrupos}
               />
             ))}
           </div>
@@ -109,18 +115,18 @@ export default function HomeScreen() {
         <NextGame
           game={displayGame}
           loading={gameLoading}
-          onCta={() => navigate(ROUTES.VAMOS_COMIGO)}
+          onCta={handleNavigateVamosComigo}
         />
 
         <RidesSection
           rides={RIDES}
           title={`Caronas — ${displayGame.homeTeam?.name} × ${displayGame.awayTeam?.name}`}
-          onViewAll={() => navigate(ROUTES.VAMOS_COMIGO)}
+          onViewAll={handleNavigateVamosComigo}
         />
 
         <FemaleAlert
           alert={FEMALE_ALERT}
-          onCreate={() => navigate(ROUTES.GRUPOS)}
+          onCreate={handleNavigateGrupos}
         />
 
       </div>

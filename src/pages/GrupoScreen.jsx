@@ -41,7 +41,7 @@ function GrupoHeader({ grupo, membersCount, onMenu, onBack }) {
         </svg>
       </button>
       {grupo?.photo ? (
-        <img src={grupo.photo} alt={grupo.name} className={styles.headerPhoto} />
+        <img src={grupo.photo} alt={grupo.name} loading="lazy" className={styles.headerPhoto} />
       ) : (
         <div className={styles.headerAvatar} style={{ background: bg }}>
           {initials(grupo?.name)}

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import styles from './RidesSection.module.css'
 
 const VEHICLE_ICONS = {
@@ -58,7 +59,7 @@ function RideCard({ ride }) {
   )
 }
 
-export default function RidesSection({ rides, title, onViewAll }) {
+export default memo(function RidesSection({ rides, title, onViewAll }) {
   return (
     <section className={styles.section} aria-labelledby="rides-title">
       <div className={styles.header}>
@@ -76,5 +77,4 @@ export default function RidesSection({ rides, title, onViewAll }) {
       </div>
     </section>
   )
-}
-
+})

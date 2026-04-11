@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Filters from '../ui/Filters'
 import GroupCard from '../ui/GroupCard'
@@ -131,12 +131,6 @@ export default function GruposScreen() {
           const todos = data.groups || []
 
           const userId = String(user?.id || user?._id || '')
-          console.log('[Grupos] userId usado:', userId, '| total:', todos.length)
-          todos.forEach(g => {
-            const leaderId = String(g.leader?._id || g.leader || '')
-            const memberIds = (g.members || []).map(m => String(m._id || m))
-            console.log(`  grupo: ${g.name} | leader: ${leaderId} | members:`, memberIds)
-          })
 
           if (!userId) {
             setGrupos(todos)
@@ -157,12 +151,10 @@ export default function GruposScreen() {
           const meusIds    = new Set(meusGruposList.map(g => String(g._id)))
           const proximos   = todos.filter(g => !meusIds.has(String(g._id)))
 
-          console.log('[Grupos] meus:', meusGruposList.map(g=>g.name), '| proximos:', proximos.map(g=>g.name))
-
           setMeusGrupos(meusGruposList)
           setGrupos(proximos)
         }
-      } catch (err) { console.warn(err) }
+      } catch (err) { /* silently handle */ }
       finally { setLoading(false) }
     }
     load()
@@ -171,7 +163,15 @@ export default function GruposScreen() {
   const ZONA_MAP = { 'Sul': 'zona-sul', 'Norte': 'zona-norte', 'Oeste': 'zona-oeste', 'Centro': 'centro', 'Niterói': 'niteroi' }
   const TYPE_FILTERS = ['organizada', 'familia', 'feminino', 'jovem']
 
-  const toCardFormat = g => ({
+  // Hash simples do ID para gerar canvasVariant determinístico (sem Math.random!)
+  const idToVariant = (id) => {
+    let hash = 0
+    const s = String(id)
+    for (let i = 0; i < s.length; i++) hash = ((hash << 5) - hash + s.charCodeAt(i)) | 0
+    return Math.abs(hash) % 3
+  }
+
+  const toCardFormat = useCallback((g) => ({
     id: g._id, name: g.name,
     team: g.team || user?.team || 'Botafogo',
     region: g.bairro || '',
@@ -179,7 +179,7 @@ export default function GruposScreen() {
     members: g.members?.length || 1, maxMembers: g.maxMembers || 100,
     rating: null, ratingCount: 0,
     meetPoint: g.meetPoint || '',
-    canvasVariant: Math.floor(Math.random() * 3),
+    canvasVariant: idToVariant(g._id),
     badge: g.privacy === 'private' ? 'silver' : null,
     badgeLabel: g.privacy === 'private' ? '🔒 Privado' : '',
     actionLabel: 'Ver grupo', actionVariant: 'brand',
@@ -188,12 +188,12 @@ export default function GruposScreen() {
     code: g.code || null,
     photo: g.photo || null,
     _raw: g,
-  })
+  }), [user?.team])
 
-  const allCards = grupos.map(toCardFormat)
+  // Memoizar a conversão e filtragem para não recalcular desnecessariamente
+  const allCards = useMemo(() => grupos.map(toCardFormat), [grupos, toCardFormat])
 
-  const filtered = allCards.filter(g => {
-    // Filtro de zona ou tipo
+  const filtered = useMemo(() => allCards.filter(g => {
     if (activeFilter !== 'todos') {
       if (TYPE_FILTERS.includes(activeFilter)) {
         if (g.groupType !== activeFilter) return false
@@ -201,7 +201,6 @@ export default function GruposScreen() {
         if (g.zone !== activeFilter) return false
       }
     }
-    // Filtro de busca
     if (search.trim()) {
       const q = search.toLowerCase()
       return (
@@ -213,7 +212,7 @@ export default function GruposScreen() {
       )
     }
     return true
-  })
+  }), [allCards, activeFilter, search])
 
   const totalCount = filtered.length + meusGrupos.length
 

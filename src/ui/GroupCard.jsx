@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, memo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { drawStadium, STADIUM_CONFIGS } from '../utils/canvasHelpers'
 import { ROUTES } from '../utils/constants'
@@ -20,7 +20,7 @@ const BADGE_VARIANTS = {
   verified: styles.badgeGreen,
 }
 
-export default function GroupCard({ group, onDetails, onAction }) {
+export default memo(function GroupCard({ group, onDetails, onAction }) {
   const navigate = useNavigate()
   const toast    = useToast()
   const { isGroupFav, toggleGroup } = useFavorites()
@@ -32,7 +32,7 @@ export default function GroupCard({ group, onDetails, onAction }) {
   const actionStyle = ACTION_VARIANTS[group.actionVariant] ?? ACTION_VARIANTS.white
   const isFav = isGroupFav(group.id)
 
-  const handleShare = (e) => {
+  const handleShare = useCallback((e) => {
     e.stopPropagation()
     if (navigator.share) {
       navigator.share({ title: group.name, text: `Conheça o grupo ${group.name} no TorcidaMatch!`, url: window.location.href })
@@ -40,13 +40,13 @@ export default function GroupCard({ group, onDetails, onAction }) {
       navigator.clipboard?.writeText(window.location.href)
       toast.success('Link copiado!')
     }
-  }
+  }, [group.name, toast])
 
-  const handleFav = (e) => {
+  const handleFav = useCallback((e) => {
     e.stopPropagation()
     toggleGroup(group)
     toast.favorite(isFav ? `${group.name} removido dos favoritos` : `${group.name} adicionado aos favoritos`)
-  }
+  }, [group, isFav, toggleGroup, toast])
 
   useEffect(() => {
     const raf = requestAnimationFrame(() =>
@@ -170,4 +170,4 @@ export default function GroupCard({ group, onDetails, onAction }) {
       </div>
     </article>
   )
-}
+})
