@@ -236,6 +236,10 @@ export default function GruposScreen() {
             <button className={styles.iconBtn}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg></button>
           </div>
         </div>
+      </div>
+
+      {/* Scroll — tudo rola junto */}
+      <div className={styles.scrollArea}>
 
         {/* ✅ Fix 2 — localização real + clique para permissão */}
         <button className={styles.locationBar} onClick={requestLocation}>
@@ -255,10 +259,6 @@ export default function GruposScreen() {
         </div>
 
         <Filters filters={GRUPOS_FILTERS} onChange={setActiveFilter}/>
-      </div>
-
-      {/* Scroll */}
-      <div className={styles.scrollArea}>
 
         <div className={styles.mapToggleRow}>
           <span className={styles.resultsCount}>{totalCount} grupos encontrados</span>
@@ -399,4 +399,5 @@ export default function GruposScreen() {
     </div>
   )
 }
+
 

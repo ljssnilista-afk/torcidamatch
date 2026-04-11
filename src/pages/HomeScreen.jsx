@@ -32,36 +32,38 @@ export default function HomeScreen() {
 
   return (
     <div className={styles.screen}>
-      {/* Banner de notícias em tempo real */}
-      <NewsBanner />
-
-      {/* Barra de dia de jogo → Vamos Comigo */}
-      <NotificationBar />
-
-      {/* Barra de busca */}
-      <div className={styles.searchWrap}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" strokeWidth="1.8" className={styles.searchIcon}>
-          <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 3.5 3.5"/>
-        </svg>
-        <input
-          className={styles.searchInput}
-          placeholder="Buscar grupos, bairros..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          aria-label="Buscar grupos"
-        />
-        {search && (
-          <button className={styles.searchClear} onClick={() => setSearch('')} aria-label="Limpar">
-            ✕
-          </button>
-        )}
-      </div>
-
-      {/* Filtros de descoberta */}
-      <Filters onChange={() => {}} />
-
       <div className={styles.scrollArea} role="feed" aria-label="Grupos de torcedores">
+
+        {/* Banner de notícias em tempo real */}
+        <NewsBanner />
+
+        {/* Barra de dia de jogo → Vamos Comigo */}
+        <NotificationBar />
+
+        {/* Barra de busca */}
+        <div className={styles.searchWrap}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="1.8" className={styles.searchIcon}>
+            <circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 3.5 3.5"/>
+          </svg>
+          <input
+            className={styles.searchInput}
+            placeholder="Buscar grupos, bairros..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            aria-label="Buscar grupos"
+          />
+          {search && (
+            <button className={styles.searchClear} onClick={() => setSearch('')} aria-label="Limpar">
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Filtros de descoberta */}
+        <div className={styles.filtersWrap}>
+          <Filters onChange={() => {}} />
+        </div>
 
         {/* Seção Grupos em alta */}
         <div className={styles.sectionDivider}>

@@ -384,7 +384,7 @@ export default function VamosComigoScreen() {
   return (
     <div className={styles.screen}>
 
-      {/* Screen header */}
+      {/* Screen header — only title stays fixed */}
       <div className={styles.screenHeader}>
         <div className={styles.titleRow}>
           <h1 className={styles.title}>
@@ -398,6 +398,10 @@ export default function VamosComigoScreen() {
             </svg>
           </button>
         </div>
+      </div>
+
+      {/* Scrollable content — tudo rola junto */}
+      <div className={styles.scrollArea}>
 
         {/* Localização real */}
         <button
@@ -455,10 +459,6 @@ export default function VamosComigoScreen() {
             </button>
           ))}
         </nav>
-      </div>
-
-      {/* Scrollable content */}
-      <div className={styles.scrollArea}>
 
         {/* Next game banner */}
         <div className={styles.gameBanner}>
@@ -599,4 +599,5 @@ export default function VamosComigoScreen() {
     </div>
   )
 }
+
 
