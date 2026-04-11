@@ -39,7 +39,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.07);
+  background: var(--metallic-light);
   border: 0.5px solid var(--color-border);
   display: flex;
   align-items: center;
@@ -230,7 +230,7 @@
 }
 .occBar {
   height: 2px;
-  background: rgba(255,255,255,0.07);
+  background: var(--metallic-light);
   border-radius: 2px;
   margin-bottom: 6px;
   overflow: hidden;

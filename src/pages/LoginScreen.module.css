@@ -5,7 +5,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: #0a0a0a;
+  background: var(--color-bg);
   position: relative;
 }
 
@@ -110,7 +110,7 @@
 /* ─── Field ───────────────────────────────────────────────────────────────── */
 .field {
   position: relative;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border: 0.5px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   height: 52px;
@@ -198,7 +198,7 @@
   -webkit-appearance: none;
   cursor: pointer;
 }
-.fieldSelect option { background: #1a1a1a; color: #fff; }
+.fieldSelect option { background: var(--color-bg); color: #fff; }
 .eyeBtn {
   padding: 0 12px;
   color: rgba(255,255,255,0.3);
@@ -393,7 +393,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border: 0.5px solid rgba(255,255,255,0.1);
   border-radius: 12px;
   padding: 0 14px;
@@ -546,7 +546,7 @@
   align-items: flex-start;
   gap: 12px;
   padding: 13px 16px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+  border-bottom: 0.5px solid var(--metallic-light);
 }
 .confirmRow:last-child { border-bottom: none; }
 .confirmLabel {

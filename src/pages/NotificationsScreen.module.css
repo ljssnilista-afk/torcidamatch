@@ -1,242 +1,33 @@
-.screen {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  background: transparent;
-  overflow: hidden;
-}
-
-/* ─── Header ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 18px 12px;
-  flex-shrink: 0;
-  border-bottom: 0.5px solid var(--color-border);
-}
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.backBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.07);
-  border: 0.5px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-secondary);
-  transition: background var(--transition);
-}
-.backBtn:hover { background: rgba(255,255,255,0.12); }
-.title {
-  font-size: 17px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.3px;
-}
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: var(--color-brand);
-  color: #000;
-  font-size: 11px;
-  font-weight: 800;
-}
-.markAllBtn {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-brand);
-  padding: 4px 0;
-  transition: opacity var(--transition);
-}
+.screen { display: flex; flex-direction: column; flex: 1; min-height: 0; background: transparent; overflow: hidden; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 12px; flex-shrink: 0; border-bottom: 0.5px solid var(--glass-border); background: linear-gradient(180deg, rgba(8,12,8,0.95) 0%, rgba(8,12,8,0.8) 100%); backdrop-filter: blur(16px); }
+.headerLeft { display: flex; align-items: center; gap: 10px; }
+.backBtn { width: 34px; height: 34px; border-radius: 12px; background: var(--metallic-light); border: 0.5px solid var(--metallic-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); transition: all var(--transition); }
+.backBtn:hover { border-color: rgba(34,197,94,0.15); color: var(--color-brand); }
+.title { font-size: 18px; font-weight: 800; color: var(--color-text-primary); letter-spacing: -0.3px; }
+.badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; padding: 0 7px; border-radius: 11px; background: var(--color-brand); color: #000; font-size: 11px; font-weight: 800; }
+.markAllBtn { font-size: 12px; font-weight: 600; color: var(--color-brand); padding: 4px 0; transition: opacity var(--transition); }
 .markAllBtn:hover { opacity: 0.75; }
-
-/* ─── Lista ──────────────────────────────────────────────────────────────────── */
-.list {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 10px 14px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* ─── Card ───────────────────────────────────────────────────────────────────── */
-.card {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 13px 12px;
-  border-radius: 14px;
-  background: var(--color-surface-1);
-  border: 0.5px solid var(--color-border);
-  cursor: pointer;
-  transition: background var(--transition), border-color var(--transition);
-  position: relative;
-}
-.card:hover {
-  background: var(--color-surface-2);
-  border-color: var(--color-border-2);
-}
-.cardUnread {
-  background: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.15);
-}
-.cardUnread:hover {
-  background: rgba(34, 197, 94, 0.08);
-}
-
-/* ─── Ícone ──────────────────────────────────────────────────────────────────── */
-.iconWrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-/* ─── Body ───────────────────────────────────────────────────────────────────── */
-.body {
-  flex: 1;
-  min-width: 0;
-}
-.topRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 3px;
-}
-.title {  /* sobrescrito pelo .title do header — escopo local */
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.time {
-  font-size: 10px;
-  color: var(--color-text-tertiary);
-  flex-shrink: 0;
-}
-.message {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  line-height: 1.45;
-}
-
-/* ─── Botões de ação ─────────────────────────────────────────────────────────── */
-.actions {
-  display: flex;
-  gap: 7px;
-  margin-top: 10px;
-}
-.btnAccept {
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: var(--color-brand);
-  color: #000;
-  font-size: 11px;
-  font-weight: 700;
-  transition: opacity var(--transition);
-}
-.btnAccept:hover { opacity: 0.85; }
-.btnDecline {
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.07);
-  border: 0.5px solid var(--color-border-2);
-  color: var(--color-text-secondary);
-  font-size: 11px;
-  font-weight: 600;
-  transition: background var(--transition);
-}
-.btnDecline:hover { background: rgba(255,255,255,0.12); }
-.btnDetails {
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.07);
-  border: 0.5px solid var(--color-border-2);
-  color: var(--color-text-secondary);
-  font-size: 11px;
-  font-weight: 600;
-  transition: background var(--transition);
-}
-.btnDetails:hover { background: rgba(255,255,255,0.12); }
-
-/* ─── Coluna direita ─────────────────────────────────────────────────────────── */
-.rightCol {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-.unreadDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-brand);
-  flex-shrink: 0;
-}
-.dismissBtn {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-tertiary);
-  transition: color var(--transition), background var(--transition);
-}
-.dismissBtn:hover {
-  color: var(--color-text-secondary);
-  background: rgba(255,255,255,0.08);
-}
-
-/* ─── Empty state ────────────────────────────────────────────────────────────── */
-.empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 60px 0;
-}
-.emptyIcon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--color-surface-2);
-  border: 0.5px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-tertiary);
-  margin-bottom: 4px;
-}
-.emptyText {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-text-secondary);
-}
-.emptySub {
-  font-size: 13px;
-  color: var(--color-text-tertiary);
-}
+.list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 8px; }
+.card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; border-radius: var(--radius-md); background: var(--metallic-light); border: 0.5px solid var(--metallic-border); cursor: pointer; transition: all var(--transition); position: relative; backdrop-filter: blur(8px); }
+.card:hover { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.12); }
+.cardUnread { background: rgba(34,197,94,0.04); border-color: rgba(34,197,94,0.1); }
+.cardUnread:hover { background: rgba(34,197,94,0.06); }
+.iconWrap { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.body { flex: 1; min-width: 0; }
+.topRow { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.time { font-size: 10px; color: var(--color-text-tertiary); flex-shrink: 0; }
+.message { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.actions { display: flex; gap: 7px; margin-top: 10px; }
+.btnAccept { padding: 7px 16px; border-radius: var(--radius-xs); background: var(--color-brand); color: #000; font-size: 11px; font-weight: 700; transition: all var(--transition); }
+.btnAccept:hover { box-shadow: var(--shadow-brand); }
+.btnDecline { padding: 7px 16px; border-radius: var(--radius-xs); background: var(--metallic-light); border: 0.5px solid var(--metallic-border); color: var(--color-text-secondary); font-size: 11px; font-weight: 600; transition: all var(--transition); }
+.btnDecline:hover { border-color: rgba(34,197,94,0.15); }
+.btnDetails { padding: 7px 16px; border-radius: var(--radius-xs); background: var(--metallic-light); border: 0.5px solid var(--metallic-border); color: var(--color-text-secondary); font-size: 11px; font-weight: 600; }
+.rightCol { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+.unreadDot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-brand); flex-shrink: 0; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+.dismissBtn { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); transition: all var(--transition); }
+.dismissBtn:hover { color: var(--color-text-secondary); background: var(--metallic-light); }
+.empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 60px 0; }
+.emptyIcon { width: 68px; height: 68px; border-radius: 20px; background: var(--metallic-light); border: 0.5px solid var(--metallic-border); display: flex; align-items: center; justify-content: center; color: var(--color-text-tertiary); margin-bottom: 4px; }
+.emptyText { font-size: 16px; font-weight: 700; color: var(--color-text-secondary); }
+.emptySub { font-size: 13px; color: var(--color-text-tertiary); }

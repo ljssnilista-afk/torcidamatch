@@ -91,7 +91,7 @@
   font-weight: 600;
   white-space: nowrap;
   border: 0.5px solid var(--color-border);
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   color: var(--color-text-tertiary);
   transition: all var(--transition);
 }
@@ -275,7 +275,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border-radius: 6px;
   padding: 3px 8px;
   margin-bottom: 10px;
@@ -284,7 +284,7 @@
   font-weight: 500;
 }
 
-.divider { height: 0.5px; background: rgba(255,255,255,0.07); margin-bottom: 10px; }
+.divider { height: 0.5px; background: var(--metallic-light); margin-bottom: 10px; }
 
 /* Pricing */
 .priceBlock { margin-bottom: 12px; }
@@ -311,7 +311,7 @@
   padding: 9px 0;
   border-radius: 9px;
   border: 0.5px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   color: var(--color-silver);
   font-size: 12px;
   font-weight: 600;
@@ -448,19 +448,19 @@
 .skHeader {
   width: 100%;
   height: 36px;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border-radius: 8px;
   animation: shimmer 1.5s infinite;
 }
 .skLine {
   height: 12px;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border-radius: 6px;
   animation: shimmer 1.5s infinite;
 }
 .skBtn {
   height: 36px;
-  background: rgba(255,255,255,0.05);
+  background: var(--metallic-light);
   border-radius: 9px;
   margin-top: auto;
   animation: shimmer 1.5s infinite;
@@ -513,7 +513,7 @@
 }
 .mapaSheet {
   width: 100%;
-  background: #111;
+  background: var(--color-surface-1);
   border-radius: 20px 20px 0 0;
   border-top: 0.5px solid rgba(255,255,255,0.1);
   overflow: hidden;
