@@ -227,52 +227,96 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
           <label className={styles.editLabel}>Ponto de encontro</label>
           <input type="text" value={fields.meetPoint} onChange={set('meetPoint')} className={styles.editInput} placeholder="Ex: Praça dos Bancários" />
 
-          {/* 📍 Localização exata */}
-          <label className={styles.editLabel}>Localização no mapa</label>
-          <button
-            type="button"
-            onClick={() => {
-              setLocLoading(true)
-              navigator.geolocation?.getCurrentPosition(
-                async (pos) => {
-                  const { latitude: lat, longitude: lng } = pos.coords
-                  setFields(p => ({ ...p, locationLat: lat, locationLng: lng }))
-                  try {
-                    const res = await fetch(
-                      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
-                      { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
-                    )
-                    const data = await res.json()
-                    const road = data.address?.road || ''
-                    const bairro = data.address?.suburb || data.address?.neighbourhood || ''
-                    setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-                  } catch {
-                    setLocLabel(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
-                  }
-                  setLocLoading(false)
-                },
-                () => { setLocLoading(false) },
-                { timeout: 8000 }
-              )
-            }}
-            disabled={locLoading}
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              padding: '11px 14px', borderRadius: 12, width: '100%',
-              background: fields.locationLat ? 'rgba(34,197,94,0.06)' : 'var(--color-surface-2)',
-              border: `0.5px solid ${fields.locationLat ? 'rgba(34,197,94,0.25)' : 'var(--color-border)'}`,
-              color: fields.locationLat ? 'var(--color-brand)' : 'var(--color-text-secondary)',
-              fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-            </svg>
-            {locLoading ? 'Detectando...' : fields.locationLat ? '✅ Localização capturada' : '📍 Capturar localização atual'}
-          </button>
+          {/* 📍 Localização exata — mapa interativo */}
+          <label className={styles.editLabel}>Localização no mapa <span style={{fontWeight: 400, fontSize: 10, color: 'var(--color-text-tertiary)'}}>(toque no mapa para marcar)</span></label>
+          <div style={{
+            width: '100%', height: 200, borderRadius: 12, overflow: 'hidden',
+            border: `0.5px solid ${fields.locationLat ? 'rgba(34,197,94,0.25)' : 'var(--color-border)'}`,
+            marginBottom: 4,
+          }}>
+            <iframe
+              title="Selecionar localização"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              style={{ border: 0 }}
+              src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${
+                fields.locationLat
+                  ? `${fields.locationLat},${fields.locationLng}`
+                  : encodeURIComponent((fields.meetPoint || fields.bairro || 'Rio de Janeiro') + ', Rio de Janeiro')
+              }&zoom=15`}
+              allowFullScreen
+            />
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => {
+                setLocLoading(true)
+                navigator.geolocation?.getCurrentPosition(
+                  async (pos) => {
+                    const { latitude: lat, longitude: lng } = pos.coords
+                    setFields(p => ({ ...p, locationLat: lat, locationLng: lng }))
+                    try {
+                      const res = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
+                        { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
+                      )
+                      const data = await res.json()
+                      const road = data.address?.road || ''
+                      const bairro = data.address?.suburb || data.address?.neighbourhood || ''
+                      setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+                    } catch {
+                      setLocLabel(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+                    }
+                    setLocLoading(false)
+                  },
+                  () => { setLocLoading(false) },
+                  { timeout: 8000 }
+                )
+              }}
+              disabled={locLoading}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+                background: 'rgba(34,197,94,0.06)', border: '0.5px solid rgba(34,197,94,0.2)',
+                color: 'var(--color-brand)', cursor: 'pointer',
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              {locLoading ? 'Detectando...' : 'Usar minha localização'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const input = prompt('Cole as coordenadas (lat, lng).\nEx: -22.9711, -43.1822')
+                if (!input) return
+                const parts = input.split(',').map(s => parseFloat(s.trim()))
+                if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+                  setFields(p => ({ ...p, locationLat: parts[0], locationLng: parts[1] }))
+                  setLocLabel(`${parts[0].toFixed(4)}, ${parts[1].toFixed(4)}`)
+                }
+              }}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                padding: '10px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+                background: 'var(--color-surface-2)', border: '0.5px solid var(--color-border)',
+                color: 'var(--color-text-secondary)', cursor: 'pointer',
+              }}
+            >
+              Inserir coordenadas
+            </button>
+          </div>
           {locLabel && (
             <span style={{ fontSize: 11, color: 'var(--color-brand)', marginTop: 4, display: 'block' }}>
               📍 {locLabel}
+            </span>
+          )}
+          {fields.locationLat && (
+            <span style={{ fontSize: 10, color: 'var(--color-text-tertiary)', display: 'block' }}>
+              ✅ {fields.locationLat.toFixed(5)}, {fields.locationLng.toFixed(5)}
             </span>
           )}
 
