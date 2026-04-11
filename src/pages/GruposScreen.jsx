@@ -87,6 +87,7 @@ export default function GruposScreen() {
   const [loading,       setLoading]       = useState(true)
   const [userLocation,  setUserLocation]  = useState(null)
   const [locationLabel, setLocationLabel] = useState('Obtendo localização...')
+  const [mapGroup,      setMapGroup]      = useState(null)
 
   // ── Localização real ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -283,7 +284,7 @@ export default function GruposScreen() {
               <GroupCard
                 key={g._id}
                 group={toCardFormat(g)}
-                onDetails={() => navigate(`/grupos/${g._id}`, { state: { grupo: g } })}
+                onDetails={() => setMapGroup(g)}
                 onAction={() => navigate(`/grupos/${g._id}`, { state: { grupo: g } })}
               />
             ))}
@@ -310,7 +311,7 @@ export default function GruposScreen() {
             {filtered.map(g => (
               <GroupCard
                 key={g.id} group={g}
-                onDetails={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
+                onDetails={() => setMapGroup(g._raw || g)}
                 onAction={() => navigate(`/grupos/${g.id}`, { state: { grupo: g._raw } })}
               />
             ))}
@@ -344,6 +345,48 @@ export default function GruposScreen() {
           userLocation={userLocation}
           onClose={() => setMapVisible(false)}
         />
+      )}
+
+      {/* Modal de mapa — ponto de encontro do grupo */}
+      {mapGroup && (
+        <div className={styles.mapaOverlay} onClick={() => setMapGroup(null)}>
+          <div className={styles.mapaSheet} onClick={e => e.stopPropagation()} style={{maxHeight: '85vh'}}>
+            <div className={styles.mapaHeader}>
+              <div>
+                <h3 className={styles.mapaTitle}>{mapGroup.name}</h3>
+                {mapGroup.meetPoint && <p style={{fontSize: '12px', color: 'var(--color-brand)', marginTop: '3px'}}>📍 {mapGroup.meetPoint}</p>}
+              </div>
+              <button className={styles.mapaClose} onClick={() => setMapGroup(null)}>✕</button>
+            </div>
+            <div style={{width: '100%', height: '300px', borderTop: '0.5px solid var(--glass-border)'}}>
+              <iframe
+                title="Mapa do ponto de encontro"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 0 }}
+                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}&zoom=15`}
+                allowFullScreen
+              />
+            </div>
+            <div style={{display: 'flex', gap: '8px', padding: '16px 20px 24px'}}>
+              <button
+                style={{flex: 1, padding: '13px', borderRadius: '14px', background: 'var(--color-brand)', color: '#000', fontSize: '14px', fontWeight: 700, boxShadow: '0 0 20px rgba(34,197,94,0.2)'}}
+                onClick={() => { setMapGroup(null); navigate(`/grupos/${mapGroup._id}`, { state: { grupo: mapGroup } }) }}
+              >
+                Ver grupo
+              </button>
+              <a
+                style={{flex: 1, padding: '13px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600, textAlign: 'center', textDecoration: 'none'}}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Abrir no Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
