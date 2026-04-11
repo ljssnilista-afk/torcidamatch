@@ -7,10 +7,10 @@ import { useToast } from '../context/ToastContext'
 import styles from './GroupCard.module.css'
 
 const ACTION_VARIANTS = {
-  white: { background: '#fff', color: '#000' },
-  danger: { background: '#EF4444', color: '#fff' },
-  silver: { background: '#C8C8C8', color: '#000' },
-  brand: { background: '#22C55E', color: '#000' },
+  white:  { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', border: '0.5px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(16px)' },
+  danger: { background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: '0.5px solid rgba(239,68,68,0.25)', backdropFilter: 'blur(16px)' },
+  silver: { background: 'rgba(168,178,168,0.08)', color: '#A8B2A8', border: '0.5px solid rgba(168,178,168,0.2)', backdropFilter: 'blur(16px)' },
+  brand:  { background: 'rgba(34,197,94,0.1)', color: '#22C55E', border: '0.5px solid rgba(34,197,94,0.25)', backdropFilter: 'blur(16px)' },
 }
 
 const BADGE_VARIANTS = {
@@ -60,11 +60,7 @@ export default function GroupCard({ group, onDetails, onAction }) {
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
-      {group.photo ? (
-        <img src={group.photo} alt={group.name} className={styles.groupPhoto} />
-      ) : (
-        <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
-      )}
+      <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
       <div className={styles.overlay} aria-hidden="true" />
 
       {/* Share button */}
@@ -155,9 +151,12 @@ export default function GroupCard({ group, onDetails, onAction }) {
           <button
             className={styles.btnOutline}
             onClick={() => onDetails?.(group)}
-            aria-label={`Ver detalhes de ${group.name}`}
+            aria-label={`Ver no mapa — ${group.name}`}
           >
-            Ver detalhes
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{marginRight: '4px', verticalAlign: 'middle'}}>
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Ver no mapa
           </button>
           <button
             className={styles.btnSolid}
@@ -172,4 +171,3 @@ export default function GroupCard({ group, onDetails, onAction }) {
     </article>
   )
 }
-
