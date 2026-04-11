@@ -1,36 +1,28 @@
 import { useEffect, useRef, memo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { drawStadium, STADIUM_CONFIGS } from '../utils/canvasHelpers'
-import { ROUTES } from '../utils/constants'
 import { useFavorites } from '../context/FavoritesContext'
 import { useToast } from '../context/ToastContext'
 import styles from './GroupCard.module.css'
 
-const ACTION_VARIANTS = {
-  white:  { background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.8)', border: '0.5px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(16px)' },
-  danger: { background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: '0.5px solid rgba(239,68,68,0.25)', backdropFilter: 'blur(16px)' },
-  silver: { background: 'rgba(168,178,168,0.08)', color: '#A8B2A8', border: '0.5px solid rgba(168,178,168,0.2)', backdropFilter: 'blur(16px)' },
-  brand:  { background: 'rgba(34,197,94,0.1)', color: '#22C55E', border: '0.5px solid rgba(34,197,94,0.25)', backdropFilter: 'blur(16px)' },
-}
-
 const BADGE_VARIANTS = {
-  oficial: styles.badgeGold,
-  green: styles.badgeGreen,
-  silver: styles.badgeSilver,
+  oficial:  styles.badgeGold,
+  green:    styles.badgeGreen,
+  silver:   styles.badgeSilver,
   verified: styles.badgeGreen,
 }
 
 export default memo(function GroupCard({ group, onDetails, onAction }) {
-  const navigate = useNavigate()
-  const toast    = useToast()
+  const toast = useToast()
   const { isGroupFav, toggleGroup } = useFavorites()
 
   const canvasRef = useRef(null)
-  const cfg = STADIUM_CONFIGS[group.canvasVariant ?? 0]
-  const pct = Math.round((group.members / group.maxMembers) * 100)
-  const barColor = pct >= 90 ? '#EF4444' : pct >= 75 ? '#D4AF37' : '#22C55E'
-  const actionStyle = ACTION_VARIANTS[group.actionVariant] ?? ACTION_VARIANTS.white
-  const isFav = isGroupFav(group.id)
+  const cfg       = STADIUM_CONFIGS[group.canvasVariant ?? 0]
+  const pct       = Math.round((group.members / group.maxMembers) * 100)
+  const barColor  = pct >= 90 ? '#EF4444' : pct >= 75 ? '#D4AF37' : '#22C55E'
+  const isFav     = isGroupFav(group.id)
+
+  // photo field — suporta tanto "photo" quanto "photoUrl"
+  const photoSrc = group.photo || group.photoUrl || null
 
   const handleShare = useCallback((e) => {
     e.stopPropagation()
@@ -60,19 +52,29 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
+      {/* Camada 0 — canvas fallback */}
       <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
-      {group.photo && (
+
+      {/* Camada 1 — foto real (se existir) */}
+      {photoSrc && (
         <img
-          src={group.photo}
+          src={photoSrc}
           className={styles.groupPhoto}
-          alt={group.name}
+          alt=""
+          draggable={false}
           onError={(e) => { e.currentTarget.style.display = 'none' }}
         />
       )}
+
+      {/* Camada 2 — overlay escuro */}
       <div className={styles.overlay} aria-hidden="true" />
 
-      {/* Share button */}
-      <button className={styles.shareBtn} aria-label={`Compartilhar grupo ${group.name}`} onClick={handleShare}>
+      {/* Camada 4 — botões share/fav */}
+      <button
+        className={styles.shareBtn}
+        aria-label={`Compartilhar grupo ${group.name}`}
+        onClick={handleShare}
+      >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
@@ -80,7 +82,6 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </svg>
       </button>
 
-      {/* Favourite button */}
       <button
         className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
         aria-label={isFav ? `Remover ${group.name} dos favoritos` : `Adicionar ${group.name} aos favoritos`}
@@ -94,15 +95,12 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </svg>
       </button>
 
-      {/* Top badges */}
+      {/* Camada 4 — badges topo */}
       <div className={styles.top}>
-        {group.badge ? (
-          <div className={`${styles.badge} ${BADGE_VARIANTS[group.badge] ?? styles.badgeGold}`}>
-            {group.badgeLabel}
-          </div>
-        ) : (
-          <div className={styles.badgeEmpty} aria-hidden="true" />
-        )}
+        {group.badge
+          ? <div className={`${styles.badge} ${BADGE_VARIANTS[group.badge] ?? styles.badgeGold}`}>{group.badgeLabel}</div>
+          : <div className={styles.badgeEmpty} aria-hidden="true" />
+        }
         <div className={styles.distBadge}>
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
@@ -111,7 +109,7 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </div>
       </div>
 
-      {/* Bottom content */}
+      {/* Camada 3 — conteúdo inferior */}
       <div className={styles.bottom}>
         <div className={styles.teamChip}>
           <span className={styles.bfgDot} aria-hidden="true" />
@@ -144,7 +142,6 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
           </div>
         )}
 
-        {/* Occupation bar */}
         <div className={styles.occWrap}>
           <div className={styles.occLabels}>
             <span>Ocupação</span>
@@ -158,17 +155,18 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         <div className={styles.actions}>
           <button
             className={styles.btnOutline}
-            onClick={() => onDetails?.(group)}
+            onClick={(e) => { e.stopPropagation(); onDetails?.(group) }}
             aria-label={`Ver no mapa — ${group.name}`}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{marginRight: '4px', verticalAlign: 'middle'}}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
+              style={{ marginRight: '4px', verticalAlign: 'middle' }}>
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
             </svg>
             Ver no mapa
           </button>
           <button
             className={styles.btnSolid}
-            onClick={() => onAction?.(group)}
+            onClick={(e) => { e.stopPropagation(); onAction?.(group) }}
             aria-label={`${group.actionLabel} — ${group.name}`}
           >
             {group.actionLabel}
