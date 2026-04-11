@@ -127,9 +127,15 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
     privacy: grupo.privacy || 'public',
     approvalRequired: grupo.approvalRequired || false,
     groupType: grupo.groupType || 'misto',
+    locationLat: grupo.location?.lat || null,
+    locationLng: grupo.location?.lng || null,
   })
   const [photoPreview, setPhotoPreview] = useState(grupo.photo || null)
-  const [photoData, setPhotoData] = useState(null) // base64 to send
+  const [photoData, setPhotoData] = useState(null)
+  const [locLoading, setLocLoading] = useState(false)
+  const [locLabel, setLocLabel] = useState(
+    grupo.location?.lat ? `${grupo.location.lat.toFixed(4)}, ${grupo.location.lng.toFixed(4)}` : ''
+  )
   const fileRef = useRef(null)
 
   const set = f => e => setFields(p => ({ ...p, [f]: typeof e === 'object' ? e.target.value : e }))
@@ -165,6 +171,11 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
   const handleSave = () => {
     const updates = { ...fields }
     if (photoData) updates.photo = photoData
+    if (fields.locationLat && fields.locationLng) {
+      updates.location = { lat: fields.locationLat, lng: fields.locationLng }
+    }
+    delete updates.locationLat
+    delete updates.locationLng
     onSave(updates)
   }
 
@@ -215,6 +226,55 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
 
           <label className={styles.editLabel}>Ponto de encontro</label>
           <input type="text" value={fields.meetPoint} onChange={set('meetPoint')} className={styles.editInput} placeholder="Ex: Praça dos Bancários" />
+
+          {/* 📍 Localização exata */}
+          <label className={styles.editLabel}>Localização no mapa</label>
+          <button
+            type="button"
+            onClick={() => {
+              setLocLoading(true)
+              navigator.geolocation?.getCurrentPosition(
+                async (pos) => {
+                  const { latitude: lat, longitude: lng } = pos.coords
+                  setFields(p => ({ ...p, locationLat: lat, locationLng: lng }))
+                  try {
+                    const res = await fetch(
+                      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
+                      { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
+                    )
+                    const data = await res.json()
+                    const road = data.address?.road || ''
+                    const bairro = data.address?.suburb || data.address?.neighbourhood || ''
+                    setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+                  } catch {
+                    setLocLabel(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+                  }
+                  setLocLoading(false)
+                },
+                () => { setLocLoading(false) },
+                { timeout: 8000 }
+              )
+            }}
+            disabled={locLoading}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              padding: '11px 14px', borderRadius: 12, width: '100%',
+              background: fields.locationLat ? 'rgba(34,197,94,0.06)' : 'var(--color-surface-2)',
+              border: `0.5px solid ${fields.locationLat ? 'rgba(34,197,94,0.25)' : 'var(--color-border)'}`,
+              color: fields.locationLat ? 'var(--color-brand)' : 'var(--color-text-secondary)',
+              fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            {locLoading ? 'Detectando...' : fields.locationLat ? '✅ Localização capturada' : '📍 Capturar localização atual'}
+          </button>
+          {locLabel && (
+            <span style={{ fontSize: 11, color: 'var(--color-brand)', marginTop: 4, display: 'block' }}>
+              📍 {locLabel}
+            </span>
+          )}
 
           <div style={{ display: 'flex', gap: 10 }}>
             <div style={{ flex: 1 }}>
