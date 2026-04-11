@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
 import { useGame } from '../context/GameContext'
-import NewsBanner from './NewsBanner'
-import NotificationBar from './NotificationBar'
-import Filters from './Filters'
-import GroupCard from './GroupCard'
-import SuggestCard from './SuggestCard'
-import NextGame from './NextGame'
-import RidesSection from './RidesSection'
-import FemaleAlert from './FemaleAlert'
+import NewsBanner from '../ui/NewsBanner'
+import NotificationBar from '../ui/NotificationBar'
+import Filters from '../ui/Filters'
+import GroupCard from '../ui/GroupCard'
+import SuggestCard from '../ui/SuggestCard'
+import NextGame from '../ui/NextGame'
+import RidesSection from '../ui/RidesSection'
+import FemaleAlert from '../ui/FemaleAlert'
 import {
   ALERT,
   FILTERS,
@@ -164,3 +164,4 @@ export default function HomeScreen() {
     </div>
   )
 }
+
