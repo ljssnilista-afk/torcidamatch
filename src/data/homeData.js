@@ -45,11 +45,15 @@ export const GROUP_CARDS = [
     rating: 4.9,
     ratingCount: 62,
     meetPoint: 'Av. Atlântica',
-    badge: 'oficial',   // 'oficial' | 'verified' | 'familia' | 'jovem' | null
+    lat: -22.9711,
+    lng: -43.1822,
+    privacy: 'private',
+    price: 'R$ 19,90/mês',
+    badge: 'oficial',
     badgeLabel: '★ Caravana Oficial',
-    canvasVariant: 0,   // which starX position to use
-    actionLabel: 'Solicitar entrada',
-    actionVariant: 'white', // 'white' | 'danger' | 'silver' | 'brand'
+    canvasVariant: 0,
+    actionLabel: 'Assinar grupo',
+    actionVariant: 'brand',
   },
   {
     id: 'furia-jovem',
@@ -63,6 +67,10 @@ export const GROUP_CARDS = [
     rating: 4.8,
     ratingCount: 88,
     meetPoint: 'Praça Saens Peña',
+    lat: -22.9253,
+    lng: -43.2345,
+    privacy: 'private',
+    price: 'R$ 14,90/mês',
     badge: 'green',
     badgeLabel: 'Fúria Jovem',
     canvasVariant: 1,
@@ -81,11 +89,15 @@ export const GROUP_CARDS = [
     rating: 4.9,
     ratingCount: 51,
     meetPoint: 'Balsa Charitas',
+    lat: -22.9426,
+    lng: -43.1291,
+    privacy: 'private',
+    price: 'R$ 24,90/mês',
     badge: 'silver',
     badgeLabel: '★ Família',
     canvasVariant: 2,
-    actionLabel: 'Solicitar entrada',
-    actionVariant: 'silver',
+    actionLabel: 'Assinar grupo',
+    actionVariant: 'brand',
   },
 ]
 
