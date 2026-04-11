@@ -1,3 +1,6 @@
+/* Import premium fonts */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
 /* ─── Global Resets ─── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -10,8 +13,7 @@
   html { --safe-bottom: env(safe-area-inset-bottom); }
 }
 
-/* Import premium fonts */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
 
 html, body, #root {
   height: 100%;
