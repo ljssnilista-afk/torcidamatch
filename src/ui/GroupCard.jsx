@@ -61,6 +61,14 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
       <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
+      {group.photo && (
+        <img
+          src={group.photo}
+          className={styles.groupPhoto}
+          alt={group.name}
+          onError={(e) => { e.currentTarget.style.display = 'none' }}
+        />
+      )}
       <div className={styles.overlay} aria-hidden="true" />
 
       {/* Share button */}
@@ -160,7 +168,6 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
           </button>
           <button
             className={styles.btnSolid}
-            style={actionStyle}
             onClick={() => onAction?.(group)}
             aria-label={`${group.actionLabel} — ${group.name}`}
           >
