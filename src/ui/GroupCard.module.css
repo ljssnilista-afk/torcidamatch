@@ -12,11 +12,30 @@
   border: 0.5px solid rgba(34, 197, 94, 0.06);
   transition: box-shadow var(--transition-slow), border-color var(--transition-slow), transform var(--transition);
   box-shadow: var(--shadow-card);
+  -webkit-tap-highlight-color: transparent;
+  isolation: isolate;
+  transform: translateZ(0);
+  will-change: transform;
 }
 .card:hover {
   box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2), var(--shadow-elevated), var(--shadow-brand);
   border-color: rgba(34, 197, 94, 0.15);
   transform: translateY(-2px);
+}
+.card:active {
+  transform: translateY(0px) scale(0.995);
+  transition: transform 0.1s ease;
+}
+.card:active .canvas,
+.card:active .groupPhoto,
+.card:active .overlay,
+.card:active .top,
+.card:active .bottom,
+.card:active .shareBtn,
+.card:active .favBtn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: none;
 }
 .canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .groupPhoto { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
@@ -47,7 +66,7 @@
 .favBtnActive { color: #EF4444; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.4); box-shadow: 0 0 14px rgba(239,68,68,0.2); }
 
 /* Top badges */
-.top { position: absolute; top: 14px; left: 14px; right: 90px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 4; }
+.top { position: absolute; top: 14px; left: 14px; right: 90px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 4; transform: translateZ(0); }
 .badge {
   display: inline-flex; align-items: center; gap: 5px; border-radius: 10px; padding: 6px 12px;
   backdrop-filter: var(--glass-blur); font-size: 9px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;
@@ -64,7 +83,7 @@
 }
 
 /* Bottom content */
-.bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px 18px; z-index: 2; }
+.bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px 18px; z-index: 2; transform: translateZ(0); will-change: transform; }
 .teamChip {
   display: inline-flex; align-items: center; gap: 6px;
   background: rgba(0,0,0,0.5); border: 0.5px solid rgba(34,197,94,0.1);
