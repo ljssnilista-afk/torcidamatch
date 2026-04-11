@@ -4,6 +4,9 @@ import { useFavorites } from '../context/FavoritesContext'
 import { useToast } from '../context/ToastContext'
 import styles from './GroupCard.module.css'
 
+// BUG 4 CORRIGIDO: ACTION_VARIANTS removido do JSX.
+// Nunca aplicar style inline no btnSolid — sobrescreve o CSS completamente.
+
 const BADGE_VARIANTS = {
   oficial:  styles.badgeGold,
   green:    styles.badgeGreen,
@@ -16,12 +19,12 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
   const { isGroupFav, toggleGroup } = useFavorites()
 
   const canvasRef = useRef(null)
-  const cfg       = STADIUM_CONFIGS[group.canvasVariant ?? 0]
-  const pct       = Math.round((group.members / group.maxMembers) * 100)
-  const barColor  = pct >= 90 ? '#EF4444' : pct >= 75 ? '#D4AF37' : '#22C55E'
-  const isFav     = isGroupFav(group.id)
+  const cfg      = STADIUM_CONFIGS[group.canvasVariant ?? 0]
+  const pct      = Math.round((group.members / group.maxMembers) * 100)
+  const barColor = pct >= 90 ? '#EF4444' : pct >= 75 ? '#D4AF37' : '#22C55E'
+  const isFav    = isGroupFav(group.id)
 
-  // photo field — suporta tanto "photo" quanto "photoUrl"
+  // BUG 5 CORRIGIDO: suporta tanto group.photo quanto group.photoUrl
   const photoSrc = group.photo || group.photoUrl || null
 
   const handleShare = useCallback((e) => {
@@ -37,7 +40,10 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
   const handleFav = useCallback((e) => {
     e.stopPropagation()
     toggleGroup(group)
-    toast.favorite(isFav ? `${group.name} removido dos favoritos` : `${group.name} adicionado aos favoritos`)
+    toast.favorite(isFav
+      ? `${group.name} removido dos favoritos`
+      : `${group.name} adicionado aos favoritos`
+    )
   }, [group, isFav, toggleGroup, toast])
 
   useEffect(() => {
@@ -52,10 +58,10 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
-      {/* Camada 0 — canvas fallback */}
+      {/* Camada base: canvas do estádio (fallback visual) */}
       <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
 
-      {/* Camada 1 — foto real (se existir) */}
+      {/* BUG 5 CORRIGIDO: foto real sobre o canvas quando disponível */}
       {photoSrc && (
         <img
           src={photoSrc}
@@ -66,10 +72,10 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         />
       )}
 
-      {/* Camada 2 — overlay escuro */}
+      {/* Gradiente escuro sobre a foto/canvas */}
       <div className={styles.overlay} aria-hidden="true" />
 
-      {/* Camada 4 — botões share/fav */}
+      {/* Botão compartilhar */}
       <button
         className={styles.shareBtn}
         aria-label={`Compartilhar grupo ${group.name}`}
@@ -82,6 +88,7 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </svg>
       </button>
 
+      {/* Botão favoritar */}
       <button
         className={`${styles.favBtn} ${isFav ? styles.favBtnActive : ''}`}
         aria-label={isFav ? `Remover ${group.name} dos favoritos` : `Adicionar ${group.name} aos favoritos`}
@@ -95,7 +102,7 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </svg>
       </button>
 
-      {/* Camada 4 — badges topo */}
+      {/* Badges topo */}
       <div className={styles.top}>
         {group.badge
           ? <div className={`${styles.badge} ${BADGE_VARIANTS[group.badge] ?? styles.badgeGold}`}>{group.badgeLabel}</div>
@@ -109,7 +116,7 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </div>
       </div>
 
-      {/* Camada 3 — conteúdo inferior */}
+      {/* Conteúdo inferior */}
       <div className={styles.bottom}>
         <div className={styles.teamChip}>
           <span className={styles.bfgDot} aria-hidden="true" />
@@ -153,6 +160,7 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
         </div>
 
         <div className={styles.actions}>
+          {/* BUG 4 CORRIGIDO: sem style inline — apenas className */}
           <button
             className={styles.btnOutline}
             onClick={(e) => { e.stopPropagation(); onDetails?.(group) }}

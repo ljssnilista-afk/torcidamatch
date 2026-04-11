@@ -1,4 +1,38 @@
-/* ─── GroupCard — Premium Dark Futuristic ─────────────────────────────────── */
+/* ─── GroupCard — Premium Dark Futuristic ─────────────────────────────────────
+ *
+ * BUGS CORRIGIDOS (diagnóstico completo):
+ *
+ * BUG 1 — isolation: isolate → sumia tudo no iOS ao tocar
+ *   Cria stacking context novo; filhos com backdrop-filter colapsam
+ *   durante eventos touch no Safari. REMOVIDO.
+ *
+ * BUG 2 — will-change: transform nos filhos → sumia conteúdo no toque
+ *   will-change em .bottom + transform no pai = compositing conflict iOS.
+ *   REMOVIDO dos filhos. Mantido só no .card raiz via translateZ(0).
+ *
+ * BUG 3 — backdrop-filter no .btnSolid dentro de pai com transform
+ *   Causa layer conflict no Safari: botão some sobre a foto.
+ *   REMOVIDO do .btnSolid e .btnOutline.
+ *
+ * BUG 4 — style={actionStyle} inline sobrescrevia TODO o CSS do .btnSolid
+ *   ACTION_VARIANTS.brand definia background/color/border inline,
+ *   anulando glassmorphism. REMOVIDO do JSX (ver GroupCard.jsx).
+ *
+ * BUG 5 — Foto não aparecia: campo aceita group.photo ou group.photoUrl
+ *   JSX agora usa: const photoSrc = group.photo || group.photoUrl || null
+ *
+ * BUG 6 — Informações sumiam no toque (tela preta)
+ *   Causa: isolation + backdrop-filter + will-change juntos no Safari.
+ *   Solução definitiva: apenas translateZ(0) no .card, zero desses em filhos.
+ *
+ * Z-INDEX DEFINITIVO (não alterar):
+ *   .canvas      → base (sem z-index)
+ *   .groupPhoto  → z-index: 1
+ *   .overlay     → z-index: 2
+ *   .bottom      → z-index: 3
+ *   .top / btns  → z-index: 4
+ * ─────────────────────────────────────────────────────────────────────────── */
+
 .card {
   border-radius: var(--radius-card);
   position: relative;
@@ -21,11 +55,10 @@
   transform: translateZ(0) translateY(-2px);
 }
 .card:active {
-  transform: translateZ(0) scale(0.995);
+  transform: translateZ(0) scale(0.993);
   transition: transform 0.08s ease;
 }
 
-/* Visual layers */
 .canvas {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
@@ -43,41 +76,38 @@
   background: linear-gradient(
     0deg,
     rgba(8,12,8,0.97) 0%,
-    rgba(8,12,8,0.65) 30%,
-    rgba(8,12,8,0.15) 55%,
+    rgba(8,12,8,0.68) 30%,
+    rgba(8,12,8,0.18) 55%,
     transparent 100%
   );
 }
 
-/* Action buttons */
 .shareBtn {
-  position: absolute; top: 14px; right: 52px; z-index: 5;
+  position: absolute; top: 14px; right: 52px; z-index: 4;
   width: 32px; height: 32px; border-radius: 10px;
   background: rgba(0,0,0,0.55);
-  border: 0.5px solid rgba(255,255,255,0.1);
+  border: 0.5px solid rgba(255,255,255,0.12);
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.7);
   transition: all var(--transition);
 }
-.shareBtn:hover { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.2); color: var(--color-brand); }
+.shareBtn:hover { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.25); color: var(--color-brand); }
 
 .favBtn {
-  position: absolute; top: 14px; right: 14px; z-index: 5;
+  position: absolute; top: 14px; right: 14px; z-index: 4;
   width: 32px; height: 32px; border-radius: 10px;
   background: rgba(0,0,0,0.55);
-  border: 0.5px solid rgba(239,68,68,0.15);
+  border: 0.5px solid rgba(239,68,68,0.2);
   display: flex; align-items: center; justify-content: center;
-  color: rgba(239,68,68,0.4);
+  color: rgba(239,68,68,0.45);
   transition: all var(--transition);
 }
-.favBtn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.4); color: #EF4444; transform: scale(1.1); }
-.favBtnActive { color: #EF4444; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.4); box-shadow: 0 0 14px rgba(239,68,68,0.2); }
+.favBtn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.45); color: #EF4444; transform: scale(1.1); }
+.favBtnActive { color: #EF4444; background: rgba(239,68,68,0.14); border-color: rgba(239,68,68,0.45); box-shadow: 0 0 14px rgba(239,68,68,0.25); }
 
-/* Top badges */
 .top {
-  position: absolute; top: 14px; left: 14px; right: 90px;
+  position: absolute; top: 14px; left: 14px; right: 90px; z-index: 4;
   display: flex; justify-content: space-between; align-items: flex-start;
-  z-index: 5;
 }
 .badge {
   display: inline-flex; align-items: center; gap: 5px;
@@ -88,123 +118,92 @@
 .badgeGreen  { background: rgba(34,197,94,0.10);  border: 0.5px solid rgba(34,197,94,0.30);  color: var(--color-brand);  box-shadow: var(--shadow-brand); }
 .badgeSilver { background: rgba(168,178,168,0.08); border: 0.5px solid rgba(168,178,168,0.2); color: var(--color-silver); }
 .badgeEmpty  { opacity: 0; pointer-events: none; width: 10px; }
-
 .distBadge {
   display: inline-flex; align-items: center; gap: 4px;
-  background: rgba(0,0,0,0.6);
-  border: 0.5px solid rgba(255,255,255,0.08);
+  background: rgba(0,0,0,0.6); border: 0.5px solid rgba(255,255,255,0.1);
   border-radius: 10px; padding: 6px 12px;
   font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.75);
 }
 
-/* Bottom content */
 .bottom {
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 20px 18px 18px;
-  z-index: 4;
+  z-index: 3;
 }
 .teamChip {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(0,0,0,0.55);
-  border: 0.5px solid rgba(34,197,94,0.1);
+  background: rgba(0,0,0,0.6); border: 0.5px solid rgba(34,197,94,0.12);
   border-radius: var(--radius-sm); padding: 5px 12px; margin-bottom: 10px;
 }
-.bfgDot    { width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, #fff 45%, #000 45%); flex-shrink: 0; }
+.bfgDot    { width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg,#fff 45%,#000 45%); flex-shrink: 0; }
 .teamName  { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.8); }
-.regionTag { font-size: 9px;  font-weight: 800; color: var(--color-brand); letter-spacing: 0.8px; text-transform: uppercase; }
-
+.regionTag { font-size: 9px; font-weight: 800; color: var(--color-brand); letter-spacing: 0.8px; text-transform: uppercase; }
 .name {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 36px; color: #fff;
   letter-spacing: 2px; line-height: 1; margin-bottom: 10px;
-  text-shadow: 0 2px 16px rgba(0,0,0,0.6), 0 0 30px rgba(34,197,94,0.06);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 30px rgba(34,197,94,0.06);
 }
-
 .statsRow { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
 .stat { display: flex; align-items: center; gap: 4px; font-size: 11px; color: rgba(255,255,255,0.55); }
 .stat strong { color: rgba(255,255,255,0.95); font-weight: 700; }
 .star { color: var(--color-gold); font-size: 12px; filter: drop-shadow(0 0 4px rgba(232,185,35,0.3)); }
-
 .meetPoint { display: flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.45); margin-bottom: 10px; }
 .meetPoint strong { color: rgba(255,255,255,0.85); font-weight: 700; }
 
-/* Occupation bar */
 .occWrap   { margin-bottom: 14px; }
 .occLabels { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 9px; color: rgba(255,255,255,0.3); font-weight: 500; }
 .occLabels strong { font-weight: 700; }
-.occBar  { height: 3px; background: rgba(255,255,255,0.04); border-radius: 2px; overflow: hidden; }
-.occFill { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px currentColor; }
+.occBar    { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+.occFill   { height: 100%; border-radius: 2px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 8px currentColor; }
 
-/* Action buttons */
 .actions { display: flex; gap: 8px; }
 
 .btnOutline {
   flex: 1; padding: 12px 0; border-radius: var(--radius-sm);
-  background: rgba(255,255,255,0.04);
-  border: 0.5px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.45);
+  border: 0.5px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.55);
   font-size: 12px; font-weight: 600;
   cursor: pointer;
   transition: all var(--transition);
 }
-.btnOutline:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.75);
-}
+.btnOutline:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); color: rgba(255,255,255,0.8); }
 .btnOutline:active { opacity: 0.7; }
 
 .btnSolid {
   flex: 1; padding: 12px 0; border-radius: var(--radius-sm);
-  background: rgba(10, 30, 16, 0.80);
+  background: rgba(8, 28, 14, 0.92);
   color: #22c55e;
   font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
-  border: 0.5px solid rgba(34, 197, 94, 0.45);
+  border: 0.5px solid rgba(34, 197, 94, 0.5);
   cursor: pointer;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.07),
-    0 0 18px rgba(34,197,94,0.15),
-    0 4px 14px rgba(0,0,0,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 0 16px rgba(34,197,94,0.15), 0 4px 12px rgba(0,0,0,0.5);
   transition: all var(--transition);
 }
 .btnSolid:hover {
-  background: rgba(14, 40, 20, 0.85);
-  border-color: rgba(34, 197, 94, 0.65);
+  background: rgba(12, 38, 18, 0.95);
+  border-color: rgba(34, 197, 94, 0.7);
   color: #4ade80;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.09),
-    0 0 28px rgba(34,197,94,0.28),
-    0 6px 16px rgba(0,0,0,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 0 26px rgba(34,197,94,0.28), 0 6px 14px rgba(0,0,0,0.5);
   transform: translateY(-1px);
 }
-.btnSolid:active {
-  transform: translateY(0);
-  opacity: 0.85;
-}
+.btnSolid:active { transform: translateY(0); opacity: 0.8; }
 
 .btnSolidDanger {
   flex: 1; padding: 12px 0; border-radius: var(--radius-sm);
-  background: rgba(30, 10, 10, 0.80);
+  background: rgba(28, 8, 8, 0.92);
   color: #f87171;
   font-size: 12px; font-weight: 700; letter-spacing: 0.4px;
-  border: 0.5px solid rgba(239, 68, 68, 0.4);
+  border: 0.5px solid rgba(239, 68, 68, 0.45);
   cursor: pointer;
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.06),
-    0 0 16px rgba(239,68,68,0.12),
-    0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 14px rgba(239,68,68,0.12), 0 4px 12px rgba(0,0,0,0.5);
   transition: all var(--transition);
 }
 .btnSolidDanger:hover {
-  background: rgba(40, 12, 12, 0.85);
-  border-color: rgba(239, 68, 68, 0.6);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 0 28px rgba(239,68,68,0.25),
-    0 6px 16px rgba(0,0,0,0.5);
+  background: rgba(40, 10, 10, 0.95);
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 26px rgba(239,68,68,0.25), 0 6px 14px rgba(0,0,0,0.5);
   transform: translateY(-1px);
 }
-.btnSolidDanger:active {
-  transform: translateY(0);
-  opacity: 0.85;
-}
+.btnSolidDanger:active { transform: translateY(0); opacity: 0.8; }
