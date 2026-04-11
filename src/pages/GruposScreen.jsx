@@ -365,7 +365,11 @@ export default function GruposScreen() {
                 height="100%"
                 frameBorder="0"
                 style={{ border: 0 }}
-                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}&zoom=15`}
+                src={
+                  mapGroup.location?.lat && mapGroup.location?.lng
+                    ? `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${mapGroup.location.lat},${mapGroup.location.lng}&zoom=16`
+                    : `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}&zoom=15`
+                }
                 allowFullScreen
               />
             </div>
@@ -378,7 +382,11 @@ export default function GruposScreen() {
               </button>
               <a
                 style={{flex: 1, padding: '13px', borderRadius: '14px', background: 'rgba(255,255,255,0.04)', border: '0.5px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', fontSize: '14px', fontWeight: 600, textAlign: 'center', textDecoration: 'none'}}
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}`}
+                href={
+                  mapGroup.location?.lat && mapGroup.location?.lng
+                    ? `https://www.google.com/maps/dir/?api=1&destination=${mapGroup.location.lat},${mapGroup.location.lng}`
+                    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((mapGroup.meetPoint || mapGroup.name) + ', Rio de Janeiro')}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
               >

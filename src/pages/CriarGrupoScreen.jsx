@@ -199,8 +199,10 @@ function StepDados({ onNext, onBack, initial }) {
 function StepLocalizacao({ onNext, onBack, initial, dados }) {
   const [fields, setFields] = useState(initial || {
     meetPoint: '', privacy: 'public', approvalRequired: false,
+    lat: null, lng: null,
   })
   const [locLoading, setLocLoading] = useState(false)
+  const [locLabel, setLocLabel] = useState('')
   const [errors, setErrors] = useState({})
 
   const set = (f) => (e) => {
@@ -212,8 +214,25 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
   const getLocation = () => {
     setLocLoading(true)
     navigator.geolocation?.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords
+        setFields(p => ({ ...p, lat, lng }))
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
+            { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
+          )
+          const data = await res.json()
+          const road = data.address?.road || ''
+          const bairro = data.address?.suburb || data.address?.neighbourhood || ''
+          setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+        } catch {
+          setLocLabel(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
+        }
+        setLocLoading(false)
+      },
       () => { setLocLoading(false) },
-      () => { setLocLoading(false) }
+      { timeout: 8000 }
     )
   }
 
@@ -267,6 +286,12 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
           </svg>
           {locLoading ? 'Detectando...' : 'Usar minha localização'}
         </button>
+        {locLabel && (
+          <div className={styles.resumoCard}>
+            <span className={styles.resumoLabel}>📍 Localização</span>
+            <span className={styles.resumoValue}>{locLabel}</span>
+          </div>
+        )}
 
         {/* Privacidade */}
         <div className={styles.field}>
@@ -395,6 +420,9 @@ export default function CriarGrupoScreen() {
         meetPoint:        localizacao.meetPoint,
         privacy:          localizacao.privacy,
         approvalRequired: localizacao.approvalRequired,
+        ...(localizacao.lat && localizacao.lng ? {
+          location: { lat: localizacao.lat, lng: localizacao.lng }
+        } : {}),
       }
 
       const res = await fetch(`${API_URL}/grupos`, {
@@ -422,7 +450,7 @@ export default function CriarGrupoScreen() {
     <div className={styles.screen}>
       {/* Header */}
       <div className={styles.header}>
-        <button className={styles.closeBtn} onClick={() => navigate(`/grupos/${data.group._id}`, { state: { grupo: data.group } })} aria-label="Fechar">
+        <button className={styles.closeBtn} onClick={() => navigate(ROUTES.GRUPOS)} aria-label="Fechar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -436,7 +464,7 @@ export default function CriarGrupoScreen() {
         {step === 0 && (
           <StepIntro
             onNext={() => setStep(1)}
-            onBack={() => navigate(`/grupos/${data.group._id}`, { state: { grupo: data.group } })}
+            onBack={() => navigate(ROUTES.GRUPOS)}
           />
         )}
         {step === 1 && (
