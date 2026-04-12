@@ -14,7 +14,7 @@ export default function NotificationBar({ text, onClick }) {
     <button
       className={styles.bar}
       onClick={handleClick}
-      aria-label="Ver ofertas de caronas"
+      aria-label="Ver ofertas de viagens"
     >
       <div className={styles.pulse} aria-hidden="true"/>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={styles.icon}>

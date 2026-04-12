@@ -144,7 +144,7 @@ export default function HomeScreen() {
 
         <RidesSection
           rides={RIDES}
-          title={`Caronas — ${displayGame.homeTeam?.name} × ${displayGame.awayTeam?.name}`}
+          title={`Viagens — ${displayGame.homeTeam?.name} × ${displayGame.awayTeam?.name}`}
           onViewAll={handleNavigateVamosComigo}
         />
 

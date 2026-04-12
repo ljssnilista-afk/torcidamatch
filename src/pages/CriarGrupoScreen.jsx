@@ -50,12 +50,12 @@ function StepIntro({ onNext, onBack }) {
       </div>
       <h2 className={styles.introTitle}>Crie seu grupo</h2>
       <p className={styles.introSub}>
-        Reúna torcedores do seu bairro, organize caronas e vá junto ao estádio com quem você conhece.
+        Reúna torcedores do seu bairro, organize viagens e vá junto ao estádio com quem você conhece.
       </p>
 
       <div className={styles.benefitsList}>
         {[
-          { icon: '🚌', text: 'Organize caronas para os jogos' },
+          { icon: '🚌', text: 'Organize viagens para os jogos' },
           { icon: '📍', text: 'Conecte torcedores da sua região' },
           { icon: '👑', text: 'Você será o líder do grupo' },
           { icon: '🔒', text: 'Limite de 100 membros por grupo' },
