@@ -2,11 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-export default defineConfig({
-  // Remover console.log e debugger em produção
-  esbuild: {
-    drop: ['console', 'debugger'],
-  },
+export default defineConfig(({ mode }) => ({
+  // Remover console.log e debugger apenas em produção
+  esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : {},
   build: {
     // Code splitting manual — separa libs grandes em chunks dedicados
     rollupOptions: {
@@ -78,4 +76,4 @@ export default defineConfig({
       },
     })
   ],
-})
+}))
