@@ -5,7 +5,7 @@
   overflow: hidden;
   position: relative;
   flex-shrink: 0;
-  min-height: 210px;
+  min-height: 260px;
   box-shadow: var(--shadow-card);
   border: 0.5px solid rgba(34,197,94,0.06);
 }
@@ -18,7 +18,7 @@
 .content { position: relative; z-index: 2; padding: 18px; }
 .label {
   font-size: 9px; font-weight: 800; color: var(--color-brand);
-  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px;
+  letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px;
   display: flex; align-items: center; gap: 6px;
 }
 .dot {
@@ -29,8 +29,36 @@
 }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* Matchup */
-.matchup { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+/* ─── Data/Hora em destaque (Req 1) ───────────────────────────────────────── */
+.dateHighlight {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 8px 0;
+}
+.bigDate {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+.bigTimeSep {
+  font-size: 18px;
+  color: var(--color-brand);
+  font-weight: 800;
+}
+.bigTime {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--color-brand);
+  letter-spacing: 1px;
+  text-shadow: 0 0 16px rgba(34,197,94,0.4);
+}
+
+/* ─── Matchup ──────────────────────────────────────────────────────────────── */
+.matchup { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .team { display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 1; }
 .shield {
   width: 52px; height: 52px; border-radius: 50%;
@@ -42,14 +70,119 @@
 .teamName { font-size: 11px; font-weight: 700; color: var(--color-text-primary); text-align: center; }
 .center { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .vs {
-  font-family: 'Bebas Neue', sans-serif; font-size: 28px;
-  color: rgba(255,255,255,0.12); letter-spacing: 3px;
+  font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+  color: rgba(255,255,255,0.25); letter-spacing: 3px; font-weight: 800;
 }
-.date { font-size: 10px; font-weight: 600; color: var(--color-text-secondary); text-align: center; }
-.stadium { font-size: 9px; font-weight: 700; color: var(--color-brand); text-align: center; letter-spacing: 0.3px; }
 
-/* Pills — glass */
-.pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+/* ─── Shield com posição na tabela (Req 5) ────────────────────────────────── */
+.shieldWrap {
+  position: relative; width: 52px; height: 52px;
+  display: flex; align-items: center; justify-content: center;
+}
+.teamLogo { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+.position {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: var(--color-brand);
+  color: #000;
+  font-size: 9px;
+  font-weight: 900;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.4);
+  letter-spacing: 0.3px;
+}
+
+/* ─── Local do jogo (Req 4) ────────────────────────────────────────────────── */
+.venueRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  color: var(--color-brand);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* ─── Countdown / Cronômetro (Req 3) ──────────────────────────────────────── */
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+.countdownLabel {
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.countdownBoxes {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.countdownUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-width: 42px;
+}
+.countdownNum {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.countdownSub {
+  font-size: 7px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.countdownSep {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--color-brand);
+  animation: pulse 1s infinite;
+}
+.countdownLive {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #ef4444;
+  letter-spacing: 2px;
+}
+.liveDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: pulse 0.8s infinite;
+  box-shadow: 0 0 12px rgba(239,68,68,0.6);
+}
+
+/* ─── Pills — glass ───────────────────────────────────────────────────────── */
+.pills { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; justify-content: center; }
 .pill {
   display: inline-flex; align-items: center; gap: 4px;
   background: var(--metallic-light); border-radius: 8px; padding: 5px 10px;
@@ -58,7 +191,7 @@
   backdrop-filter: blur(8px);
 }
 
-/* CTA — glowing green */
+/* ─── CTA — glowing green ──────────────────────────────────────────────────── */
 .cta {
   width: 100%; padding: 12px; border-radius: var(--radius-sm);
   border: 0.5px solid rgba(34,197,94,0.2);
@@ -72,11 +205,7 @@
   box-shadow: 0 0 20px rgba(34,197,94,0.1);
 }
 
-/* Logo */
-.shieldWrap { position: relative; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; }
-.teamLogo { width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
-
-/* Skeleton */
+/* ─── Skeleton ─────────────────────────────────────────────────────────────── */
 @keyframes shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
 .skelBase {
   background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 75%);
@@ -84,7 +213,7 @@
 }
 .skeleton {
   border-radius: var(--radius-card); background: var(--color-surface-1);
-  border: 0.5px solid var(--glass-border); padding: 18px; margin: 0 0 14px; min-height: 200px;
+  border: 0.5px solid var(--glass-border); padding: 18px; margin: 0 0 14px; min-height: 260px;
 }
 .skelLabel { composes: skelBase; height: 12px; width: 55%; margin-bottom: 20px; }
 .skelMatchup { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }

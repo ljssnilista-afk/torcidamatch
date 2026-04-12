@@ -144,8 +144,13 @@ export const NEXT_GAME = {
   label: 'Próximo jogo — Nilton Santos',
   homeTeam: { code: 'BOT', name: 'Botafogo', bg: '#111', color: '#fff' },
   awayTeam: { code: 'FLA', name: 'Flamengo', bg: '#CC0000', color: '#fff' },
+  homeApiId: 1958,
+  awayApiId: 5981,
   date: 'Dom 22/06 • 16h',
+  utcDate: '2026-06-22T19:00:00Z',
   stadium: 'Estádio Nilton Santos',
+  homePosition: null,
+  awayPosition: null,
   pills: [
     { icon: 'users', text: '22 caronas' },
     { icon: 'clock', text: '3h 40min' },

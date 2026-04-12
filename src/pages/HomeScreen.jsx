@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../utils/constants'
 import { useUser } from '../context/UserContext'
@@ -22,6 +22,10 @@ import {
 } from '../data/homeData'
 import styles from './HomeScreen.module.css'
 
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : '/api'
+
 export default function HomeScreen() {
   const navigate = useNavigate()
   const { user }  = useUser()
@@ -29,6 +33,23 @@ export default function HomeScreen() {
   const displayGame = nextGame ?? NEXT_GAME
   const [search, setSearch] = useState('')
   const [mapGroup, setMapGroup] = useState(null)
+  const [ridesCount, setRidesCount] = useState(null)
+
+  // Buscar quantidade real de caronas disponíveis para o próximo jogo
+  useEffect(() => {
+    async function fetchRidesCount() {
+      try {
+        const res = await fetch(`${API_URL}/rides?status=open&limit=1`)
+        if (res.ok) {
+          const data = await res.json()
+          setRidesCount(data.total ?? data.rides?.length ?? null)
+        }
+      } catch {
+        // silencioso — fallback para pills estáticas
+      }
+    }
+    fetchRidesCount()
+  }, [displayGame])
 
   // Memoizar callbacks para evitar re-render dos filhos com React.memo
   const handleNavigateGrupos = useCallback(() => navigate(ROUTES.GRUPOS), [navigate])
@@ -116,6 +137,9 @@ export default function HomeScreen() {
           game={displayGame}
           loading={gameLoading}
           onCta={handleNavigateVamosComigo}
+          ridesCount={ridesCount}
+          homePosition={displayGame.homePosition ?? null}
+          awayPosition={displayGame.awayPosition ?? null}
         />
 
         <RidesSection

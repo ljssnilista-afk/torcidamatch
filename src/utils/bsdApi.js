@@ -164,7 +164,10 @@ export function bsdEventToNextGame(event) {
       color: '#fff',
     },
     date,
+    utcDate: event.event_date,
     stadium: event.venue ?? 'A confirmar',
+    homePosition: null,  // preenchido via standings
+    awayPosition: null,  // preenchido via standings
     pills:   [],        // HomeScreen preenche com dados de caronas
     _raw:    event,     // evento bruto para uso avançado
   }
