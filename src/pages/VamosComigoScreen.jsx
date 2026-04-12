@@ -72,7 +72,7 @@ const VehicleIcon = ({ type }) => {
   )
   if (type === 'onibus') return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
+      <path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/>
     </svg>
   )
   return (
@@ -245,7 +245,7 @@ function EmptyState({ onOffer }) {
   return (
     <div className={styles.emptyState}>
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(34,197,94,0.3)" strokeWidth="1.2">
-        <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
+        <path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/>
       </svg>
       <p className={styles.emptyTitle}>Nenhuma viagem encontrada</p>
       <p className={styles.emptySub}>Que tal criar uma oferta para outros torcedores?</p>
@@ -540,7 +540,7 @@ export default function VamosComigoScreen() {
         <div className={styles.ctaBanner}>
           <div className={styles.ctaLeft}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="1.8">
-              <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
+              <circle cx="12" cy="12" r="10"/><text x="12" y="17" textAnchor="middle" fill="#22C55E" stroke="none" fontSize="14" fontWeight="700" fontFamily="sans-serif">$</text>
             </svg>
             <div>
               <p className={styles.ctaTitle}>Vai de carro ao jogo?</p>

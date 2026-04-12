@@ -306,7 +306,7 @@ export default function CriarViagemScreen() {
             </div>
             {/* Ticket summary */}
             <div className={styles.ticket}>
-              <div className={styles.ticketHeader}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/></svg><span>Resumo da viagem</span></div>
+              <div className={styles.ticketHeader}><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2"><path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/></svg><span>Resumo da viagem</span></div>
               <div className={styles.ticketDivider}><div className={styles.ticketNotchLeft} /><div className={styles.ticketDash} /><div className={styles.ticketNotchRight} /></div>
               <div className={styles.ticketBody}>
                 <div className={styles.ticketRow}><span>Jogo</span><span className={styles.ticketVal}>{selectedGame?.homeTeam} × {selectedGame?.awayTeam}</span></div>

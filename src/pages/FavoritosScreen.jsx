@@ -10,7 +10,7 @@ import styles from './FavoritosScreen.module.css'
 const VEHICLE_ICONS = {
   ônibus: (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8l5 3-5 3" />
+      <path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/>
     </svg>
   ),
   van: (
@@ -342,7 +342,7 @@ export default function FavoritosScreen() {
                 <div className={styles.ctaLeft}>
                   <div className={styles.ctaIcon}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l5 3-5 3"/>
+                      <path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/>
                     </svg>
                   </div>
                   <div>
@@ -380,7 +380,7 @@ export default function FavoritosScreen() {
                 <p className={styles.suggestLabel}>Precisa de mais opções?</p>
                 <button className={styles.suggestBtn} onClick={() => navigate(ROUTES.VAMOS_COMIGO)}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8l5 3-5 3" />
+                    <path d="M7 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0"/><path d="M5 17H3v-6l2-5h9l4 5h1a2 2 0 0 1 2 2v4h-2m-4 0H9"/>
                   </svg>
                   Ver todas as viagens
                 </button>
