@@ -58,22 +58,22 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
-      {/* Camada base: canvas do estádio (fallback visual) */}
-      <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
-
-      {/* BUG 5 CORRIGIDO: foto real sobre o canvas quando disponível */}
-      {photoSrc && (
-        <img
-          src={photoSrc}
-          className={styles.groupPhoto}
-          alt=""
-          draggable={false}
-          onError={(e) => { e.currentTarget.style.display = 'none' }}
-        />
-      )}
-
-      {/* Gradiente escuro sobre a foto/canvas */}
-      <div className={styles.overlay} aria-hidden="true" />
+      {/* BUG 7 FIX: Background wrapper isolado com GPU compositing.
+          Conteúdo (botões, .top, .bottom) fica FORA deste wrapper,
+          evitando que Safari iOS esconda z-index dos filhos. */}
+      <div className={styles.cardBg}>
+        <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
+        {photoSrc && (
+          <img
+            src={photoSrc}
+            className={styles.groupPhoto}
+            alt=""
+            draggable={false}
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
+          />
+        )}
+        <div className={styles.overlay} aria-hidden="true" />
+      </div>
 
       {/* Botão compartilhar */}
       <button

@@ -1,42 +1,24 @@
 /* ─── GroupCard — Premium Dark Futuristic ─────────────────────────────────────
  *
- * BUGS CORRIGIDOS (diagnóstico completo):
+ * SAFARI iOS FIX (BUG 7 — definitivo):
+ *   Causa raiz: transform: translateZ(0) no .card criava GPU compositing
+ *   context que fazia Safari reordenar/esconder filhos com z-index.
  *
- * BUG 1 — isolation: isolate → sumia tudo no iOS ao tocar
- *   Cria stacking context novo; filhos com backdrop-filter colapsam
- *   durante eventos touch no Safari. REMOVIDO.
+ *   Solução: REMOVER transform do .card. Mover GPU acceleration para
+ *   .cardBg (wrapper que contém apenas canvas/foto/overlay).
+ *   O conteúdo (.top, .bottom, botões) fica FORA do contexto GPU,
+ *   usando z-index normal que Safari respeita.
  *
- * BUG 2 — will-change: transform nos filhos → sumia conteúdo no toque
- *   will-change em .bottom + transform no pai = compositing conflict iOS.
- *   REMOVIDO dos filhos. Mantido só no .card raiz via translateZ(0).
- *
- * BUG 3 — backdrop-filter no .btnSolid dentro de pai com transform
- *   Causa layer conflict no Safari: botão some sobre a foto.
- *   REMOVIDO do .btnSolid e .btnOutline.
- *
- * BUG 4 — style={actionStyle} inline sobrescrevia TODO o CSS do .btnSolid
- *   ACTION_VARIANTS.brand definia background/color/border inline,
- *   anulando glassmorphism. REMOVIDO do JSX (ver GroupCard.jsx).
- *
- * BUG 5 — Foto não aparecia: campo aceita group.photo ou group.photoUrl
- *   JSX agora usa: const photoSrc = group.photo || group.photoUrl || null
- *
- * BUG 6 — Informações sumiam no toque (tela preta)
- *   Causa: isolation + backdrop-filter + will-change juntos no Safari.
- *   Solução definitiva: apenas translateZ(0) no .card, zero desses em filhos.
- *
- * BUG 7 — Conteúdo do card invisível no Safari iOS
- *   Causa: Safari reordena layers GPU dentro de parent com transform.
- *   inset shorthand pode falhar em Safari mais antigo.
- *   Solução: longhand (top/right/bottom/left), -webkit-backface-visibility
- *   no .bottom, e pointer-events:none no .overlay.
- *
- * Z-INDEX DEFINITIVO (não alterar):
- *   .canvas      → base (sem z-index)
- *   .groupPhoto  → z-index: 1
- *   .overlay     → z-index: 2
- *   .bottom      → z-index: 3
- *   .top / btns  → z-index: 4
+ * ESTRUTURA:
+ *   .card (relative, SEM transform)
+ *     .cardBg (absolute, COM translateZ(0) — só background)
+ *       canvas
+ *       img (foto)
+ *       .overlay (gradient)
+ *     .shareBtn (absolute, z-index 4)
+ *     .favBtn (absolute, z-index 4)
+ *     .top (absolute, z-index 4)
+ *     .bottom (absolute, z-index 3)
  * ─────────────────────────────────────────────────────────────────────────── */
 
 .card {
@@ -52,19 +34,24 @@
   border: 0.5px solid rgba(34, 197, 94, 0.06);
   box-shadow: var(--shadow-card);
   -webkit-tap-highlight-color: transparent;
-  transform: translateZ(0);
-  transition: box-shadow var(--transition-slow), border-color var(--transition-slow), transform var(--transition);
+  /* SEM transform aqui — essa é a chave do fix Safari */
+  transition: box-shadow var(--transition-slow), border-color var(--transition-slow), opacity var(--transition);
 }
 .card:hover {
   box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.2), var(--shadow-elevated), var(--shadow-brand);
   border-color: rgba(34, 197, 94, 0.15);
-  transform: translateZ(0) translateY(-2px);
 }
 .card:active {
-  /* BUG 7: scale() no :active causa re-compositing no Safari iOS
-     que pode esconder o .bottom momentaneamente. Usar opacity é mais seguro. */
   opacity: 0.97;
   transition: opacity 0.08s ease;
+}
+
+/* ── Background wrapper — GPU composited isolado ───────────────────────────── */
+.cardBg {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .canvas {
@@ -78,12 +65,10 @@
   top: 0; right: 0; bottom: 0; left: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  z-index: 1;
 }
 .overlay {
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
-  z-index: 2;
   pointer-events: none;
   background: linear-gradient(
     0deg,
@@ -94,6 +79,7 @@
   );
 }
 
+/* ── Conteúdo — FORA do contexto GPU, z-index funciona normal ──────────────── */
 .shareBtn {
   position: absolute; top: 14px; right: 52px; z-index: 4;
   width: 32px; height: 32px; border-radius: 10px;
@@ -114,7 +100,7 @@
   color: rgba(239,68,68,0.45);
   transition: all var(--transition);
 }
-.favBtn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.45); color: #EF4444; transform: scale(1.1); }
+.favBtn:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.45); color: #EF4444; }
 .favBtnActive { color: #EF4444; background: rgba(239,68,68,0.14); border-color: rgba(239,68,68,0.45); box-shadow: 0 0 14px rgba(239,68,68,0.25); }
 
 .top {
@@ -141,10 +127,6 @@
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 20px 18px 18px;
   z-index: 3;
-  /* BUG 7 fix: força compositing layer separado no Safari iOS
-     sem usar will-change (que causa BUG 2) */
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 .teamChip {
   display: inline-flex; align-items: center; gap: 6px;
@@ -202,9 +184,8 @@
   border-color: rgba(34, 197, 94, 0.7);
   color: #4ade80;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.09), 0 0 26px rgba(34,197,94,0.28), 0 6px 14px rgba(0,0,0,0.5);
-  transform: translateY(-1px);
 }
-.btnSolid:active { transform: translateY(0); opacity: 0.8; }
+.btnSolid:active { opacity: 0.8; }
 
 .btnSolidDanger {
   flex: 1; padding: 12px 0; border-radius: var(--radius-sm);
@@ -220,6 +201,5 @@
   background: rgba(40, 10, 10, 0.95);
   border-color: rgba(239, 68, 68, 0.65);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 0 26px rgba(239,68,68,0.25), 0 6px 14px rgba(0,0,0,0.5);
-  transform: translateY(-1px);
 }
-.btnSolidDanger:active { transform: translateY(0); opacity: 0.8; }
+.btnSolidDanger:active { opacity: 0.8; }
