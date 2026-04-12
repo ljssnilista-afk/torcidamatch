@@ -152,8 +152,7 @@ export const NEXT_GAME = {
   homePosition: null,
   awayPosition: null,
   pills: [
-    { icon: 'users', text: '22 caronas' },
-    { icon: 'clock', text: '3h 40min' },
+    { icon: 'users', text: '22 viagens' },
     { icon: 'pin', text: 'Arnaldo Quintela' },
   ],
 }
