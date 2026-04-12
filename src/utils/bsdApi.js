@@ -19,6 +19,13 @@ async function apiFetch(path, params = {}) {
   try {
     const res = await fetch(url, { headers, signal: controller.signal })
     if (!res.ok) throw new Error(`BSD API ${res.status}: ${url}`)
+
+    // Protege contra proxy retornando HTML ao invés de JSON
+    const contentType = res.headers.get('content-type') || ''
+    if (!contentType.includes('application/json')) {
+      throw new Error(`BSD API retornou ${contentType || 'tipo desconhecido'} ao invés de JSON`)
+    }
+
     return await res.json()
   } finally {
     clearTimeout(timeout)
