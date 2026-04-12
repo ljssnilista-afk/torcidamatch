@@ -25,6 +25,12 @@
  *   Causa: isolation + backdrop-filter + will-change juntos no Safari.
  *   Solução definitiva: apenas translateZ(0) no .card, zero desses em filhos.
  *
+ * BUG 7 — Conteúdo do card invisível no Safari iOS
+ *   Causa: Safari reordena layers GPU dentro de parent com transform.
+ *   inset shorthand pode falhar em Safari mais antigo.
+ *   Solução: longhand (top/right/bottom/left), -webkit-backface-visibility
+ *   no .bottom, e pointer-events:none no .overlay.
+ *
  * Z-INDEX DEFINITIVO (não alterar):
  *   .canvas      → base (sem z-index)
  *   .groupPhoto  → z-index: 1
@@ -55,24 +61,30 @@
   transform: translateZ(0) translateY(-2px);
 }
 .card:active {
-  transform: translateZ(0) scale(0.993);
-  transition: transform 0.08s ease;
+  /* BUG 7: scale() no :active causa re-compositing no Safari iOS
+     que pode esconder o .bottom momentaneamente. Usar opacity é mais seguro. */
+  opacity: 0.97;
+  transition: opacity 0.08s ease;
 }
 
 .canvas {
-  position: absolute; inset: 0;
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%; height: 100%;
   display: block;
 }
 .groupPhoto {
-  position: absolute; inset: 0;
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   z-index: 1;
 }
 .overlay {
-  position: absolute; inset: 0;
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   z-index: 2;
+  pointer-events: none;
   background: linear-gradient(
     0deg,
     rgba(8,12,8,0.97) 0%,
@@ -129,6 +141,10 @@
   position: absolute; bottom: 0; left: 0; right: 0;
   padding: 20px 18px 18px;
   z-index: 3;
+  /* BUG 7 fix: força compositing layer separado no Safari iOS
+     sem usar will-change (que causa BUG 2) */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .teamChip {
   display: inline-flex; align-items: center; gap: 6px;
