@@ -1,5 +1,4 @@
-import { useEffect, useRef, memo, useCallback } from 'react'
-import { drawStadium, STADIUM_CONFIGS } from '../utils/canvasHelpers'
+import { memo, useCallback } from 'react'
 import { useFavorites } from '../context/FavoritesContext'
 import { useToast } from '../context/ToastContext'
 import styles from './GroupCard.module.css'
@@ -18,8 +17,6 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
   const toast = useToast()
   const { isGroupFav, toggleGroup } = useFavorites()
 
-  const canvasRef = useRef(null)
-  const cfg      = STADIUM_CONFIGS[group.canvasVariant ?? 0]
   const pct      = Math.round((group.members / group.maxMembers) * 100)
   const barColor = pct >= 90 ? '#EF4444' : pct >= 75 ? '#D4AF37' : '#22C55E'
   const isFav    = isGroupFav(group.id)
@@ -46,24 +43,14 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
     )
   }, [group, isFav, toggleGroup, toast])
 
-  useEffect(() => {
-    const raf = requestAnimationFrame(() =>
-      requestAnimationFrame(() => drawStadium(canvasRef.current, cfg))
-    )
-    return () => cancelAnimationFrame(raf)
-  }, [cfg])
-
   return (
     <article
       className={styles.card}
       aria-label={`Grupo ${group.name}, ${group.region}, ${group.members} de ${group.maxMembers} membros`}
     >
-      {/* BUG 7 FIX: Background wrapper isolado com GPU compositing.
-          Conteúdo (botões, .top, .bottom) fica FORA deste wrapper,
-          evitando que Safari iOS esconda z-index dos filhos. */}
+      {/* Background: foto do grupo OU placeholder com ícone de pessoas */}
       <div className={styles.cardBg}>
-        <canvas ref={canvasRef} className={styles.canvas} width={362} height={560} />
-        {photoSrc && (
+        {photoSrc ? (
           <img
             src={photoSrc}
             className={styles.groupPhoto}
@@ -71,6 +58,15 @@ export default memo(function GroupCard({ group, onDetails, onAction }) {
             draggable={false}
             onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
+        ) : (
+          <div className={styles.placeholder} aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+          </div>
         )}
         <div className={styles.overlay} aria-hidden="true" />
       </div>
