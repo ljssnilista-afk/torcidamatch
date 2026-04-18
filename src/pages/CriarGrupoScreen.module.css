@@ -1,3 +1,8 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   CriarGrupoScreen — Premium Dark Theme
+   Design tokens from main.css (--color-brand, --color-bg, etc.)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 /* ─── Screen ─────────────────────────────────────────────────────────────── */
 .screen {
   display: flex;
@@ -13,13 +18,14 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px 10px;
+  padding: 14px 18px 12px;
   flex-shrink: 0;
   border-bottom: 0.5px solid var(--color-border);
 }
+
 .closeBtn {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--metallic-light);
   border: 0.5px solid var(--color-border);
@@ -28,37 +34,48 @@
   justify-content: center;
   color: var(--color-text-secondary);
   flex-shrink: 0;
+  transition: background 0.15s;
 }
+.closeBtn:active {
+  background: var(--color-surface-2);
+}
+
 .headerTitle {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--color-text-primary);
   flex: 1;
+  text-align: center;
 }
 
-/* ─── Step indicator ─────────────────────────────────────────────────────── */
+/* ─── Step Indicator (pill-style) ────────────────────────────────────────── */
 .stepIndicator {
   display: flex;
   gap: 5px;
   align-items: center;
 }
+
 .stepDot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.15);
-  transition: all 0.2s ease;
-}
-.stepDotActive {
-  background: var(--color-brand);
-  width: 18px;
-  border-radius: 3px;
-}
-.stepDotDone {
-  background: rgba(34,197,94,0.4);
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ─── Scroll area ─────────────────────────────────────────────────────────── */
+.stepDotActive {
+  background: var(--color-brand);
+  width: 20px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--color-brand-glow);
+}
+
+.stepDotDone {
+  background: var(--color-brand);
+  opacity: 0.7;
+}
+
+/* ─── Scroll Area ────────────────────────────────────────────────────────── */
 .scrollArea {
   flex: 1;
   overflow-y: auto;
@@ -69,7 +86,7 @@
 }
 .scrollArea::-webkit-scrollbar { display: none; }
 
-/* ─── Step wrapper ────────────────────────────────────────────────────────── */
+/* ─── Step Wrapper ───────────────────────────────────────────────────────── */
 .stepWrap {
   padding: 24px 20px 32px;
   display: flex;
@@ -77,115 +94,220 @@
   gap: 0;
 }
 
-/* ─── Intro ───────────────────────────────────────────────────────────────── */
-.introIcon {
-  width: 80px;
-  height: 80px;
-  border-radius: 20px;
-  background: rgba(34,197,94,0.08);
-  border: 0.5px solid rgba(34,197,94,0.2);
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEP 1 — Intro / Boas-vindas
+   ═══════════════════════════════════════════════════════════════════════════ */
+.introIconWrap {
   display: flex;
-  align-items: center;
   justify-content: center;
   margin-bottom: 20px;
 }
+
+.introIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: var(--color-brand-dim);
+  border: 0.5px solid rgba(34, 197, 94, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px var(--color-brand-dim);
+}
+
 .introTitle {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
   color: var(--color-text-primary);
   letter-spacing: -0.5px;
   margin-bottom: 8px;
+  text-align: center;
 }
+
 .introSub {
   font-size: 13px;
   color: var(--color-text-secondary);
-  line-height: 1.55;
-  margin-bottom: 24px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  text-align: center;
+  max-width: 300px;
+  align-self: center;
 }
+
+/* Feature cards */
 .benefitsList {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 28px;
 }
+
 .benefitItem {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   background: var(--color-surface-1);
   border: 0.5px solid var(--color-border);
-  border-radius: 10px;
-  padding: 11px 14px;
+  border-radius: 14px;
+  padding: 14px 16px;
+  transition: border-color 0.15s;
 }
-.benefitEmoji { font-size: 18px; flex-shrink: 0; }
-.benefitText  { font-size: 13px; color: var(--color-text-secondary); font-weight: 500; }
+.benefitItem:hover {
+  border-color: var(--color-border-2);
+}
 
-/* ─── Step títulos ────────────────────────────────────────────────────────── */
+.benefitIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.benefitText {
+  font-size: 13.5px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEP 2 & 3 — Títulos de etapa
+   ═══════════════════════════════════════════════════════════════════════════ */
 .stepTitle {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: var(--color-text-primary);
   letter-spacing: -0.4px;
   margin-bottom: 4px;
 }
+
 .stepSub {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--color-text-tertiary);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
-/* ─── Form ────────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Form — campos de formulário
+   ═══════════════════════════════════════════════════════════════════════════ */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 24px;
 }
+
 .field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
+
 .label {
   font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-weight: 700;
+  color: var(--color-brand);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
+
+.required {
+  color: var(--color-brand);
+}
+
 .optional {
   font-weight: 400;
   text-transform: none;
   color: var(--color-text-tertiary);
+  letter-spacing: 0;
 }
-.input, .select, .textarea {
+
+/* Inputs */
+.input,
+.select,
+.textarea {
   background: var(--color-surface-2);
   border: 0.5px solid var(--color-border-2);
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
   color: var(--color-text-primary);
   font-size: 14px;
   font-family: 'Inter', sans-serif;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   -webkit-appearance: none;
+  min-height: 48px;
 }
-.input:focus, .select:focus, .textarea:focus {
-  border-color: rgba(34,197,94,0.4);
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: rgba(34, 197, 94, 0.5);
+  box-shadow: 0 0 0 3px var(--color-brand-dim);
 }
-.input::placeholder, .textarea::placeholder { color: var(--color-text-tertiary); }
-.select { cursor: pointer; }
-.textarea { resize: none; line-height: 1.5; }
-.inputError { border-color: rgba(239,68,68,0.5) !important; }
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.select {
+  cursor: pointer;
+  padding-right: 36px;
+}
+
+.selectWrap {
+  position: relative;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  display: flex;
+}
+
+.textarea {
+  resize: none;
+  line-height: 1.5;
+  min-height: 80px;
+}
+
+.inputError {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
+}
 
 .fieldMeta {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.error   { font-size: 11px; color: #EF4444; }
-.hint    { font-size: 11px; color: var(--color-text-tertiary); }
-.counter { font-size: 10px; color: var(--color-text-tertiary); margin-left: auto; }
+
+.error {
+  font-size: 11px;
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.counter {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
 
 .row2 {
   display: grid;
@@ -193,190 +315,351 @@
   gap: 10px;
 }
 
-/* ─── Localização ─────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEP 3 — Localização & Privacidade
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Resumo card */
 .resumoCard {
   background: var(--color-surface-1);
   border: 0.5px solid var(--color-border);
-  border-radius: 10px;
-  padding: 12px 14px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 10px;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 20px;
-  align-items: center;
 }
-.resumoLabel { font-size: 10px; color: var(--color-text-tertiary); font-weight: 600; }
-.resumoValue { font-size: 12px; color: var(--color-text-primary); font-weight: 600; }
 
+.resumoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resumoLabel {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 42px;
+}
+
+.resumoValueBold {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+
+.resumoValueBrand {
+  font-size: 12px;
+  color: var(--color-brand);
+  font-weight: 500;
+}
+
+/* Botão localização */
 .btnLocation {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 0.5px solid rgba(34,197,94,0.3);
-  background: rgba(34,197,94,0.06);
+  gap: 8px;
+  padding: 13px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(34, 197, 94, 0.35);
+  background: var(--color-brand-dim);
   color: var(--color-brand);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   width: 100%;
   justify-content: center;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
-.btnLocation:hover { background: rgba(34,197,94,0.1); }
-.btnLocation:disabled { opacity: 0.5; }
+.btnLocation:hover {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.5);
+}
+.btnLocation:disabled {
+  opacity: 0.5;
+}
 
-/* Radio cards */
-.radioGroup { display: flex; flex-direction: column; gap: 8px; }
+/* Location result */
+.locResult {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-1);
+  border: 0.5px solid var(--color-border);
+  color: var(--color-brand);
+}
+
+.locResultIcon {
+  flex-shrink: 0;
+  display: flex;
+  color: var(--color-brand);
+}
+
+.locResultText {
+  font-size: 12px;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+/* Radio cards (privacidade) */
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .radioCard {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
   border: 0.5px solid var(--color-border);
   background: var(--color-surface-2);
   cursor: pointer;
-  transition: all 0.15s;
-}
-.radioCardActive {
-  border-color: rgba(34,197,94,0.4);
-  background: rgba(34,197,94,0.06);
-}
-.radioInput { display: none; }
-.radioLabel {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-}
-.radioDesc {
-  display: block;
-  font-size: 11px;
-  color: var(--color-text-tertiary);
-  margin-top: 1px;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
 }
 
-/* Checkbox card */
-.checkCard {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 0.5px solid var(--color-border);
-  background: var(--color-surface-2);
-  cursor: pointer;
+.radioCardActive {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.04);
+  border-left: 3px solid var(--color-brand);
 }
-.checkInput { display: none; }
-.checkLabel {
-  display: block;
-  font-size: 13px;
+
+.radioContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.radioLabel {
+  font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
-  flex: 1;
 }
-.checkDesc {
-  display: block;
+
+.radioCardActive .radioLabel {
+  color: var(--color-text-primary);
+}
+
+.radioDesc {
   font-size: 11px;
   color: var(--color-text-tertiary);
-  margin-top: 1px;
 }
-.checkBox {
+
+.radioCardActive .radioDesc {
+  color: var(--color-brand);
+  opacity: 0.8;
+}
+
+/* Radio circle */
+.radioCircle {
   width: 20px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: 50%;
   border: 1.5px solid var(--color-border-2);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.15s;
-}
-.checkBoxActive {
-  background: var(--color-brand);
-  border-color: var(--color-brand);
-  color: #000;
+  transition: all 0.2s;
 }
 
-/* ─── Confirmação ─────────────────────────────────────────────────────────── */
-.confirmIcon {
-  width: 72px;
-  height: 72px;
-  border-radius: 18px;
-  background: rgba(34,197,94,0.08);
-  border: 0.5px solid rgba(34,197,94,0.2);
+.radioCircleActive {
+  border-color: var(--color-brand);
+}
+
+.radioCircleDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-brand);
+}
+
+/* Approval card */
+.approvalCard {
   display: flex;
   align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 0.5px solid var(--color-border);
+  background: var(--color-surface-2);
+}
+
+.approvalContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.approvalLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.approvalDesc {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+/* Toggle switch */
+.toggle {
+  width: 42px;
+  height: 24px;
+  border-radius: 12px;
+  background: var(--color-surface-3);
+  border: 0.5px solid var(--color-border-2);
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+  padding: 0;
+}
+
+.toggleOn {
+  background: var(--color-brand);
+  border-color: var(--color-brand);
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--color-text-tertiary);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s;
+}
+
+.toggleOn .toggleThumb {
+  transform: translateX(18px);
+  background: #000;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   STEP 4 — Confirmação
+   ═══════════════════════════════════════════════════════════════════════════ */
+.confirmIconWrap {
+  display: flex;
   justify-content: center;
   margin-bottom: 16px;
 }
+
+.confirmIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: var(--color-brand-dim);
+  border: 0.5px solid rgba(34, 197, 94, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px var(--color-brand-dim);
+}
+
 .confirmCard {
   background: var(--color-surface-1);
   border: 0.5px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   margin-bottom: 24px;
 }
+
 .confirmRow {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 11px 14px;
+  gap: 14px;
+  padding: 12px 16px;
   border-bottom: 0.5px solid var(--color-border);
 }
-.confirmRow:last-child { border-bottom: none; }
+.confirmRow:last-child {
+  border-bottom: none;
+}
+
 .confirmLabel {
   font-size: 11px;
   color: var(--color-text-tertiary);
   font-weight: 600;
   min-width: 80px;
-  padding-top: 1px;
+  padding-top: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
+
 .confirmValue {
   font-size: 13px;
   color: var(--color-text-primary);
   font-weight: 500;
   flex: 1;
   line-height: 1.4;
+  text-align: right;
 }
 
-/* ─── Botões ──────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Botões
+   ═══════════════════════════════════════════════════════════════════════════ */
 .btnPrimary {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 15px;
+  border-radius: 14px;
   background: var(--color-brand);
   color: #000;
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   text-align: center;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, transform 0.1s;
   margin-bottom: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  min-height: 52px;
+  letter-spacing: -0.2px;
 }
-.btnPrimary:hover { opacity: 0.88; }
-.btnPrimary:disabled { opacity: 0.5; cursor: not-allowed; }
-.btnLoading { opacity: 0.7; }
+.btnPrimary:hover {
+  opacity: 0.9;
+}
+.btnPrimary:active {
+  transform: scale(0.985);
+}
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnLoading {
+  opacity: 0.7;
+}
 
 .btnBack {
   width: 100%;
   padding: 12px;
   border-radius: 12px;
   background: transparent;
-  color: var(--color-text-tertiary);
+  color: var(--color-brand);
+  opacity: 0.5;
   font-size: 13px;
   font-weight: 500;
   text-align: center;
+  transition: opacity 0.15s;
 }
-.btnBack:hover { color: var(--color-text-secondary); }
+.btnBack:hover {
+  opacity: 0.75;
+}
 
-.submitBtnDisabled { opacity: 0.4; cursor: not-allowed; }
-
-/* Loading dots */
+/* ─── Loading dots ───────────────────────────────────────────────────────── */
 .dots {
   display: flex;
   gap: 5px;
@@ -391,6 +674,7 @@
 }
 .dots span:nth-child(2) { animation-delay: 0.2s; }
 .dots span:nth-child(3) { animation-delay: 0.4s; }
+
 @keyframes dotBounce {
   0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
   40%           { transform: scale(1);   opacity: 1; }
