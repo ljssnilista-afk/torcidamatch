@@ -3,6 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
 import { ROUTES } from '../utils/constants'
+import PaymentModal from '../ui/PaymentModal'
 import styles from './GrupoScreen.module.css'
 
 const API_URL = import.meta.env.VITE_API_URL
@@ -657,9 +658,9 @@ function GuestView({ grupo, members, joinStatus, onJoin }) {
           </div>
         ) : (
           <>
-            {isPrivate && grupo?.subscriptionPrice > 0 && (
+            {isPrivate && grupo?.membershipFee > 0 && (
               <p className={styles.joinPrice}>
-                R$ {Number(grupo.subscriptionPrice).toFixed(2)}<span>/mês</span>
+                R$ {(grupo.membershipFee / 100).toFixed(2).replace('.', ',')}<span>/mês</span>
               </p>
             )}
             <button
@@ -669,6 +670,8 @@ function GuestView({ grupo, members, joinStatus, onJoin }) {
             >
               {joinStatus === 'requesting' ? (
                 <><span className={styles.joinSpinner}/> Aguarde...</>
+              ) : joinStatus === 'pendingPayment' ? (
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar mensalidade</>
               ) : isPrivate ? (
                 <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Assinar grupo</>
               ) : (
@@ -687,7 +690,7 @@ export default function GrupoScreen() {
   const { id }       = useParams()
   const location     = useLocation()
   const navigate     = useNavigate()
-  const { user }     = useUser()
+  const { user, logout } = useUser()
   const toast        = useToast()
 
   const [grupo,      setGrupo]      = useState(location.state?.grupo || null)
@@ -703,7 +706,8 @@ export default function GrupoScreen() {
   const [editLoading,setEditLoading]= useState(false)
   const [wsReady,    setWsReady]    = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
-  const [joinStatus, setJoinStatus] = useState(null) // null | 'requesting' | 'pending'
+  const [joinStatus, setJoinStatus] = useState(null) // null | 'requesting' | 'pending' | 'pendingPayment'
+  const [showPayment, setShowPayment] = useState(false)
 
   const bottomRef = useRef(null)
   const wsRef     = useRef(null)
@@ -740,10 +744,16 @@ export default function GrupoScreen() {
   // ── Detectar solicitação pendente já existente ────────────────────────────
   useEffect(() => {
     if (!grupo || !user) return
-    const alreadyPending = grupo.pendingMembers?.some(
+    const pendingEntry = grupo.pendingMembers?.find(
       p => String(p.user) === String(user.id)
     )
-    if (alreadyPending) setJoinStatus('pending')
+    if (pendingEntry) {
+      if (pendingEntry.status === 'pendingPayment') {
+        setJoinStatus('pendingPayment')
+      } else {
+        setJoinStatus('pending')
+      }
+    }
   }, [grupo, user])
 
   // ── Entrar no grupo ────────────────────────────────────────────────────────
@@ -752,6 +762,13 @@ export default function GrupoScreen() {
       toast.error('Faça login para entrar no grupo')
       return
     }
+
+    // Se já está em pendingPayment (voltou para a tela), abrir modal direto
+    if (joinStatus === 'pendingPayment') {
+      setShowPayment(true)
+      return
+    }
+
     setJoinStatus('requesting')
     try {
       const res = await fetch(`${API_URL}/grupos/${id}/entrar`, {
@@ -765,12 +782,17 @@ export default function GrupoScreen() {
           toast.success(data.message || 'Solicitação enviada ao líder!')
         } else if (data.status === 'pendingPayment') {
           setJoinStatus('pendingPayment')
-          toast.success(data.message || 'Pague a mensalidade para acessar o grupo')
+          setShowPayment(true)
         } else {
           toast.success(data.message || 'Você entrou no grupo!')
           setJoinStatus(null)
           await loadGrupo()
         }
+      } else if (res.status === 401) {
+        toast.error('Sessão expirada. Faça login novamente.')
+        logout()
+        navigate(ROUTES.LOGIN)
+        return
       } else {
         toast.error(data.error || 'Erro ao solicitar entrada')
         setJoinStatus(null)
@@ -1037,6 +1059,26 @@ export default function GrupoScreen() {
           onSave={handleEditGroup}
           onClose={() => setShowEdit(false)}
           loading={editLoading}
+        />
+      )}
+
+      {/* Modal de pagamento Stripe */}
+      {showPayment && grupo && (
+        <PaymentModal
+          type="group"
+          targetId={id}
+          description={`Assinatura · ${grupo.name}`}
+          visible={showPayment}
+          onClose={() => {
+            setShowPayment(false)
+            if (joinStatus === 'pendingPayment') setJoinStatus(null)
+          }}
+          onSuccess={() => {
+            setShowPayment(false)
+            setJoinStatus(null)
+            toast.success('Pagamento confirmado! Bem-vindo ao grupo.')
+            loadGrupo()
+          }}
         />
       )}
     </div>
