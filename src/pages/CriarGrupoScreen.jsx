@@ -24,16 +24,43 @@ const ZONAS = ['Zona Sul','Zona Norte','Zona Oeste','Centro','Niterói','Baixada
    ═══════════════════════════════════════════════════════════════════════════ */
 const Icons = {
   close: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
       <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
     </svg>
   ),
   people: (
-    <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#00E676" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
       <circle cx="9" cy="7" r="4"/>
       <path d="M23 21v-2a4 4 0 00-3-3.87"/>
       <path d="M16 3.13a4 4 0 010 7.75"/>
+    </svg>
+  ),
+  bus: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="14" rx="3"/>
+      <path d="M3 10h18"/>
+      <path d="M12 3v7"/>
+      <circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>
+      <path d="M5.5 17v3M18.5 17v3"/>
+    </svg>
+  ),
+  pin: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+  ),
+  crown: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 20h20"/>
+      <path d="M4 20V9l4 4 4-7 4 7 4-4v11"/>
+    </svg>
+  ),
+  lock: (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0110 0v4"/>
     </svg>
   ),
   mapPin: (
@@ -43,7 +70,7 @@ const Icons = {
     </svg>
   ),
   check: (
-    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#00E676" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-brand)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
       <polyline points="22,4 12,14.01 9,11.01"/>
     </svg>
@@ -96,10 +123,10 @@ function ToggleSwitch({ checked, onChange }) {
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepIntro({ onNext, onBack }) {
   const features = [
-    { emoji: '🚌', color: '#4FC3F7', text: 'Organize viagens para os jogos' },
-    { emoji: '📍', color: '#FF5252', text: 'Conecte torcedores da sua região' },
-    { emoji: '👑', color: '#FFD740', text: 'Você será o líder do grupo'      },
-    { emoji: '🔒', color: 'rgba(255,255,255,0.4)', text: 'Limite de 100 membros por grupo' },
+    { icon: Icons.bus,   color: '#4FC3F7', text: 'Organize viagens para os jogos' },
+    { icon: Icons.pin,   color: '#FF5252', text: 'Conecte torcedores da sua região' },
+    { icon: Icons.crown, color: '#FFD740', text: 'Você será o líder do grupo' },
+    { icon: Icons.lock,  color: 'var(--color-text-secondary)', text: 'Limite de 100 membros por grupo' },
   ]
 
   return (
@@ -120,7 +147,7 @@ function StepIntro({ onNext, onBack }) {
         {features.map(f => (
           <div key={f.text} className={styles.benefitItem}>
             <div className={styles.benefitIcon} style={{ color: f.color }}>
-              <span style={{ fontSize: 20 }}>{f.emoji}</span>
+              {f.icon}
             </div>
             <span className={styles.benefitText}>{f.text}</span>
           </div>
@@ -176,9 +203,7 @@ function StepDados({ onNext, onBack, initial }) {
       <div className={styles.form}>
         {/* Nome */}
         <div className={styles.field}>
-          <label className={styles.label}>
-            Nome do grupo <span className={styles.required}>*</span>
-          </label>
+          <label className={styles.label}>Nome do grupo <span className={styles.required}>*</span></label>
           <input
             className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
             placeholder="Ex: Botafogo de Copacabana"
@@ -197,9 +222,7 @@ function StepDados({ onNext, onBack, initial }) {
 
         {/* Time */}
         <div className={styles.field}>
-          <label className={styles.label}>
-            Time <span className={styles.required}>*</span>
-          </label>
+          <label className={styles.label}>Time <span className={styles.required}>*</span></label>
           <div className={styles.selectWrap}>
             <select
               className={`${styles.select} ${errors.team ? styles.inputError : ''}`}
@@ -217,9 +240,7 @@ function StepDados({ onNext, onBack, initial }) {
         {/* Bairro + Zona */}
         <div className={styles.row2}>
           <div className={styles.field}>
-            <label className={styles.label}>
-              Bairro <span className={styles.required}>*</span>
-            </label>
+            <label className={styles.label}>Bairro <span className={styles.required}>*</span></label>
             <input
               className={`${styles.input} ${errors.bairro ? styles.inputError : ''}`}
               placeholder="Ex: Copacabana"
@@ -229,9 +250,7 @@ function StepDados({ onNext, onBack, initial }) {
             {errors.bairro && <span className={styles.error}>{errors.bairro}</span>}
           </div>
           <div className={styles.field}>
-            <label className={styles.label}>
-              Zona <span className={styles.required}>*</span>
-            </label>
+            <label className={styles.label}>Zona <span className={styles.required}>*</span></label>
             <div className={styles.selectWrap}>
               <select
                 className={`${styles.select} ${errors.zona ? styles.inputError : ''}`}
@@ -249,9 +268,7 @@ function StepDados({ onNext, onBack, initial }) {
 
         {/* Descrição */}
         <div className={styles.field}>
-          <label className={styles.label}>
-            Descrição <span className={styles.optional}>(opcional)</span>
-          </label>
+          <label className={styles.label}>Descrição <span className={styles.optional}>(opcional)</span></label>
           <textarea
             className={`${styles.textarea} ${errors.description ? styles.inputError : ''}`}
             placeholder="Conte um pouco sobre seu grupo..."
@@ -282,8 +299,8 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
     lat: null, lng: null,
   })
   const [locLoading, setLocLoading] = useState(false)
-  const [locLabel,   setLocLabel]   = useState('')
-  const [errors,     setErrors]     = useState({})
+  const [locLabel, setLocLabel] = useState('')
+  const [errors, setErrors] = useState({})
 
   const set = (f) => (e) => {
     const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value
@@ -291,7 +308,9 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
     setErrors(p => ({ ...p, [f]: '' }))
   }
 
-  const setPrivacy = (value) => setFields(p => ({ ...p, privacy: value }))
+  const setPrivacy = (value) => {
+    setFields(p => ({ ...p, privacy: value }))
+  }
 
   const getLocation = () => {
     setLocLoading(true)
@@ -305,7 +324,7 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
             { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
           )
           const data = await res.json()
-          const road   = data.address?.road || ''
+          const road = data.address?.road || ''
           const bairro = data.address?.suburb || data.address?.neighbourhood || ''
           setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
         } catch {
@@ -332,7 +351,7 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
 
   const privacyOptions = [
     { value: 'public',  label: 'Público',  desc: 'Aparece na busca para todos' },
-    { value: 'private', label: 'Privado',  desc: 'Apenas por convite'          },
+    { value: 'private', label: 'Privado',  desc: 'Apenas por convite' },
   ]
 
   return (
@@ -355,9 +374,7 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
       <div className={styles.form}>
         {/* Ponto de encontro */}
         <div className={styles.field}>
-          <label className={styles.label}>
-            Ponto de encontro <span className={styles.required}>*</span>
-          </label>
+          <label className={styles.label}>Ponto de encontro <span className={styles.required}>*</span></label>
           <input
             className={`${styles.input} ${errors.meetPoint ? styles.inputError : ''}`}
             placeholder="Ex: Av. Atlântica, 3000 — em frente ao posto"
@@ -387,26 +404,24 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
 
         {/* Privacidade */}
         <div className={styles.field}>
-          <label className={styles.sectionLabel}>Privacidade</label>
-          <div style={{ marginTop: 8 }}>
-            <div className={styles.radioGroup}>
-              {privacyOptions.map(opt => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  className={`${styles.radioCard} ${fields.privacy === opt.value ? styles.radioCardActive : ''}`}
-                  onClick={() => setPrivacy(opt.value)}
-                >
-                  <div className={styles.radioContent}>
-                    <span className={styles.radioLabel}>{opt.label}</span>
-                    <span className={styles.radioDesc}>{opt.desc}</span>
-                  </div>
-                  <div className={`${styles.radioCircle} ${fields.privacy === opt.value ? styles.radioCircleActive : ''}`}>
-                    {fields.privacy === opt.value && <div className={styles.radioCircleDot} />}
-                  </div>
-                </button>
-              ))}
-            </div>
+          <label className={styles.label}>Privacidade</label>
+          <div className={styles.radioGroup}>
+            {privacyOptions.map(opt => (
+              <button
+                key={opt.value}
+                type="button"
+                className={`${styles.radioCard} ${fields.privacy === opt.value ? styles.radioCardActive : ''}`}
+                onClick={() => setPrivacy(opt.value)}
+              >
+                <div className={styles.radioContent}>
+                  <span className={styles.radioLabel}>{opt.label}</span>
+                  <span className={styles.radioDesc}>{opt.desc}</span>
+                </div>
+                <div className={`${styles.radioCircle} ${fields.privacy === opt.value ? styles.radioCircleActive : ''}`}>
+                  {fields.privacy === opt.value && <div className={styles.radioCircleDot} />}
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -434,12 +449,12 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepConfirm({ dados, localizacao, onConfirm, loading }) {
   const rows = [
-    ['Nome',        dados.name],
-    ['Time',        dados.team],
-    ['Bairro',      `${dados.bairro}, ${dados.zona}`],
-    ['Ponto',       localizacao.meetPoint],
-    ['Privacidade', localizacao.privacy === 'public' ? 'Público' : 'Privado'],
-    ['Aprovação',   localizacao.approvalRequired ? 'Manual' : 'Automática'],
+    ['Nome',          dados.name],
+    ['Time',          dados.team],
+    ['Bairro',        `${dados.bairro}, ${dados.zona}`],
+    ['Ponto',         localizacao.meetPoint],
+    ['Privacidade',   localizacao.privacy === 'public' ? 'Público' : 'Privado'],
+    ['Aprovação',     localizacao.approvalRequired ? 'Manual' : 'Automática'],
   ]
   if (dados.description) rows.splice(3, 0, ['Descrição', dados.description])
 
@@ -521,7 +536,7 @@ export default function CriarGrupoScreen() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Erro ao criar grupo')
 
-      toast.success('Grupo criado com sucesso!')
+      toast.success(`Grupo criado com sucesso!`)
       navigate(`/grupos/${data.group._id}`, { state: { grupo: data.group } })
     } catch (err) {
       toast.error(err.message)
@@ -534,11 +549,7 @@ export default function CriarGrupoScreen() {
     <div className={styles.screen}>
       {/* Header fixo */}
       <div className={styles.header}>
-        <button
-          className={styles.closeBtn}
-          onClick={() => navigate(ROUTES.GRUPOS)}
-          aria-label="Fechar"
-        >
+        <button className={styles.closeBtn} onClick={() => navigate(ROUTES.GRUPOS)} aria-label="Fechar">
           {Icons.close}
         </button>
         <span className={styles.headerTitle}>Criar grupo</span>
