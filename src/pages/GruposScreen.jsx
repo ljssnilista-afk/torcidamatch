@@ -171,24 +171,41 @@ export default function GruposScreen() {
     return Math.abs(hash) % 3
   }
 
-  const toCardFormat = useCallback((g) => ({
-    id: g._id, name: g.name,
-    team: g.team || user?.team || 'Botafogo',
-    region: g.bairro || '',
-    distance: g.zona ? `Zona ${g.zona}` : '',
-    members: g.members?.length || 1, maxMembers: g.maxMembers || 100,
-    rating: null, ratingCount: 0,
-    meetPoint: g.meetPoint || '',
-    canvasVariant: idToVariant(g._id),
-    badge: g.privacy === 'private' ? 'silver' : null,
-    badgeLabel: g.privacy === 'private' ? '🔒 Privado' : '',
-    actionLabel: 'Ver grupo', actionVariant: 'brand',
-    zone: ZONA_MAP[g.zona] || 'todos',
-    groupType: g.groupType || '',
-    code: g.code || null,
-    photo: g.photo || null,
-    _raw: g,
-  }), [user?.team])
+  const toCardFormat = useCallback((g, isMine = false) => {
+    const isPrivate = g.privacy === 'private'
+    const hasFee = g.membershipFee > 0
+
+    let actionLabel = 'Ver grupo'
+    let actionVariant = 'brand'
+    if (!isMine) {
+      if (isPrivate && hasFee) {
+        actionLabel = `Entrar (R$ ${(g.membershipFee / 100).toFixed(2).replace('.', ',')})`
+        actionVariant = 'brand'
+      } else {
+        actionLabel = 'Solicitar entrada'
+        actionVariant = 'outline'
+      }
+    }
+
+    return {
+      id: g._id, name: g.name,
+      team: g.team || user?.team || 'Botafogo',
+      region: g.bairro || '',
+      distance: g.zona ? `Zona ${g.zona}` : '',
+      members: g.members?.length || 1, maxMembers: g.maxMembers || 100,
+      rating: null, ratingCount: 0,
+      meetPoint: g.meetPoint || '',
+      canvasVariant: idToVariant(g._id),
+      badge: isPrivate ? 'silver' : null,
+      badgeLabel: isPrivate ? '🔒 Privado' : '',
+      actionLabel, actionVariant,
+      zone: ZONA_MAP[g.zona] || 'todos',
+      groupType: g.groupType || '',
+      code: g.code || null,
+      photo: g.photo || null,
+      _raw: g,
+    }
+  }, [user?.team])
 
   // Memoizar a conversão e filtragem para não recalcular desnecessariamente
   const allCards = useMemo(() => grupos.map(toCardFormat), [grupos, toCardFormat])
@@ -282,7 +299,7 @@ export default function GruposScreen() {
             {meusGrupos.map(g => (
               <GroupCard
                 key={g._id}
-                group={toCardFormat(g)}
+                group={toCardFormat(g, true)}
                 onDetails={() => setMapGroup(g)}
                 onAction={() => navigate(`/grupos/${g._id}`, { state: { grupo: g } })}
               />

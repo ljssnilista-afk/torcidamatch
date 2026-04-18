@@ -672,10 +672,10 @@ function GuestView({ grupo, members, joinStatus, onJoin }) {
                 <><span className={styles.joinSpinner}/> Aguarde...</>
               ) : joinStatus === 'pendingPayment' ? (
                 <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pagar mensalidade</>
-              ) : isPrivate ? (
-                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Assinar grupo</>
+              ) : isPrivate && grupo?.membershipFee > 0 ? (
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Entrar (R$ {(grupo.membershipFee / 100).toFixed(2).replace('.', ',')}/mês)</>
               ) : (
-                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20,6 9,17 4,12"/></svg> Entrar no Grupo</>
+                <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20,6 9,17 4,12"/></svg> Solicitar entrada</>
               )}
             </button>
           </>
