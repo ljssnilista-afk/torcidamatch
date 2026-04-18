@@ -7,7 +7,7 @@ import { registerUser, loginUser } from '../services/authApi'
 import styles from './LoginScreen.module.css'
 
 const teamLogoUrl = (apiId) =>
-  `https://torcida-match-api-production.up.railway.app/api/bsd/img/team/${apiId}/`
+  `https://torcida-match-api-1.onrender.com/api/bsd/img/team/${apiId}/`
 
 const CLUBES_RJ = [
   { id: 'botafogo',      name: 'Botafogo',      tipo: 'grande',      emoji: '⭐', cores: ['#1a1a1a','#fff'], apiId: 1958 },

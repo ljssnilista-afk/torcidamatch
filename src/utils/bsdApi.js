@@ -1,7 +1,7 @@
 // ─── BSD Sports API Client ────────────────────────────────────────────────────
-// Chamadas passam pelo backend Railway para evitar CORS
+// Chamadas passam pelo backend Render para evitar CORS
 
-const BASE_URL = 'https://torcida-match-api-production.up.railway.app/api/bsd'
+const BASE_URL = 'https://torcida-match-api-1.onrender.com/api/bsd'
 const TOKEN    = 'e06ac9d43652a8adb1f8997bc4f9c4575db1353f'
 const IMG_BASE = 'https://sports.bzzoiro.com/img'
 
