@@ -127,7 +127,8 @@ function GameCard({ game, selected, onSelect }) {
 export default function CriarViagemScreen() {
   const navigate = useNavigate()
   const toast = useToast()
-  const { user } = useUser()
+  // ✅ Adicionado ensureValidToken
+  const { user, ensureValidToken } = useUser()
   const token = user?.token
   const [step, setStep] = useState(0)
   const [direction, setDirection] = useState('forward')
@@ -154,7 +155,6 @@ export default function CriarViagemScreen() {
         const data = await fetchEvents({ team: user?.team || 'Botafogo', dateFrom: fmt(today), dateTo: fmt(in60d), status: 'notstarted' })
         const expectedApiId = TEAM_API_IDS[user?.team] || null
         const filtered = (data.results ?? []).filter(ev => {
-          // Se temos o apiId do time, filtrar para só mostrar jogos desse time exato
           if (expectedApiId) {
             const homeApiId = ev.home_team_obj?.id
             const awayApiId = ev.away_team_obj?.id
@@ -176,7 +176,10 @@ export default function CriarViagemScreen() {
     async function checkLeader() {
       if (!token) return
       try {
-        const res = await fetch(`${API_URL}/grupos`, { headers: { Authorization: `Bearer ${token}` } })
+        // ✅ Garante token válido antes de verificar líder
+        const validToken = await ensureValidToken()
+        if (!validToken) return
+        const res = await fetch(`${API_URL}/grupos`, { headers: { Authorization: `Bearer ${validToken}` } })
         if (res.ok) {
           const data = await res.json()
           const myGroup = (data.groups || []).find(g => String(g.leader?._id || g.leader) === String(user?.id))
@@ -204,6 +207,14 @@ export default function CriarViagemScreen() {
     if (!canNext() || submitting) return
     setSubmitting(true)
     try {
+      // ✅ Garante token válido antes de criar viagem
+      const validToken = await ensureValidToken()
+      if (!validToken) {
+        toast.error('Sessão expirada. Faça login novamente.')
+        navigate(ROUTES.LOGIN)
+        return
+      }
+
       const gameDate = new Date(selectedGame.rawDate)
       gameDate.setHours(parseInt(departureHour), parseInt(departureMinute), 0, 0)
       const body = {
@@ -213,7 +224,8 @@ export default function CriarViagemScreen() {
         game: { homeTeam: selectedGame.homeTeam, awayTeam: selectedGame.awayTeam, date: selectedGame.rawDate, stadium: selectedGame.stadium },
         groupId: isLeader && leaderGroup ? leaderGroup._id : null,
       }
-      const res = await fetch(`${API_URL}/rides`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body) })
+      // ✅ Usa validToken no lugar de token fixo
+      const res = await fetch(`${API_URL}/rides`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${validToken}` }, body: JSON.stringify(body) })
       const data = await res.json()
       if (res.ok) { toast.success(data.message || 'Viagem criada!'); navigate(ROUTES.VAMOS_COMIGO) }
       else toast.error(data.error || 'Erro ao criar viagem')
