@@ -147,8 +147,8 @@ export function bsdEventToNextGame(event) {
 
   return {
     // IDs para buscar logos
-    homeApiId: home?.api_id ?? null,
-    awayApiId: away?.api_id ?? null,
+    homeApiId: home?.id ?? null,
+    awayApiId: away?.id ?? null,
 
     label:   `Próximo jogo — ${event.league?.name ?? 'Brasileirão'}`,
     homeTeam: {
