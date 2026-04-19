@@ -136,3 +136,192 @@
 .btnSubmitting { pointer-events: none; }
 .spinner { width: 20px; height: 20px; border: 2.5px solid rgba(0,0,0,0.15); border-top-color: #000; border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Rules accordion ────────────────────────────────────────────────────── */
+.rulesCard {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rulesToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.rulesToggle:hover { background: rgba(255,255,255,0.03); }
+
+.rulesToggleLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-primary);
+}
+
+.rulesToggleTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.rulesBody {
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rulesGroup { display: flex; flex-direction: column; gap: 8px; }
+
+.rulesGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.rulesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rulesList li {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding-left: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.rulesList li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: rgba(255,255,255,0.2);
+}
+
+.rulesDivider {
+  height: 0.5px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* ─── Return info card (motorista) ──────────────────────────────────────── */
+.returnInfoCard {
+  background: rgba(34,197,94,0.04);
+  border: 1px solid rgba(34,197,94,0.14);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.returnInfoHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.returnInfoEmoji { font-size: 18px; }
+
+.returnInfoTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.returnInfoText {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin: 0 0 8px;
+}
+
+.returnInfoText:last-of-type { margin-bottom: 12px; }
+
+.returnInfoText strong {
+  color: #22C55E;
+  font-weight: 700;
+}
+
+.returnInfoPills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pillGreenSm {
+  font-size: 11px;
+  font-weight: 700;
+  color: #22C55E;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+.pillAmberSm {
+  font-size: 11px;
+  font-weight: 700;
+  color: #F59E0B;
+  background: rgba(245,158,11,0.1);
+  border: 0.5px solid rgba(245,158,11,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+/* ─── Terms checkbox ─────────────────────────────────────────────────────── */
+.termsLabel {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px 0 8px;
+}
+
+.termsCheck {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s;
+  cursor: pointer;
+  margin-top: 1px;
+}
+
+.termsCheckActive {
+  background: #22C55E;
+  border-color: #22C55E;
+  box-shadow: 0 0 10px rgba(34,197,94,0.3);
+}
+
+.termsText {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.termsText strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}

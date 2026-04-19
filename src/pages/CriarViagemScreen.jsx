@@ -147,6 +147,8 @@ export default function CriarViagemScreen() {
   const [submitting, setSubmitting] = useState(false)
   const [isLeader, setIsLeader] = useState(false)
   const [leaderGroup, setLeaderGroup] = useState(null)
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [rulesOpen, setRulesOpen] = useState(false)
 
   useEffect(() => {
     async function loadGames() {
@@ -197,7 +199,7 @@ export default function CriarViagemScreen() {
   const canNext = () => {
     if (step === 0) return !!selectedGame
     if (step === 1) return !!vehicle && seats >= 1
-    if (step === 2) return !!price && !!meetPoint
+    if (step === 2) return !!price && !!meetPoint && termsAccepted
     return false
   }
   const nextStep = () => { if (canNext() && step < 2) { setDirection('forward'); setStep(step + 1) } }
@@ -329,6 +331,105 @@ export default function CriarViagemScreen() {
               </div>
               <div className={styles.ticketFooter}>O app retém 20% de comissão sobre cada vaga paga.</div>
             </div>
+
+            {/* ── Regras e segurança (acordeão) ── */}
+            <div className={styles.rulesCard}>
+              <button className={styles.rulesToggle} onClick={() => setRulesOpen(o => !o)} type="button">
+                <div className={styles.rulesToggleLeft}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2">
+                    <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                  </svg>
+                  <span className={styles.rulesToggleTitle}>Regras e segurança do app</span>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                  style={{ transform: rulesOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </button>
+
+              {rulesOpen && (
+                <div className={styles.rulesBody}>
+                  <div className={styles.rulesGroup}>
+                    <div className={styles.rulesGroupTitle}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+                      </svg>
+                      Segurança
+                    </div>
+                    <ul className={styles.rulesList}>
+                      <li>Todos os motoristas passam por verificação de identidade</li>
+                      <li>Compartilhamento de localização em tempo real disponível</li>
+                      <li>Suporte 24h em caso de incidente durante a viagem</li>
+                    </ul>
+                  </div>
+
+                  <div className={styles.rulesDivider} />
+
+                  <div className={styles.rulesGroup}>
+                    <div className={styles.rulesGroupTitle}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                      </svg>
+                      Normas de conduta
+                    </div>
+                    <ul className={styles.rulesList}>
+                      <li>Respeito e cordialidade entre todos os ocupantes</li>
+                      <li>Proibido consumo de álcool e drogas durante a viagem</li>
+                      <li>Uso obrigatório de cinto de segurança em todos os bancos</li>
+                      <li>Motorista tem o direito de recusar passageiros desrespeitosos</li>
+                    </ul>
+                  </div>
+
+                  <div className={styles.rulesDivider} />
+
+                  <div className={styles.rulesGroup}>
+                    <div className={styles.rulesGroupTitle}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                      </svg>
+                      Cancelamento
+                    </div>
+                    <ul className={styles.rulesList}>
+                      <li>Cancelamento gratuito até 2h antes da saída</li>
+                      <li>Após esse prazo, multa de 50% do valor da vaga</li>
+                      <li>Não comparecimento sem aviso: avaliação negativa automática</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ── Sobre ida e volta (para o motorista) ── */}
+            <div className={styles.returnInfoCard}>
+              <div className={styles.returnInfoHeader}>
+                <span className={styles.returnInfoEmoji}>💚</span>
+                <span className={styles.returnInfoTitle}>Sobre ida e volta</span>
+              </div>
+              <p className={styles.returnInfoText}>
+                Sua responsabilidade é <strong>levar os passageiros até o estádio</strong> — a ida é garantida após o pagamento.
+              </p>
+              <p className={styles.returnInfoText}>
+                A volta é uma <strong>cortesia sua</strong>, não uma obrigação. Ela depende do bom comportamento dos passageiros e da conexão que rolar no caminho. Seja gente boa, curta o rolê e, se a galera se der bem, todos voltam juntos! 🚗💨
+              </p>
+              <div className={styles.returnInfoPills}>
+                <span className={styles.pillGreenSm}>✅ Ida: obrigatória</span>
+                <span className={styles.pillAmberSm}>💛 Volta: cortesia sua</span>
+              </div>
+            </div>
+
+            {/* ── Checkbox de aceite ── */}
+            <label className={styles.termsLabel}>
+              <div className={`${styles.termsCheck} ${termsAccepted ? styles.termsCheckActive : ''}`} onClick={() => setTermsAccepted(t => !t)} role="checkbox" aria-checked={termsAccepted} tabIndex={0} onKeyDown={e => e.key === ' ' && setTermsAccepted(t => !t)}>
+                {termsAccepted && (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3">
+                    <polyline points="20,6 9,17 4,12"/>
+                  </svg>
+                )}
+              </div>
+              <span className={styles.termsText}>
+                Li e concordo com as <strong>regras, normas de conduta</strong> e <strong>política de cancelamento</strong> do TorcidaMatch
+              </span>
+            </label>
           </>
         )}
 

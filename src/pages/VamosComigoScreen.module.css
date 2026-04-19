@@ -306,8 +306,12 @@
 
 /* Card actions */
 .cardActions { display: flex; gap: 8px; }
-.btnDetails {
+.btnShare {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   padding: 9px 0;
   border-radius: 9px;
   border: 0.5px solid rgba(255,255,255,0.18);
@@ -315,6 +319,11 @@
   color: var(--color-silver);
   font-size: 12px;
   font-weight: 600;
+  transition: border-color 0.18s, color 0.18s;
+}
+.btnShare:hover {
+  border-color: rgba(34,197,94,0.3);
+  color: #22C55E;
 }
 .btnReserve {
   flex: 1;

@@ -88,8 +88,23 @@ const VEHICLE_LABELS = { carro: 'Carro', van: 'Van', onibus: 'Ônibus' }
 
 // ─── Ride Card ───────────────────────────────────────────────────────────────
 
-function RideCard({ ride, onReserve, onDetails }) {
+function RideCard({ ride, onReserve }) {
   const hasMemberPrice = ride.memberPrice != null && ride.memberPrice !== ride.price
+
+  const handleShare = async () => {
+    const url  = `${window.location.origin}/vamos-comigo/${ride._id}`
+    const code = ride.shareCode ? ` · Código: ${ride.shareCode}` : ''
+    const text = `🚗 Vamos juntos! ${ride.driverName} sai de ${ride.meetPoint} às ${formatTime(ride.departureTime)}${code}`
+
+    if (navigator.share) {
+      try { await navigator.share({ title: 'Vamos Comigo! – TorcidaMatch', text, url }) } catch {}
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`)
+      // feedback visual temporário via title do botão (sem toast pra não importar contexto aqui)
+      const btn = document.activeElement
+      if (btn) { const orig = btn.textContent; btn.textContent = 'Copiado!'; setTimeout(() => { btn.textContent = orig }, 1800) }
+    }
+  }
 
   return (
     <article
@@ -181,11 +196,15 @@ function RideCard({ ride, onReserve, onDetails }) {
 
       <div className={styles.cardActions}>
         <button
-          className={styles.btnDetails}
-          onClick={() => onDetails?.(ride)}
-          aria-label={`Ver detalhes de ${ride.driverName}`}
+          className={styles.btnShare}
+          onClick={handleShare}
+          aria-label={`Compartilhar viagem de ${ride.driverName}`}
         >
-          Detalhes
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Compartilhar
         </button>
         <button
           className={styles.btnReserve}
@@ -476,7 +495,6 @@ export default function VamosComigoScreen() {
                 key={ride._id}
                 ride={ride}
                 onReserve={handleReserve}
-                onDetails={r => navigate(`/vamos-comigo/${r._id}`)}
               />
             ))}
             {/* Offer ride card */}
