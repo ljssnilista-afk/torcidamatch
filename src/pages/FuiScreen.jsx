@@ -48,10 +48,27 @@ const TABS = [
 
 // ─── Ride Card (compact) ────────────────────────────────────────────────────
 
-function RideCard({ ride, role, onTap }) {
+function ReturnBadge({ returnApproved }) {
+  if (returnApproved === true)
+    return <span className={styles.returnBadgeYes}>🔄 Volta garantida</span>
+  if (returnApproved === false)
+    return <span className={styles.returnBadgeNo}>❌ Sem vaga de volta</span>
+  return <span className={styles.returnBadgePending}>⏳ Volta pendente</span>
+}
+
+function RideCard({ ride, role, onTap, userId }) {
   const countdown = useCountdown(ride.departureTime)
   const st = STATUS_COLORS[ride.status] || '#22C55E'
-  const activeP = ride.passengers?.filter(p => p.status !== 'cancelled').length || 0
+
+  // Encontra o status de volta do passageiro logado (se for passageiro)
+  const myPassenger = role === 'passageiro'
+    ? ride.passengers?.find(p => String(p.user) === String(userId))
+    : null
+
+  // Mostra badge de volta apenas em viagens in_progress ou completed
+  const showReturn = role === 'passageiro' &&
+    myPassenger &&
+    ['in_progress', 'completed'].includes(ride.status)
 
   return (
     <button className={styles.rideCard} onClick={() => onTap(ride)}>
@@ -75,6 +92,11 @@ function RideCard({ ride, role, onTap }) {
           <span className={styles.rideCountdown}>⏱ {countdown}</span>
         ) : null}
       </div>
+      {showReturn && (
+        <div className={styles.returnRow}>
+          <ReturnBadge returnApproved={myPassenger.returnApproved} />
+        </div>
+      )}
     </button>
   )
 }
@@ -266,7 +288,7 @@ export default function FuiScreen() {
             <EmptyTab icon="🎟️" title="Nenhuma viagem confirmada" sub="Explore o Vamos Comigo e reserve sua vaga!" btnLabel="Explorar viagens" onBtn={() => navigate(ROUTES.VAMOS_COMIGO)} />
           ) : (
             <div className={styles.list}>
-              {proximas.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} />)}
+              {proximas.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} userId={user?.id} />)}
             </div>
           )
         )}
@@ -295,7 +317,7 @@ export default function FuiScreen() {
             <EmptyTab icon="📜" title="Nenhuma viagem no histórico" sub="Suas viagens concluídas aparecerão aqui." />
           ) : (
             <div className={styles.list}>
-              {historico.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} />)}
+              {historico.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} userId={user?.id} />)}
             </div>
           )
         )}

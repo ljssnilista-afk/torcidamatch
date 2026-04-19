@@ -153,6 +153,21 @@ function StepSummary({ ride, onContinue, loading }) {
           </span>
         </div>
 
+        {/* ── Sobre a volta ── */}
+        <div className={styles.returnBox}>
+          <div className={styles.returnHeader}>
+            <span className={styles.returnIcon}>💚</span>
+            <span className={styles.returnTitle}>Ida garantida · Volta condicional</span>
+          </div>
+          <p className={styles.returnText}>
+            Sua ida está <strong>100% garantida</strong> após o pagamento. A volta não é automática — ela depende da boa convivência durante o trajeto. Seja pontual, trate todos com respeito e curta o rolê. O motorista decide quem volta junto!
+          </p>
+          <div className={styles.returnPills}>
+            <span className={styles.pillGreen}>✅ Ida confirmada</span>
+            <span className={styles.pillAmber}>⚠️ Volta condicional</span>
+          </div>
+        </div>
+
         {/* ── Nota de captura ── */}
         <div className={styles.captureBox}>
           <p className={styles.captureNote}>

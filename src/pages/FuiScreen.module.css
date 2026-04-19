@@ -38,6 +38,12 @@
 .ridePrice { font-size: 15px; font-weight: 800; color: var(--color-brand); margin-left: auto; }
 .rideCountdown { font-size: 11px; font-weight: 600; color: var(--color-gold); }
 
+/* Return badge (volta condicional) */
+.returnRow { margin-top: 10px; padding-top: 10px; border-top: 0.5px solid var(--glass-border); }
+.returnBadgeYes { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #22C55E; background: rgba(34,197,94,0.08); border: 0.5px solid rgba(34,197,94,0.2); border-radius: 20px; padding: 4px 12px; }
+.returnBadgeNo { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #EF4444; background: rgba(239,68,68,0.08); border: 0.5px solid rgba(239,68,68,0.2); border-radius: 20px; padding: 4px 12px; }
+.returnBadgePending { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #F59E0B; background: rgba(245,158,11,0.08); border: 0.5px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 4px 12px; }
+
 /* Group Card */
 .groupCard { width: 100%; display: flex; align-items: center; gap: 14px; background: var(--metallic-light); border: 0.5px solid var(--metallic-border); border-radius: var(--radius-md); padding: 16px 18px; transition: all var(--transition); cursor: pointer; text-align: left; backdrop-filter: blur(8px); }
 .groupCard:hover { border-color: rgba(34,197,94,0.15); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
