@@ -94,8 +94,8 @@ export async function fetchNextGame(teamName) {
   // Filtrar para só mostrar jogos do time correto (ex: Botafogo-RJ, não Botafogo-SP)
   const filtered = (data.results ?? []).filter(ev => {
     if (expectedApiId) {
-      const homeApiId = ev.home_team_obj?.api_id
-      const awayApiId = ev.away_team_obj?.api_id
+      const homeApiId = ev.home_team_obj?.id
+      const awayApiId = ev.away_team_obj?.id
       return homeApiId === expectedApiId || awayApiId === expectedApiId
     }
     return true
