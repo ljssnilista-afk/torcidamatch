@@ -29,7 +29,7 @@ function formatDate(iso) {
   const d = new Date(iso)
   const dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
   const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
-  return `${dias[d.getDay()]} · ${d.getDate()}/${meses[d.getMonth()]}`
+  return `${dias[d.getDay()]}, ${d.getDate()}/${meses[d.getMonth()]}`
 }
 
 function formatTime(iso) {
@@ -37,25 +37,28 @@ function formatTime(iso) {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// STEP 1 — Seleção de assento
-// ═══════════════════════════════════════════════════════════════════════════════
-function StepAssento({ ride, selectedSeat, onSelectSeat, onContinue, userId }) {
-  const occupiedSeats = ride.passengers
-    .filter(p => p.status !== 'cancelled')
-    .map((_, i) => i + 1)
+function getInitials(name = '') {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+}
 
-  const totalSeats = ride.totalSeats
-  const cols = ride.vehicle === 'carro' ? 2 : 3
+// ═══════════════════════════════════════════════════════════════════════════════
+// STEP 1 — Resumo da viagem + CTA pagar
+// ═══════════════════════════════════════════════════════════════════════════════
+function StepSummary({ ride, onContinue, loading }) {
   const price = ride.price
   const serviceFee = Math.round(price * 0.08)
   const total = price + serviceFee
 
+  const vehicleLabel = { carro: 'Carro', van: 'Van', onibus: 'Ônibus' }[ride.vehicle] || ride.vehicle
+
   return (
     <div className={styles.stepContent}>
+      {/* Header */}
       <div className={styles.headerBar}>
-        <button className={styles.backBtn} onClick={() => window.history.back()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <button className={styles.backBtn} onClick={() => window.history.back()} aria-label="Voltar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
         </button>
         <div className={styles.headerCenter}>
           <h2 className={styles.headerTitle}>Reservar vaga</h2>
@@ -64,7 +67,9 @@ function StepAssento({ ride, selectedSeat, onSelectSeat, onContinue, userId }) {
       </div>
 
       <div className={styles.body}>
-        {/* Rota */}
+
+        {/* ── Bloco 1: Viagem ── */}
+        <p className={styles.sectionLabel}>VIAGEM</p>
         <div className={styles.routeCard}>
           <div className={styles.routeRow}>
             <div className={styles.routeDotGreen} />
@@ -78,111 +83,106 @@ function StepAssento({ ride, selectedSeat, onSelectSeat, onContinue, userId }) {
             <div className={styles.routeDotRed} />
             <div className={styles.routeInfo}>
               <span className={styles.routeLabel}>DESTINO · {ride.game?.date ? formatTime(ride.game.date) : ''}</span>
-              <span className={styles.routePlace}>{ride.game?.stadium}</span>
+              <span className={styles.routePlace}>{ride.game?.stadium || 'A confirmar'}</span>
             </div>
           </div>
         </div>
 
-        {/* Tags */}
         <div className={styles.tagRow}>
           <span className={styles.tagGreen}>
-            {ride.vehicle?.toUpperCase()} · {ride.totalSeats} VAGAS
+            {vehicleLabel} · {ride.availableSeats ?? ride.totalSeats} vaga{ride.availableSeats !== 1 ? 's' : ''}
           </span>
-          <span className={styles.tag}>{ride.game?.date ? formatDate(ride.game.date) : ''}</span>
-          <span className={styles.tag}>{ride.game?.homeTeam} × {ride.game?.awayTeam}</span>
+          {ride.game?.date && <span className={styles.tag}>{formatDate(ride.game.date)}</span>}
+          {ride.game?.homeTeam && (
+            <span className={styles.tag}>{ride.game.homeTeam} × {ride.game.awayTeam}</span>
+          )}
         </div>
 
-        {/* Grid de assentos */}
-        <p className={styles.sectionLabel}>ESCOLHA SEU ASSENTO</p>
-
-        {/* Motorista */}
-        <div className={styles.driverRow}>
-          <div className={styles.driverSeat}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#737373" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-              <path d="M12 2a10 10 0 0110 10"/>
-            </svg>
+        {/* ── Bloco 2: Motorista ── */}
+        <p className={styles.sectionLabel}>MOTORISTA</p>
+        <div className={styles.driverCard}>
+          <div className={styles.driverAvatar}>
+            {getInitials(ride.driverName)}
           </div>
-          <span className={styles.driverLabel}>MOTORISTA</span>
-        </div>
-
-        {/* Seats grid */}
-        <div className={styles.seatGrid} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
-          {Array.from({ length: totalSeats }, (_, i) => {
-            const num = i + 1
-            const isOccupied = occupiedSeats.includes(num)
-            const isSelected = selectedSeat === num
-            const isDriver = false
-
-            return (
-              <button
-                key={num}
-                className={`${styles.seat} ${isOccupied ? styles.seatOccupied : ''} ${isSelected ? styles.seatSelected : ''}`}
-                onClick={() => !isOccupied && onSelectSeat(num)}
-                disabled={isOccupied}
-              >
-                {String(num).padStart(2, '0')}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Legenda */}
-        <div className={styles.legendRow}>
-          <div className={styles.legendItem}>
-            <div className={styles.legendDot} style={{ background: '#404040' }} />
-            <span>Livre</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div className={styles.legendDot} style={{ background: '#22C55E' }} />
-            <span>Sua vaga</span>
-          </div>
-          <div className={styles.legendItem}>
-            <div className={styles.legendDot} style={{ background: '#252525' }} />
-            <span>Ocupada</span>
+          <div className={styles.driverInfo}>
+            <span className={styles.driverName}>{ride.driverName}</span>
+            {ride.driverHandle && (
+              <span className={styles.driverHandle}>@{ride.driverHandle}</span>
+            )}
+            {ride.groupName && (
+              <span className={styles.driverGroup}>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                {ride.groupName}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* Resumo preço */}
-        {selectedSeat && (
-          <div className={styles.priceSummary}>
-            <div className={styles.priceRow}>
-              <span className={styles.priceLabel}>Vaga nº {String(selectedSeat).padStart(2, '0')}</span>
-              <span className={styles.priceValue}>R$ {formatPrice(price)}</span>
-            </div>
-            <div className={styles.priceRow}>
-              <span className={styles.priceLabel}>Taxa de serviço · 8%</span>
-              <span className={styles.priceValue}>R$ {formatPrice(serviceFee)}</span>
-            </div>
-            <div className={styles.priceDivider} />
-            <div className={styles.priceRow}>
-              <span className={styles.priceTotalLabel}>Total</span>
-              <span className={styles.priceTotalValue}>R$ {formatPrice(total)}</span>
-            </div>
+        {/* ── Bloco 3: Preço ── */}
+        <p className={styles.sectionLabel}>RESUMO DE PREÇO</p>
+        <div className={styles.priceSummary}>
+          <div className={styles.priceRow}>
+            <span className={styles.priceLabel}>1 vaga</span>
+            <span className={styles.priceValue}>R$ {formatPrice(price)}</span>
           </div>
-        )}
+          <div className={styles.priceRow}>
+            <span className={styles.priceLabel}>Taxa de serviço · 8%</span>
+            <span className={styles.priceValue}>R$ {formatPrice(serviceFee)}</span>
+          </div>
+          <div className={styles.priceDivider} />
+          <div className={styles.priceRow}>
+            <span className={styles.priceTotalLabel}>Total</span>
+            <span className={styles.priceTotalValue}>R$ {formatPrice(total)}</span>
+          </div>
+        </div>
 
-        <p className={styles.captureNote}>
-          Reservado agora · capturado após validação pelo motorista
-        </p>
+        {/* ── Bloco 4: Métodos de pagamento ── */}
+        <div className={styles.paymentMethodsBox}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          <span className={styles.paymentMethodsText}>
+            Pagamento 100% seguro via Stripe
+          </span>
+          <span className={styles.paymentMethodsBadges}>
+            Cartão de crédito · PIX · Boleto
+          </span>
+        </div>
+
+        {/* ── Nota de captura ── */}
+        <div className={styles.captureBox}>
+          <p className={styles.captureNote}>
+            Seu cartão é <strong>autorizado agora</strong> e cobrado apenas quando o motorista validar o código no embarque. Cancelamento gratuito até 2h antes da saída.
+          </p>
+        </div>
+
       </div>
 
       {/* CTA */}
       <div className={styles.ctaBar}>
         <button
           className={styles.ctaBtn}
-          disabled={!selectedSeat}
           onClick={onContinue}
-          style={{ opacity: selectedSeat ? 1 : 0.4 }}
+          disabled={loading}
+          style={{ opacity: loading ? 0.7 : 1 }}
         >
-          {selectedSeat
-            ? `Reservar vaga ${String(selectedSeat).padStart(2, '0')}`
-            : 'Selecione um assento'
-          }
+          {loading ? (
+            'Preparando pagamento...'
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+              Confirmar e pagar · R$ {formatPrice(total)}
+            </>
+          )}
         </button>
-        <p className={styles.secureLine}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-          PAGAMENTO 100% SEGURO VIA STRIPE
+        <p className={styles.termsNote}>
+          Ao pagar, você concorda com os termos e políticas de cancelamento.
         </p>
       </div>
     </div>
@@ -190,16 +190,15 @@ function StepAssento({ ride, selectedSeat, onSelectSeat, onContinue, userId }) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// STEP 2 — Confirmar & Pagar (Stripe Elements)
+// STEP 2 — Formulário Stripe (dentro de Elements)
 // ═══════════════════════════════════════════════════════════════════════════════
-function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
+function StripeCheckout({ amount, ride, onSuccess, onBack }) {
   const stripe = useStripe()
   const elements = useElements()
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [timer, setTimer] = useState(300) // 5 min
+  const [timer, setTimer] = useState(300)
 
-  // Countdown timer
   useEffect(() => {
     const interval = setInterval(() => {
       setTimer(t => {
@@ -228,8 +227,11 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
 
       if (error) {
         setStatus('error')
-        setErrorMsg(error.type === 'card_error' || error.type === 'validation_error'
-          ? error.message : 'Erro ao processar pagamento. Tente novamente.')
+        setErrorMsg(
+          error.type === 'card_error' || error.type === 'validation_error'
+            ? error.message
+            : 'Erro ao processar pagamento. Tente novamente.'
+        )
         return
       }
 
@@ -245,16 +247,18 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
   return (
     <div className={styles.stepContent}>
       <div className={styles.headerBar}>
-        <button className={styles.backBtn} onClick={onBack}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        <button className={styles.backBtn} onClick={onBack} aria-label="Voltar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
         </button>
         <div className={styles.headerCenter}>
-          <h2 className={styles.headerTitle}>Confirmar reserva</h2>
+          <h2 className={styles.headerTitle}>Confirmar pagamento</h2>
         </div>
       </div>
 
       <div className={styles.body}>
-        {/* Timer banner */}
+        {/* Timer */}
         <div className={styles.timerBanner}>
           <div className={styles.timerLeft}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -271,20 +275,19 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
           </div>
         </div>
 
-        {/* Route compact */}
+        {/* Rota compacta */}
         <div className={styles.routeCompact}>
           <div className={styles.routeCompactRow}>
             <div className={styles.routeDotGreen} />
             <span className={styles.routeCompactText}>{ride.meetPoint}</span>
-            <span className={styles.tagSmall}>VAGA {String(seatNum).padStart(2, '0')}</span>
           </div>
           <div className={styles.routeLineShort} />
           <div className={styles.routeCompactRow}>
             <div className={styles.routeDotRed} />
-            <span className={styles.routeCompactText}>{ride.game?.stadium}</span>
+            <span className={styles.routeCompactText}>{ride.game?.stadium || 'A confirmar'}</span>
           </div>
           <span className={styles.routeCompactDate}>
-            {ride.game?.date ? formatDate(ride.game.date) : ''} · {formatTime(ride.departureTime)}
+            {ride.game?.date ? formatDate(ride.game.date) : ''} · {formatTime(ride.departureTime)} · {ride.driverName}
           </span>
         </div>
 
@@ -295,11 +298,11 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
             <PaymentElement options={{ layout: 'tabs' }} />
           </div>
 
-          {/* Info box */}
           <div className={styles.infoBox}>
             <p className={styles.infoTitle}>Seu cartão é apenas autorizado agora.</p>
             <p className={styles.infoText}>
-              A cobrança só acontece quando o motorista valida o código no embarque. Se a viagem não rolar, nada é cobrado — automático.
+              A cobrança só acontece quando o motorista valida o código no embarque.
+              Se a viagem não acontecer, nada é cobrado — automático.
             </p>
           </div>
 
@@ -316,7 +319,9 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
             </button>
             <p className={styles.cancelNote}>Cancelamento grátis até 2h antes da saída</p>
             <p className={styles.secureLine}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
               PAGAMENTO 100% SEGURO VIA STRIPE
             </p>
           </div>
@@ -326,7 +331,7 @@ function StripeCheckout({ amount, ride, seatNum, onSuccess, onBack }) {
   )
 }
 
-function StepPagamento({ ride, seatNum, amount, clientSecret, publishableKey, onSuccess, onBack }) {
+function StepPagamento({ ride, amount, clientSecret, publishableKey, onSuccess, onBack }) {
   if (!clientSecret || !publishableKey) {
     return (
       <div className={styles.loadingWrap}>
@@ -362,15 +367,15 @@ function StepPagamento({ ride, seatNum, amount, clientSecret, publishableKey, on
         locale: 'pt-BR',
       }}
     >
-      <StripeCheckout amount={amount} ride={ride} seatNum={seatNum} onSuccess={onSuccess} onBack={onBack} />
+      <StripeCheckout amount={amount} ride={ride} onSuccess={onSuccess} onBack={onBack} />
     </Elements>
   )
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// STEP 3 — Código de validação
+// STEP 3 — Código de validação + sucesso
 // ═══════════════════════════════════════════════════════════════════════════════
-function StepCodigo({ ride, seatNum, amount, validationCode }) {
+function StepCodigo({ ride, amount, validationCode }) {
   const navigate = useNavigate()
 
   const handleShare = () => {
@@ -387,29 +392,27 @@ function StepCodigo({ ride, seatNum, amount, validationCode }) {
   return (
     <div className={styles.stepContent}>
       <div className={styles.successCenter}>
-        {/* Check */}
         <div className={styles.successGlow} />
         <div className={styles.successCheck}>
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
         </div>
-
         <h1 className={styles.successTitle}>Vaga garantida!</h1>
         <p className={styles.successSub}>
-          Mostre o código abaixo ao motorista{'\n'}no embarque. O pagamento é capturado só então.
+          Mostre o código ao motorista no embarque.{'\n'}O pagamento é capturado só então.
         </p>
       </div>
 
       <div className={styles.body}>
-        {/* Código grande */}
         <div className={styles.codeCard}>
           <p className={styles.sectionLabel}>CÓDIGO DE VALIDAÇÃO</p>
           <p className={styles.codeValue}>{validationCode}</p>
           <p className={styles.codeExpiry}>
-            válido até {formatTime(ride.departureTime)} · {ride.game?.date ? formatDate(ride.game.date).split(' · ')[1] : ''}
+            válido até {formatTime(ride.departureTime)} · {ride.game?.date ? formatDate(ride.game.date) : ''}
           </p>
         </div>
 
-        {/* Rota resumo */}
         <div className={styles.routeCompact}>
           <div className={styles.routeCompactRow}>
             <div className={styles.routeDotGreen} />
@@ -418,11 +421,11 @@ function StepCodigo({ ride, seatNum, amount, validationCode }) {
           <div className={styles.routeLineShort} />
           <div className={styles.routeCompactRow}>
             <div className={styles.routeDotRed} />
-            <span className={styles.routeCompactText}>{ride.game?.stadium}</span>
+            <span className={styles.routeCompactText}>{ride.game?.stadium || 'A confirmar'}</span>
           </div>
           <div className={styles.routeCompactFooter}>
             <span className={styles.routeCompactDate}>
-              {ride.game?.date ? formatDate(ride.game.date) : ''} · {formatTime(ride.departureTime)} · Vaga {String(seatNum).padStart(2, '0')}
+              {ride.game?.date ? formatDate(ride.game.date) : ''} · {formatTime(ride.departureTime)}
             </span>
             <span className={styles.authorizedAmount}>R$ {formatPrice(amount)} autorizado</span>
           </div>
@@ -430,7 +433,7 @@ function StepCodigo({ ride, seatNum, amount, validationCode }) {
       </div>
 
       <div className={styles.ctaBar}>
-        <button className={styles.ctaBtn} onClick={() => navigate(`/vamos-comigo/${ride._id}`)}>
+        <button className={styles.ctaBtn} onClick={() => navigate(ROUTES.FUI)}>
           Ver minha viagem
         </button>
         <button className={styles.outlineBtn} onClick={handleShare}>
@@ -451,10 +454,10 @@ export default function ReservaVagaScreen() {
   const toast = useToast()
   const token = user?.token
 
-  const [step, setStep] = useState(1) // 1=assento, 2=pagamento, 3=código
+  const [step, setStep] = useState(1)      // 1=resumo, 2=pagamento, 3=código
   const [ride, setRide] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [selectedSeat, setSelectedSeat] = useState(null)
+  const [paying, setPaying] = useState(false)
 
   // Stripe state
   const [clientSecret, setClientSecret] = useState(null)
@@ -468,19 +471,22 @@ export default function ReservaVagaScreen() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`${API_URL}/vamos-comigo/${id}`, {
+        const res = await fetch(`${API_URL}/rides/${id}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
         const data = await res.json()
         if (res.ok) setRide(data.ride || data)
         else toast.error(data.error || 'Erro ao carregar viagem')
-      } catch { toast.error('Erro de conexão') }
-      finally { setLoading(false) }
+      } catch {
+        toast.error('Erro de conexão')
+      } finally {
+        setLoading(false)
+      }
     }
     load()
   }, [id])
 
-  // Advance to payment
+  // Cria payment intent e avança para pagamento
   const goToPayment = useCallback(async () => {
     if (!token) {
       toast.error('Faça login para continuar')
@@ -488,6 +494,7 @@ export default function ReservaVagaScreen() {
       return
     }
 
+    setPaying(true)
     try {
       const config = await getStripeConfig()
       setPublishableKey(config.publishableKey)
@@ -499,11 +506,12 @@ export default function ReservaVagaScreen() {
       setStep(2)
     } catch (err) {
       toast.error(err.message || 'Erro ao iniciar pagamento')
+    } finally {
+      setPaying(false)
     }
   }, [id, token, navigate, toast])
 
-  const handlePaymentSuccess = (paymentIntent) => {
-    // Generate a validation code
+  const handlePaymentSuccess = () => {
     const code = `TM-${String(Math.floor(1000 + Math.random() * 9000))}`
     setValidationCode(code)
     setStep(3)
@@ -533,18 +541,15 @@ export default function ReservaVagaScreen() {
   return (
     <div className={styles.screen}>
       {step === 1 && (
-        <StepAssento
+        <StepSummary
           ride={ride}
-          selectedSeat={selectedSeat}
-          onSelectSeat={setSelectedSeat}
           onContinue={goToPayment}
-          userId={user?.id}
+          loading={paying}
         />
       )}
       {step === 2 && (
         <StepPagamento
           ride={ride}
-          seatNum={selectedSeat}
           amount={amount}
           clientSecret={clientSecret}
           publishableKey={publishableKey}
@@ -555,7 +560,6 @@ export default function ReservaVagaScreen() {
       {step === 3 && (
         <StepCodigo
           ride={ride}
-          seatNum={selectedSeat}
           amount={amount}
           validationCode={validationCode}
         />

@@ -146,16 +146,67 @@ function StripeCheckout({ amount, grupo, planLabel, onSuccess, onBack }) {
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
+  // ── CEP state ──────────────────────────────────────────────────────────────
+  const [cep, setCep] = useState('')
+  const [cepStatus, setCepStatus] = useState('idle') // idle | loading | valid | invalid
+  const [cepData, setCepData] = useState(null) // { logradouro, bairro, localidade, uf }
+
+  const handleCepChange = async (e) => {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 8)
+    // Formata exibição: 12345-678
+    const formatted = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw
+    setCep(formatted)
+    setCepData(null)
+
+    if (raw.length === 8) {
+      setCepStatus('loading')
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`)
+        const data = await res.json()
+        if (data.erro) {
+          setCepStatus('invalid')
+        } else {
+          setCepStatus('valid')
+          setCepData(data)
+        }
+      } catch {
+        setCepStatus('invalid')
+      }
+    } else {
+      setCepStatus('idle')
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!stripe || !elements) return
+
+    // Bloquear se CEP inválido ou não preenchido
+    if (cepStatus !== 'valid' || !cepData) {
+      setErrorMsg('Informe um CEP válido para continuar.')
+      return
+    }
+
     setStatus('loading')
     setErrorMsg('')
 
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
-        confirmParams: { return_url: `${window.location.origin}/payment-success` },
+        confirmParams: {
+          return_url: `${window.location.origin}/payment-success`,
+          payment_method_data: {
+            billing_details: {
+              address: {
+                postal_code: cep.replace('-', ''),
+                line1: cepData.logradouro || '',
+                city: cepData.localidade || '',
+                state: cepData.uf || '',
+                country: 'BR',
+              },
+            },
+          },
+        },
         redirect: 'if_required',
       })
 
@@ -174,6 +225,21 @@ function StripeCheckout({ amount, grupo, planLabel, onSuccess, onBack }) {
       setErrorMsg('Erro de conexão. Verifique sua internet.')
     }
   }
+
+  // ── CEP input visual ───────────────────────────────────────────────────────
+  const cepBorderColor =
+    cepStatus === 'valid' ? '#22C55E' :
+    cepStatus === 'invalid' ? '#EF4444' :
+    '#2a2a2a'
+
+  const cepIcon =
+    cepStatus === 'loading' ? (
+      <span className={styles.cepSpinner} />
+    ) : cepStatus === 'valid' ? (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    ) : cepStatus === 'invalid' ? (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    ) : null
 
   return (
     <div className={styles.stepContent}>
@@ -199,11 +265,54 @@ function StripeCheckout({ amount, grupo, planLabel, onSuccess, onBack }) {
           </div>
         </div>
 
-        {/* Stripe Payment Element */}
+        {/* Stripe Payment Element + CEP */}
         <form onSubmit={handleSubmit}>
           <p className={styles.sectionLabel}>DADOS DO PAGAMENTO</p>
           <div className={styles.stripeWrapper}>
-            <PaymentElement options={{ layout: 'tabs' }} />
+            <PaymentElement options={{
+              layout: 'tabs',
+              fields: { billingDetails: { address: 'never' } },
+            }} />
+          </div>
+
+          {/* Campo CEP com validação real */}
+          <div className={styles.cepWrapper}>
+            <label className={styles.cepLabel}>CEP válido</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="00000-000"
+                value={cep}
+                onChange={handleCepChange}
+                maxLength={9}
+                className={styles.cepInput}
+                style={{
+                  borderColor: cepBorderColor,
+                  boxShadow: cepStatus === 'valid'
+                    ? '0 0 0 1px rgba(34,197,94,0.25)'
+                    : cepStatus === 'invalid'
+                    ? '0 0 0 1px rgba(239,68,68,0.25)'
+                    : 'none',
+                }}
+              />
+              {cepIcon && (
+                <span className={styles.cepIconWrap}>{cepIcon}</span>
+              )}
+            </div>
+
+            {/* Endereço confirmado */}
+            {cepStatus === 'valid' && cepData && (
+              <div className={styles.cepAddress}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                {cepData.logradouro ? `${cepData.logradouro}, ` : ''}
+                {cepData.bairro ? `${cepData.bairro} · ` : ''}
+                {cepData.localidade}/{cepData.uf}
+              </div>
+            )}
+            {cepStatus === 'invalid' && (
+              <div className={styles.cepError}>CEP não encontrado. Verifique e tente novamente.</div>
+            )}
           </div>
 
           {errorMsg && (
@@ -220,8 +329,8 @@ function StripeCheckout({ amount, grupo, planLabel, onSuccess, onBack }) {
             <button
               type="submit"
               className={styles.ctaBtn}
-              disabled={!stripe || status === 'loading'}
-              style={{ opacity: status === 'loading' ? 0.7 : 1 }}
+              disabled={!stripe || status === 'loading' || cepStatus !== 'valid'}
+              style={{ opacity: (!stripe || status === 'loading' || cepStatus !== 'valid') ? 0.6 : 1 }}
             >
               {status === 'loading' ? 'Processando...' : 'Confirmar assinatura'}
             </button>

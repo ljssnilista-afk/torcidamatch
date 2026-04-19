@@ -272,7 +272,6 @@ export default function VamosComigoScreen() {
   const [activeFilter, setActiveFilter] = useState('todos')
   const [search,       setSearch]       = useState('')
   const [loading,      setLoading]      = useState(true)
-  const [reserving,    setReserving]    = useState(null)   // ID da viagem sendo reservada
   const [userLocation,  setUserLocation]  = useState(null)
   const [locationLabel, setLocationLabel] = useState('Obtendo localização...')
   const [mapVisible,    setMapVisible]    = useState(false)
@@ -304,34 +303,12 @@ export default function VamosComigoScreen() {
   useEffect(() => { loadRides() }, [loadRides])
 
   // ── Reservar vaga ──────────────────────────────────────────────────────────
-  const handleReserve = async (ride) => {
+  const handleReserve = (ride) => {
     if (!token) {
       toast.error('Faça login para reservar')
       return
     }
-    if (reserving) return
-
-    setReserving(ride._id)
-    try {
-      const res = await fetch(`${API_URL}/rides/${ride._id}/reserve`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      const data = await res.json()
-      if (res.ok) {
-        toast.success(data.message || 'Reserva confirmada!')
-        loadRides() // recarregar para atualizar vagas
-      } else {
-        toast.error(data.error || 'Erro ao reservar')
-      }
-    } catch {
-      toast.error('Erro de conexão ao reservar')
-    } finally {
-      setReserving(null)
-    }
+    navigate(ROUTES.RESERVAR_VAGA.replace(':id', ride._id))
   }
 
   // ── Localização real ──────────────────────────────────────────────────────

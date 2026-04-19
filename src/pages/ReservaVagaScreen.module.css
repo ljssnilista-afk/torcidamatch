@@ -215,95 +215,117 @@
   margin-left: auto;
 }
 
-/* ─── Seat grid ────────────────────────────────────────────────────────────── */
-.driverRow {
+/* ─── Driver card ───────────────────────────────────────────────────────────── */
+.driverCard {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin-bottom: 16px;
-}
-
-.driverSeat {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: #1e1e1e;
+  gap: 14px;
+  background: #161616;
   border: 1px solid #2a2a2a;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.driverLabel {
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.8px;
-  color: #525252;
-  text-transform: uppercase;
-}
-
-.seatGrid {
-  display: grid;
-  gap: 10px;
-  max-width: 280px;
-  margin: 0 auto 20px;
-}
-
-.seat {
-  aspect-ratio: 1;
-  border-radius: 10px;
-  border: 1.5px solid #2a2a2a;
-  background: #1e1e1e;
-  color: #a3a3a3;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Inter', system-ui, sans-serif;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s;
-}
-.seat:hover:not(:disabled) {
-  border-color: rgba(34,197,94,0.25);
-  color: #f5f5f5;
-}
-
-.seatOccupied {
-  background: #141414;
-  border-color: #1a1a1a;
-  color: #333;
-  cursor: not-allowed;
-}
-
-.seatSelected {
-  background: rgba(34,197,94,0.12);
-  border-color: #22C55E;
-  color: #22C55E;
-  box-shadow: 0 0 0 1px rgba(34,197,94,0.15), 0 4px 16px rgba(34,197,94,0.1);
-}
-
-/* ─── Legend ────────────────────────────────────────────────────────────────── */
-.legendRow {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 20px;
 }
 
-.legendItem {
+.driverAvatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22C55E22, #22C55E44);
+  border: 1.5px solid rgba(34,197,94,0.3);
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: #737373;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: #22C55E;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
 }
 
-.legendDot {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
+.driverInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.driverName {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f5f5f5;
+  margin: 0;
+}
+
+.driverHandle {
+  font-size: 12px;
+  color: #737373;
+  margin: 0;
+}
+
+.driverGroup {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #22C55E;
+  margin: 2px 0 0;
+}
+
+/* ─── Payment methods box ───────────────────────────────────────────────────── */
+.paymentMethodsBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34,197,94,0.04);
+  border: 1px solid rgba(34,197,94,0.12);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.paymentMethodsText {
+  font-size: 12px;
+  font-weight: 700;
+  color: #22C55E;
+  flex: 1;
+  min-width: 150px;
+}
+
+.paymentMethodsBadges {
+  font-size: 11px;
+  color: #737373;
+  white-space: nowrap;
+}
+
+/* ─── Capture box ───────────────────────────────────────────────────────────── */
+.captureBox {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+}
+
+.captureNote {
+  font-size: 12px;
+  color: #737373;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.captureNote strong {
+  color: #a3a3a3;
+  font-weight: 700;
+}
+
+/* ─── Terms note ────────────────────────────────────────────────────────────── */
+.termsNote {
+  font-size: 11px;
+  color: #525252;
+  text-align: center;
+  margin: 10px 0 0;
+  line-height: 1.5;
 }
 
 /* ─── Price summary ────────────────────────────────────────────────────────── */
@@ -377,6 +399,10 @@
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .ctaBtn:hover { background: #1fad52; box-shadow: 0 4px 20px rgba(34,197,94,0.25); }
 .ctaBtn:active { transform: scale(0.98); }
