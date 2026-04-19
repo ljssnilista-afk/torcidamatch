@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
@@ -9,13 +9,6 @@ const API_URL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
   : '/torcida-api/api'
 
-const TIMES_RJ = [
-  'Botafogo','Flamengo','Fluminense','Vasco da Gama',
-  'América-RJ','Bangu','Bonsucesso','Campo Grande',
-  'Madureira','Olaria','Portuguesa-RJ','São Cristóvão',
-  'Volta Redonda','Americano','Boavista-RJ','Cabofriense',
-  'Nova Iguaçu','Friburguense','Goytacaz','Serrano',
-]
 
 const ZONAS = ['Zona Sul','Zona Norte','Zona Oeste','Centro','Niterói','Baixada','Interior']
 
@@ -168,8 +161,12 @@ function StepIntro({ onNext, onBack }) {
    Etapa 2 — Dados do grupo
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepDados({ onNext, onBack, initial }) {
+  const { user } = useUser()
+  // O time vem do perfil do usuário — não é preenchido aqui
+  const userTeam = user?.team || user?.time || ''
+
   const [fields, setFields] = useState(initial || {
-    name: '', team: '', bairro: '', zona: '', description: '',
+    name: '', bairro: '', zona: '', description: '',
   })
   const [errors, setErrors] = useState({})
 
@@ -182,7 +179,6 @@ function StepDados({ onNext, onBack, initial }) {
     const e = {}
     if (!fields.name.trim() || fields.name.length < 3) e.name = 'Mínimo 3 caracteres'
     if (fields.name.length > 50) e.name = 'Máximo 50 caracteres'
-    if (!fields.team) e.team = 'Selecione o time'
     if (!fields.bairro.trim()) e.bairro = 'Informe o bairro'
     if (!fields.zona) e.zona = 'Selecione a zona'
     if (fields.description.length > 140) e.description = 'Máximo 140 caracteres'
@@ -192,7 +188,8 @@ function StepDados({ onNext, onBack, initial }) {
   const handleNext = () => {
     const errs = validate()
     if (Object.keys(errs).length) { setErrors(errs); return }
-    onNext(fields)
+    // Injeta o time do perfil ao avançar
+    onNext({ ...fields, team: userTeam })
   }
 
   return (
@@ -220,21 +217,13 @@ function StepDados({ onNext, onBack, initial }) {
           </div>
         </div>
 
-        {/* Time */}
+        {/* Time — somente leitura, vindo do perfil */}
         <div className={styles.field}>
-          <label className={styles.label}>Time <span className={styles.required}>*</span></label>
-          <div className={styles.selectWrap}>
-            <select
-              className={`${styles.select} ${errors.team ? styles.inputError : ''}`}
-              value={fields.team}
-              onChange={set('team')}
-            >
-              <option value="">Selecione o time...</option>
-              {TIMES_RJ.map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <span className={styles.selectChevron}>{Icons.chevronDown}</span>
+          <label className={styles.label}>Time</label>
+          <div className={styles.teamBadge}>
+            <span className={styles.teamBadgeText}>{userTeam || '—'}</span>
+            <span className={styles.teamBadgeHint}>Definido no seu perfil</span>
           </div>
-          {errors.team && <span className={styles.error}>{errors.team}</span>}
         </div>
 
         {/* Bairro + Zona */}
@@ -291,224 +280,55 @@ function StepDados({ onNext, onBack, initial }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Helpers de geocodificação (Nominatim / OpenStreetMap)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-// Geocodificação reversa: coordenadas → endereço legível
-async function reverseGeocode(lat, lng) {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
-    { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
-  )
-  const data = await res.json()
-  const { road = '', house_number = '', suburb = '', neighbourhood = '', city = '' } = data.address || {}
-  const street = road ? `${road}${house_number ? ', ' + house_number : ''}` : ''
-  const bairro = suburb || neighbourhood
-  const parts = [street, bairro, city].filter(Boolean)
-  return parts.join(' — ') || `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-}
-
-// Geocodificação direta: endereço → coordenadas (limita ao Brasil)
-async function forwardGeocode(address) {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1&countrycodes=br&accept-language=pt-BR`,
-    { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
-  )
-  const data = await res.json()
-  if (!data.length) return null
-  return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), label: data[0].display_name }
-}
-
-// Validação: coordenadas dentro do Brasil (bounding box aproximado)
-function isWithinBrazil(lat, lng) {
-  return lat >= -33.75 && lat <= 5.27 && lng >= -73.99 && lng <= -28.83
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MapPicker — mapa Leaflet com marcador arrastável
-   ═══════════════════════════════════════════════════════════════════════════ */
-function MapPicker({ lat, lng, onMove }) {
-  const containerRef = useRef(null)
-  const mapRef      = useRef(null)
-  const markerRef   = useRef(null)
-
-  useEffect(() => {
-    // Injeta CSS do Leaflet uma única vez
-    if (!document.getElementById('leaflet-css')) {
-      const link = document.createElement('link')
-      link.id   = 'leaflet-css'
-      link.rel  = 'stylesheet'
-      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-      document.head.appendChild(link)
-    }
-
-    // Carrega o script do Leaflet dinamicamente
-    const loadLeaflet = () => new Promise((resolve) => {
-      if (window.L) return resolve(window.L)
-      const script = document.createElement('script')
-      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-      script.onload = () => resolve(window.L)
-      document.head.appendChild(script)
-    })
-
-    loadLeaflet().then((L) => {
-      if (mapRef.current || !containerRef.current) return
-
-      const initialLat = lat || -22.9068
-      const initialLng = lng || -43.1729
-
-      const map = L.map(containerRef.current, { zoomControl: true }).setView([initialLat, initialLng], 14)
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19,
-      }).addTo(map)
-
-      // Ícone personalizado verde para o marcador
-      const greenIcon = L.divIcon({
-        className: '',
-        html: `<div style="
-          width:28px;height:28px;border-radius:50% 50% 50% 0;
-          background:#22c55e;border:3px solid #fff;
-          transform:rotate(-45deg);
-          box-shadow:0 2px 8px rgba(34,197,94,0.5)
-        "></div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-      })
-
-      const marker = L.marker([initialLat, initialLng], { draggable: true, icon: greenIcon }).addTo(map)
-
-      marker.on('dragend', (e) => {
-        const { lat: newLat, lng: newLng } = e.target.getLatLng()
-        onMove(newLat, newLng)
-      })
-
-      // Clique no mapa também move o marcador
-      map.on('click', (e) => {
-        marker.setLatLng(e.latlng)
-        onMove(e.latlng.lat, e.latlng.lng)
-      })
-
-      mapRef.current    = map
-      markerRef.current = marker
-    })
-
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove()
-        mapRef.current    = null
-        markerRef.current = null
-      }
-    }
-  }, []) // monta apenas uma vez
-
-  // Sincroniza marcador quando lat/lng mudam externamente (ex: "usar minha localização")
-  useEffect(() => {
-    if (markerRef.current && lat && lng) {
-      markerRef.current.setLatLng([lat, lng])
-      mapRef.current?.setView([lat, lng], 15)
-    }
-  }, [lat, lng])
-
-  return (
-    <div
-      ref={containerRef}
-      className={styles.mapContainer}
-      aria-label="Mapa para selecionar ponto de encontro"
-    />
-  )
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    Etapa 3 — Localização & Privacidade
    ═══════════════════════════════════════════════════════════════════════════ */
 function StepLocalizacao({ onNext, onBack, initial, dados }) {
   const [fields, setFields] = useState(initial || {
     meetPoint: '', privacy: 'public', approvalRequired: false,
-    mensalidade: '', lat: null, lng: null,
+    lat: null, lng: null,
   })
-  const [locLoading,    setLocLoading]    = useState(false)
-  const [geocodeTimer,  setGeocodeTimer]  = useState(null)
-  const [errors,        setErrors]        = useState({})
+  const [locLoading, setLocLoading] = useState(false)
+  const [locLabel, setLocLabel] = useState('')
+  const [errors, setErrors] = useState({})
 
   const set = (f) => (e) => {
-    const val = e.target.value
+    const val = e.target.type === 'checkbox' ? e.target.checked : e.target.value
     setFields(p => ({ ...p, [f]: val }))
     setErrors(p => ({ ...p, [f]: '' }))
-
-    // Quando o usuário digita no campo de endereço, faz geocodificação direta (debounced 800ms)
-    if (f === 'meetPoint') {
-      clearTimeout(geocodeTimer)
-      if (val.trim().length > 5) {
-        const t = setTimeout(async () => {
-          try {
-            const result = await forwardGeocode(val)
-            if (result) {
-              setFields(p => ({ ...p, lat: result.lat, lng: result.lng }))
-            }
-          } catch { /* silencioso */ }
-        }, 800)
-        setGeocodeTimer(t)
-      }
-    }
   }
 
   const setPrivacy = (value) => {
-    setFields(p => ({ ...p, privacy: value, mensalidade: value === 'public' ? '' : p.mensalidade }))
+    setFields(p => ({ ...p, privacy: value }))
   }
 
-  // Chamado quando o marcador é arrastado ou o mapa é clicado → geocodificação reversa
-  const handleMapMove = async (lat, lng) => {
-    setFields(p => ({ ...p, lat, lng }))
-    try {
-      const label = await reverseGeocode(lat, lng)
-      setFields(p => ({ ...p, meetPoint: label }))
-      setErrors(p => ({ ...p, meetPoint: '' }))
-    } catch { /* mantém o endereço anterior */ }
-  }
-
-  // Botão "Usar minha localização" → GPS → geocodificação reversa → preenche campo
   const getLocation = () => {
-    if (!navigator.geolocation) return
     setLocLoading(true)
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords: { latitude: lat, longitude: lng } }) => {
-        if (!isWithinBrazil(lat, lng)) {
-          setErrors(p => ({ ...p, meetPoint: 'Localização fora do Brasil' }))
-          setLocLoading(false)
-          return
-        }
+    navigator.geolocation?.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords
         setFields(p => ({ ...p, lat, lng }))
         try {
-          const label = await reverseGeocode(lat, lng)
-          setFields(p => ({ ...p, meetPoint: label }))
-          setErrors(p => ({ ...p, meetPoint: '' }))
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`,
+            { headers: { 'User-Agent': 'TorcidaMatch/1.0' } }
+          )
+          const data = await res.json()
+          const road = data.address?.road || ''
+          const bairro = data.address?.suburb || data.address?.neighbourhood || ''
+          setLocLabel(road ? `${road}, ${bairro}` : `${lat.toFixed(4)}, ${lng.toFixed(4)}`)
         } catch {
-          setFields(p => ({ ...p, meetPoint: `${lat.toFixed(5)}, ${lng.toFixed(5)}` }))
+          setLocLabel(`${lat.toFixed(4)}, ${lng.toFixed(4)}`)
         }
         setLocLoading(false)
       },
-      () => {
-        setErrors(p => ({ ...p, meetPoint: 'Não foi possível obter sua localização' }))
-        setLocLoading(false)
-      },
+      () => { setLocLoading(false) },
       { timeout: 8000 }
     )
   }
 
   const validate = () => {
     const e = {}
-    if (!fields.meetPoint.trim())
-      e.meetPoint = 'Informe o ponto de encontro'
-    if (!fields.lat || !fields.lng)
-      e.meetPoint = 'Confirme a localização no mapa'
-    if (fields.lat && fields.lng && !isWithinBrazil(fields.lat, fields.lng))
-      e.meetPoint = 'Ponto de encontro deve estar no Brasil'
-    if (fields.privacy === 'private') {
-      const valor = parseFloat(fields.mensalidade)
-      if (!fields.mensalidade || isNaN(valor) || valor < 5)
-        e.mensalidade = 'Valor mínimo R$ 5,00'
-    }
+    if (!fields.meetPoint.trim()) e.meetPoint = 'Informe o ponto de encontro'
     return e
   }
 
@@ -551,14 +371,9 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
             onChange={set('meetPoint')}
           />
           {errors.meetPoint && <span className={styles.error}>{errors.meetPoint}</span>}
-          {!errors.meetPoint && fields.lat && fields.lng && (
-            <span className={styles.hint}>
-              📍 {fields.lat.toFixed(5)}, {fields.lng.toFixed(5)}
-            </span>
-          )}
         </div>
 
-        {/* Botão usar minha localização */}
+        {/* Botão localização */}
         <button
           type="button"
           className={styles.btnLocation}
@@ -569,18 +384,12 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
           {locLoading ? 'Detectando...' : 'Usar minha localização'}
         </button>
 
-        {/* Mapa interativo Leaflet */}
-        <div className={styles.field}>
-          <label className={styles.label}>Confirme no mapa <span className={styles.required}>*</span></label>
-          <p className={styles.hint} style={{ marginBottom: 8 }}>
-            Clique ou arraste o marcador para ajustar o ponto exato
-          </p>
-          <MapPicker
-            lat={fields.lat}
-            lng={fields.lng}
-            onMove={handleMapMove}
-          />
-        </div>
+        {locLabel && (
+          <div className={styles.locResult}>
+            <span className={styles.locResultIcon}>{Icons.mapPin}</span>
+            <span className={styles.locResultText}>{locLabel}</span>
+          </div>
+        )}
 
         {/* Privacidade */}
         <div className={styles.field}>
@@ -604,26 +413,6 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
             ))}
           </div>
         </div>
-
-        {/* Mensalidade — apenas para grupos privados */}
-        {fields.privacy === 'private' && (
-          <div className={styles.field}>
-            <label className={styles.label}>Mensalidade <span className={styles.required}>*</span></label>
-            <input
-              type="number"
-              min="5"
-              step="0.01"
-              className={`${styles.input} ${errors.mensalidade ? styles.inputError : ''}`}
-              placeholder="R$ 0,00 (mínimo R$ 5,00)"
-              value={fields.mensalidade}
-              onChange={set('mensalidade')}
-            />
-            {errors.mensalidade
-              ? <span className={styles.error}>{errors.mensalidade}</span>
-              : <span className={styles.hint}>Valor cobrado mensalmente dos membros</span>
-            }
-          </div>
-        )}
 
         {/* Aprovação manual */}
         <div className={styles.approvalCard}>
@@ -654,7 +443,6 @@ function StepConfirm({ dados, localizacao, onConfirm, loading }) {
     ['Bairro',        `${dados.bairro}, ${dados.zona}`],
     ['Ponto',         localizacao.meetPoint],
     ['Privacidade',   localizacao.privacy === 'public' ? 'Público' : 'Privado'],
-    ...(localizacao.privacy === 'private' ? [['Mensalidade', `R$ ${parseFloat(localizacao.mensalidade).toFixed(2)}/mês`]] : []),
     ['Aprovação',     localizacao.approvalRequired ? 'Manual' : 'Automática'],
   ]
   if (dados.description) rows.splice(3, 0, ['Descrição', dados.description])
@@ -720,7 +508,6 @@ export default function CriarGrupoScreen() {
         meetPoint:        localizacao.meetPoint,
         privacy:          localizacao.privacy,
         approvalRequired: localizacao.approvalRequired,
-        ...(localizacao.privacy === 'private' ? { mensalidade: parseFloat(localizacao.mensalidade) } : {}),
         ...(localizacao.lat && localizacao.lng ? {
           location: { lat: localizacao.lat, lng: localizacao.lng }
         } : {}),

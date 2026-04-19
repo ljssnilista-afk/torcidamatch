@@ -260,7 +260,30 @@
   padding-right: 36px;
 }
 
-.selectWrap {
+/* Time badge (somente leitura, vindo do perfil) */
+.teamBadge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  min-height: 48px;
+}
+
+.teamBadgeText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-brand);
+}
+
+.teamBadgeHint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+
   position: relative;
 }
 
@@ -313,16 +336,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-}
-
-/* Mapa Leaflet */
-.mapContainer {
-  width: 100%;
-  height: 220px;
-  border-radius: var(--radius-sm);
-  border: 0.5px solid var(--color-border-2);
-  overflow: hidden;
-  background: var(--color-surface-2);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
