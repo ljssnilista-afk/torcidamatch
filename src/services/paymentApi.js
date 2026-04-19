@@ -70,3 +70,18 @@ export async function createRidePaymentIntent(token, rideId) {
   if (!res.ok) throw new Error(data.error || 'Erro ao criar pagamento')
   return data // { clientSecret, paymentIntentId, amount, currency, isMember }
 }
+
+// ─── Confirmar reserva após pagamento Stripe ────────────────────────────────
+// Chamado imediatamente após stripe.confirmPayment() retornar 'succeeded'.
+// Registra o passageiro no banco e retorna o código de validação real.
+export async function confirmRidePayment(token, { paymentIntentId, rideId }) {
+  const res = await fetch(`${API_URL}/payments/confirm-ride`, {
+    method: 'POST',
+    headers: authHeaders(token),
+    body: JSON.stringify({ paymentIntentId, rideId }),
+  })
+
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Erro ao confirmar reserva')
+  return data // { validationCode, rideShareCode, message }
+}

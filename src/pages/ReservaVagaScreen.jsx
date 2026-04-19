@@ -4,7 +4,7 @@ import { useUser } from '../context/UserContext'
 import { useToast } from '../context/ToastContext'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import { getStripeConfig, createRidePaymentIntent } from '../services/paymentApi'
+import { getStripeConfig, createRidePaymentIntent, confirmRidePayment } from '../services/paymentApi'
 import { ROUTES } from '../utils/constants'
 import styles from './ReservaVagaScreen.module.css'
 
@@ -207,7 +207,7 @@ function StepSummary({ ride, onContinue, loading }) {
 // ═══════════════════════════════════════════════════════════════════════════════
 // STEP 2 — Formulário Stripe (dentro de Elements)
 // ═══════════════════════════════════════════════════════════════════════════════
-function StripeCheckout({ amount, ride, onSuccess, onBack }) {
+function StripeCheckout({ amount, ride, onSuccess, onBack, token, rideId }) {
   const stripe = useStripe()
   const elements = useElements()
   const [status, setStatus] = useState('idle')
@@ -250,8 +250,19 @@ function StripeCheckout({ amount, ride, onSuccess, onBack }) {
         return
       }
 
-      if (paymentIntent?.status === 'succeeded') {
-        onSuccess(paymentIntent)
+      if (paymentIntent?.status === 'succeeded' || paymentIntent?.status === 'requires_capture') {
+        // Confirmar imediatamente no backend — não depender só do webhook
+        try {
+          const result = await confirmRidePayment(token, {
+            paymentIntentId: paymentIntent.id,
+            rideId,
+          })
+          onSuccess({ ...paymentIntent, validationCode: result.validationCode })
+        } catch (confirmErr) {
+          // Pagamento OK mas confirmação falhou — ainda exibe sucesso com código fallback
+          console.error('[StripeCheckout] Falha na confirmação backend:', confirmErr.message)
+          onSuccess(paymentIntent)
+        }
       }
     } catch {
       setStatus('error')
@@ -346,7 +357,7 @@ function StripeCheckout({ amount, ride, onSuccess, onBack }) {
   )
 }
 
-function StepPagamento({ ride, amount, clientSecret, publishableKey, onSuccess, onBack }) {
+function StepPagamento({ ride, amount, clientSecret, publishableKey, onSuccess, onBack, token, rideId }) {
   if (!clientSecret || !publishableKey) {
     return (
       <div className={styles.loadingWrap}>
@@ -382,7 +393,7 @@ function StepPagamento({ ride, amount, clientSecret, publishableKey, onSuccess, 
         locale: 'pt-BR',
       }}
     >
-      <StripeCheckout amount={amount} ride={ride} onSuccess={onSuccess} onBack={onBack} />
+      <StripeCheckout amount={amount} ride={ride} onSuccess={onSuccess} onBack={onBack} token={token} rideId={rideId} />
     </Elements>
   )
 }
@@ -526,8 +537,10 @@ export default function ReservaVagaScreen() {
     }
   }, [id, token, navigate, toast])
 
-  const handlePaymentSuccess = () => {
-    const code = `TM-${String(Math.floor(1000 + Math.random() * 9000))}`
+  const handlePaymentSuccess = (paymentIntent) => {
+    // Preferir código real do backend; fallback local se confirmação falhou
+    const code = paymentIntent?.validationCode
+      || `TM-${String(Math.floor(1000 + Math.random() * 9000))}`
     setValidationCode(code)
     setStep(3)
   }
@@ -570,6 +583,8 @@ export default function ReservaVagaScreen() {
           publishableKey={publishableKey}
           onSuccess={handlePaymentSuccess}
           onBack={() => setStep(1)}
+          token={token}
+          rideId={id}
         />
       )}
       {step === 3 && (
