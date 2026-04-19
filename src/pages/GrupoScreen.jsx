@@ -374,6 +374,30 @@ function EditGroupModal({ grupo, onSave, onClose, loading }) {
             </>
           )}
 
+          {/* Mensalidade (apenas privado) */}
+          {fields.privacy === 'private' && (
+            <>
+              <label className={styles.editLabel}>Mensalidade (R$/mês)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0,00 (gratuito)"
+                value={grupo.membershipFee ? (grupo.membershipFee / 100).toFixed(2) : ''}
+                onChange={(e) => {
+                  const val = e.target.value
+                  const cents = val ? Math.round(parseFloat(val) * 100) : 0
+                  setFields(p => ({ ...p, membershipFee: cents }))
+                }}
+                className={styles.editInput}
+                style={{ paddingLeft: 14 }}
+              />
+              <span style={{ fontSize: 11, color: 'var(--color-text-tertiary)', marginTop: 2, display: 'block' }}>
+                Mínimo R$ 1,00 ou deixe vazio para gratuito
+              </span>
+            </>
+          )}
+
           <label className={styles.editLabel}>Tipo do grupo</label>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
@@ -763,9 +787,9 @@ export default function GrupoScreen() {
       return
     }
 
-    // Se já está em pendingPayment (voltou para a tela), abrir modal direto
+    // Se já está em pendingPayment (voltou para a tela), navegar para AssinaturaScreen
     if (joinStatus === 'pendingPayment') {
-      setShowPayment(true)
+      navigate(`/grupos/${id}/assinar`)
       return
     }
 
@@ -782,7 +806,7 @@ export default function GrupoScreen() {
           toast.success(data.message || 'Solicitação enviada ao líder!')
         } else if (data.status === 'pendingPayment') {
           setJoinStatus('pendingPayment')
-          setShowPayment(true)
+          navigate(`/grupos/${id}/assinar`)
         } else {
           toast.success(data.message || 'Você entrou no grupo!')
           setJoinStatus(null)

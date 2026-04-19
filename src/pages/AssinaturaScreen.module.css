@@ -1,0 +1,595 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   AssinaturaScreen — Concrete Cathedral dark theme
+   3-step flow: Plano → Pagamento → Sucesso
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #0d0d0d;
+  color: #f5f5f5;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.stepContent::-webkit-scrollbar { display: none; }
+
+/* ─── Loading ──────────────────────────────────────────────────────────────── */
+.loadingWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 16px;
+  padding: 48px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #2a2a2a;
+  border-top-color: #22C55E;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loadingText {
+  font-size: 14px;
+  color: #a3a3a3;
+  margin: 0;
+}
+
+/* ─── STEP 1: Hero ─────────────────────────────────────────────────────────── */
+.heroSection {
+  position: relative;
+  padding: 56px 20px 24px;
+  background: linear-gradient(180deg, rgba(34,197,94,0.06) 0%, transparent 100%);
+  border-bottom: 0.5px solid rgba(34,197,94,0.08);
+}
+
+.heroBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(34,197,94,0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+}
+
+.heroBadge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #22C55E;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin-bottom: 10px;
+}
+
+.heroTitle {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.6px;
+  color: #f5f5f5;
+  margin: 0 0 4px;
+}
+
+.heroSub {
+  font-size: 13px;
+  color: #a3a3a3;
+  margin: 0;
+}
+
+/* ─── Back button ──────────────────────────────────────────────────────────── */
+.backBtn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(30,30,30,0.8);
+  border: 0.5px solid #2a2a2a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a3a3a3;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s;
+}
+.backBtn:hover {
+  border-color: rgba(34,197,94,0.2);
+  color: #22C55E;
+}
+
+/* ─── Body ─────────────────────────────────────────────────────────────────── */
+.body {
+  padding: 20px;
+  flex: 1;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: #737373;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+}
+
+/* ─── Plan cards ───────────────────────────────────────────────────────────── */
+.planCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #2a2a2a;
+  background: #161616;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+  color: #f5f5f5;
+  font-family: inherit;
+}
+.planCard:hover {
+  border-color: rgba(34,197,94,0.15);
+}
+
+.planCardSelected {
+  border-color: #22C55E;
+  background: rgba(34,197,94,0.04);
+  box-shadow: 0 0 0 1px rgba(34,197,94,0.1), 0 4px 24px rgba(34,197,94,0.06);
+}
+
+/* Radio */
+.planRadio {
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.radioOuter {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #404040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.radioActive {
+  border-color: #22C55E;
+  background: rgba(34,197,94,0.08);
+}
+
+.radioInner {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22C55E;
+}
+
+/* Plan info */
+.planInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.planHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.planName {
+  font-size: 16px;
+  font-weight: 800;
+  color: #f5f5f5;
+}
+
+.badgePopular {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #22C55E;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.badgeEcon {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #a3a3a3;
+  background: rgba(163,163,163,0.08);
+  border: 0.5px solid rgba(163,163,163,0.15);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+/* Price */
+.planPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.priceMain {
+  font-size: 22px;
+  font-weight: 900;
+  color: #22C55E;
+}
+
+.pricePer {
+  font-size: 12px;
+  color: #737373;
+}
+
+/* Benefits */
+.planBenefits {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.benefit {
+  font-size: 12px;
+  color: #a3a3a3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22C55E;
+  flex-shrink: 0;
+}
+
+/* ─── Summary card ─────────────────────────────────────────────────────────── */
+.summaryCard {
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.summaryLabel {
+  font-size: 13px;
+  color: #a3a3a3;
+}
+
+.summaryValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.summaryValueGreen {
+  font-size: 13px;
+  font-weight: 700;
+  color: #22C55E;
+}
+
+.summaryDivider {
+  height: 0.5px;
+  background: #2a2a2a;
+  margin: 8px 0;
+}
+
+.summaryTotal {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f5f5f5;
+}
+
+.summaryTotalValue {
+  font-size: 18px;
+  font-weight: 900;
+  color: #22C55E;
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: #737373;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+/* ─── CTA bar ──────────────────────────────────────────────────────────────── */
+.ctaBar {
+  padding: 16px 20px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
+.ctaBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #22C55E;
+  color: #000;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: -0.2px;
+}
+.ctaBtn:hover {
+  background: #1fad52;
+  box-shadow: 0 4px 20px rgba(34,197,94,0.25);
+}
+.ctaBtn:active {
+  transform: scale(0.98);
+}
+
+.outlineBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1.5px solid #2a2a2a;
+  background: transparent;
+  color: #f5f5f5;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Inter', system-ui, sans-serif;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+.outlineBtn:hover {
+  border-color: rgba(34,197,94,0.2);
+}
+
+.secureLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #525252;
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+/* ─── STEP 2: Header bar ───────────────────────────────────────────────────── */
+.headerBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid #1e1e1e;
+  flex-shrink: 0;
+}
+
+.headerCenter {
+  flex: 1;
+  text-align: center;
+}
+
+.headerTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #f5f5f5;
+  margin: 0;
+}
+
+.headerSub {
+  font-size: 12px;
+  color: #737373;
+  margin: 2px 0 0;
+}
+
+/* Compact summary */
+.compactSummary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+}
+
+.compactIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.compactInitials {
+  font-size: 14px;
+  font-weight: 800;
+  color: #22C55E;
+}
+
+.compactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compactName {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.compactPlan {
+  font-size: 12px;
+  color: #737373;
+}
+
+/* Stripe wrapper */
+.stripeWrapper {
+  margin-bottom: 20px;
+}
+
+/* Error box */
+.errorBox {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 12px;
+  padding: 12px;
+  color: #EF4444;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+/* Total row */
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 0.5px solid #2a2a2a;
+  margin-bottom: 8px;
+}
+
+.totalLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f5f5f5;
+}
+
+.totalValue {
+  font-size: 20px;
+  font-weight: 900;
+  color: #22C55E;
+}
+
+/* ─── STEP 3: Success ──────────────────────────────────────────────────────── */
+.successCenter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 60px 24px 24px;
+  position: relative;
+}
+
+.successGlow {
+  position: absolute;
+  top: 40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.successCheck {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2.5px solid #22C55E;
+  background: rgba(34,197,94,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 1;
+  animation: scaleIn 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.successTitle {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: #f5f5f5;
+  margin: 0 0 8px;
+}
+
+.successSub {
+  font-size: 14px;
+  color: #a3a3a3;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Success card */
+.successCard {
+  margin: 24px 20px 0;
+  background: #161616;
+  border: 1px solid #2a2a2a;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.successGroupName {
+  font-size: 18px;
+  font-weight: 800;
+  color: #f5f5f5;
+  margin: 4px 0 8px;
+}
+
+.badgeAtiva {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #22C55E;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-radius: 4px;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+}

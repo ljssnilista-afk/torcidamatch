@@ -89,11 +89,6 @@ const Icons = {
       <line x1="12" y1="22" x2="12" y2="18"/>
     </svg>
   ),
-  money: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-    </svg>
-  ),
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -116,7 +111,7 @@ function StepIndicator({ current, total }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   MapPicker — componente interno para capturar cliques no mapa
+   MapClickHandler — captura cliques no mapa Leaflet
    ═══════════════════════════════════════════════════════════════════════════ */
 function MapClickHandler({ onLocationSelect }) {
   useMapEvents({
@@ -196,7 +191,7 @@ function MapPicker({ visible, onClose, onConfirm, initialLat, initialLng }) {
         {/* Instrução */}
         <p className={styles.mapHint}>Toque no mapa para posicionar o ponto de encontro</p>
 
-        {/* Mapa */}
+        {/* Mapa — OpenStreetMap padrão */}
         <div className={styles.mapContainer}>
           <MapContainer
             center={pin ? [pin.lat, pin.lng] : [DEFAULT_LAT, DEFAULT_LNG]}
@@ -417,7 +412,6 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
   }
 
   const handleFeeChange = (e) => {
-    // Só aceita números e ponto/vírgula
     const raw = e.target.value.replace(/[^\d,\.]/g, '')
     setFields(p => ({ ...p, monthlyFee: raw }))
     setErrors(p => ({ ...p, monthlyFee: '' }))
@@ -466,7 +460,7 @@ function StepLocalizacao({ onNext, onBack, initial, dados }) {
           onClick={() => setMapOpen(true)}
         >
           {Icons.mapPin}
-          Marcar localização
+          {fields.lat ? 'Alterar localização' : 'Marcar localização'}
         </button>
 
         {locLabel && (
@@ -586,8 +580,8 @@ function StepConfirm({ dados, localizacao, onConfirm, loading }) {
     ['Tipo',       isPrivate ? 'Privado (pago)' : 'Público'],
   ]
   if (dados.description) rows.splice(3, 0, ['Descrição', dados.description])
-  if (isPrivate) {
-    rows.push(['Mensalidade', `R$ ${localizacao.monthlyFee}`])
+  if (isPrivate && localizacao.monthlyFee) {
+    rows.push(['Mensalidade', `R$ ${localizacao.monthlyFee}/mês`])
   }
   if (localizacao.locLabel) {
     rows.push(['Local', localizacao.locLabel])
@@ -662,7 +656,7 @@ export default function CriarGrupoScreen() {
         privacy:          localizacao.groupType,
         approvalRequired: localizacao.groupType === 'public',
         ...(isPrivate && localizacao.monthlyFee ? {
-          monthlyFee: parseFloat(localizacao.monthlyFee.replace(',', '.')),
+          membershipFee: Math.round(parseFloat(localizacao.monthlyFee.replace(',', '.')) * 100),
         } : {}),
         ...(localizacao.lat && localizacao.lng ? {
           location: { lat: localizacao.lat, lng: localizacao.lng }

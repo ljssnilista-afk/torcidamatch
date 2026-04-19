@@ -15,6 +15,8 @@ const DetalhesViagemScreen = lazy(() => import('../pages/DetalhesViagemScreen'))
 const FuiScreen            = lazy(() => import('../pages/FuiScreen'))
 const PerfilScreen         = lazy(() => import('../pages/PerfilScreen'))
 const NotificationsScreen  = lazy(() => import('../pages/NotificationsScreen'))
+const AssinaturaScreen     = lazy(() => import('../pages/AssinaturaScreen'))
+const ReservaVagaScreen    = lazy(() => import('../pages/ReservaVagaScreen'))
 
 // ─── Screen skeleton shown while lazy chunk loads ────────────────────────────
 function ScreenSkeleton() {
@@ -51,9 +53,11 @@ export default function AppRouter() {
           <Route path={ROUTES.GRUPOS}         element={<GruposScreen />} />
           <Route path={ROUTES.CRIAR_GRUPO}    element={<CriarGrupoScreen />} />
           <Route path={ROUTES.GRUPO_DETAIL}   element={<GrupoScreen />} />
+          <Route path={ROUTES.ASSINAR_GRUPO} element={<AssinaturaScreen />} />
           <Route path={ROUTES.VAMOS_COMIGO}   element={<VamosComigoScreen />} />
           <Route path={ROUTES.CRIAR_VIAGEM}  element={<CriarViagemScreen />} />
           <Route path={ROUTES.DETALHE_VIAGEM} element={<DetalhesViagemScreen />} />
+          <Route path={ROUTES.RESERVAR_VAGA} element={<ReservaVagaScreen />} />
           <Route path={ROUTES.FUI}            element={<FuiScreen />} />
           <Route path={ROUTES.PERFIL}         element={<PerfilScreen />} />
           <Route path={ROUTES.NOTIFICATIONS}  element={<NotificationsScreen />} />
