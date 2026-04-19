@@ -68,10 +68,10 @@ export async function fetchEvents({ team, dateFrom, dateTo, league, status } = {
 
 // ─── Mapa de apiId dos times do RJ (para filtrar homônimos) ──────────────────
 export const TEAM_API_IDS = {
-  'Botafogo':      1958,
-  'Flamengo':      5981,
-  'Fluminense':    1961,
-  'Vasco da Gama': 1974,
+  'Botafogo':      163,
+  'Flamengo':      160,
+  'Fluminense':    153,
+  'Vasco da Gama': 164,
 }
 
 /** Busca o próximo jogo de um time */
