@@ -283,10 +283,6 @@
   color: var(--color-text-tertiary);
 }
 
-
-  position: relative;
-}
-
 .selectChevron {
   position: absolute;
   right: 14px;
