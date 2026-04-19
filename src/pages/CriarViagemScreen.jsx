@@ -87,8 +87,8 @@ function StepIndicator({ current, total }) {
 
 function GameCard({ game, selected, onSelect }) {
   const isSelected = selected?._raw?.id === game._raw?.id
-  const homeId = game._raw?.home_team_obj?.api_id
-  const awayId = game._raw?.away_team_obj?.api_id
+  const homeId = game._raw?.home_team_obj?.id
+  const awayId = game._raw?.away_team_obj?.id
   return (
     <button className={`${styles.gameCard} ${isSelected ? styles.gameCardSelected : ''}`} onClick={() => onSelect(game)}>
       {isSelected && <div className={styles.gameGlow} />}
@@ -156,8 +156,8 @@ export default function CriarViagemScreen() {
         const filtered = (data.results ?? []).filter(ev => {
           // Se temos o apiId do time, filtrar para só mostrar jogos desse time exato
           if (expectedApiId) {
-            const homeApiId = ev.home_team_obj?.api_id
-            const awayApiId = ev.away_team_obj?.api_id
+            const homeApiId = ev.home_team_obj?.id
+            const awayApiId = ev.away_team_obj?.id
             return homeApiId === expectedApiId || awayApiId === expectedApiId
           }
           return true
