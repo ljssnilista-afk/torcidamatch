@@ -1356,6 +1356,14 @@
   gap: 16px;
 }
 
+/* Saldo + botão lado a lado */
+.walletTopRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .walletBalance {
   display: flex;
   flex-direction: column;
@@ -1375,6 +1383,85 @@
   font-weight: 900;
   color: #22C55E;
   letter-spacing: -1px;
+  line-height: 1;
+}
+
+/* Botão Sacar primário */
+.withdrawPrimaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: #22C55E;
+  color: #000;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.withdrawPrimaryBtn:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(34,197,94,0.35);
+  transform: translateY(-1px);
+}
+.withdrawPrimaryBtnDisabled {
+  background: rgba(34,197,94,0.15);
+  color: rgba(34,197,94,0.4);
+  cursor: not-allowed;
+}
+
+/* Barra de progresso */
+.walletProgressBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
+  background: rgba(34,197,94,0.04);
+  border: 0.5px solid rgba(34,197,94,0.12);
+  border-radius: 12px;
+}
+
+.walletProgressHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.walletProgressPct {
+  color: #22C55E;
+}
+
+.walletProgressTrack {
+  height: 6px;
+  border-radius: 99px;
+  background: rgba(34,197,94,0.12);
+  overflow: hidden;
+}
+
+.walletProgressFill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #22C55E 0%, #4ade80 100%);
+  transition: width 0.6s ease;
+  min-width: 4px;
+}
+
+.walletProgressHint {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.walletProgressHint strong {
+  color: var(--color-text-primary);
 }
 
 .walletHint {
@@ -1382,6 +1469,21 @@
   color: var(--color-text-tertiary);
   margin-top: 2px;
 }
+
+/* Botão Alterar PIX */
+.pixChangeBtn {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  background: none;
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pixChangeBtn:hover { color: var(--color-text-secondary); border-color: rgba(255,255,255,0.2); }
 
 /* ─── PIX setup ─────────────────────────────────────────────────────────────── */
 .pixSetup {
@@ -1602,4 +1704,248 @@
 .withdrawInfoItem strong {
   color: var(--color-text-primary);
   font-weight: 700;
+}
+
+/* ─── Bottom sheet (overlay + sheet base) ───────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: flex-end;
+  z-index: 60;
+  animation: fadeIn 0.18s ease;
+}
+
+.sheet {
+  width: 100%;
+  background: var(--color-surface-1);
+  border-radius: 22px 22px 0 0;
+  border-top: 0.5px solid var(--color-border-2);
+  max-height: 90%;
+  overflow-y: auto;
+  animation: slideUp 0.22s ease;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.sheet::-webkit-scrollbar { display: none; }
+
+.sheetHandle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin: 12px auto 0;
+}
+
+.sheetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  position: sticky;
+  top: 0;
+  background: var(--color-surface-1);
+  z-index: 1;
+}
+
+.sheetTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.4px;
+}
+
+.sheetCancelBtn {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 60px;
+}
+.sheetCancelBtn:hover { color: var(--color-text-secondary); }
+
+.sheetSaveBtn {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-brand);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-family: inherit;
+  cursor: pointer;
+  min-width: 60px;
+  text-align: right;
+}
+.sheetSaveBtn:hover { opacity: 0.8; }
+.sheetSaveBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sheetBody {
+  padding: 4px 18px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ─── Edit input error states ────────────────────────────────────────────────── */
+.editInputErr {
+  border-color: rgba(239,68,68,0.55) !important;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+}
+
+.editErr {
+  font-size: 11px;
+  color: var(--color-danger);
+  padding-left: 2px;
+  margin-top: -4px;
+}
+
+/* ─── Withdraw modal — saldo box ─────────────────────────────────────────────── */
+.withdrawSaldoBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 18px 16px;
+  background: rgba(34,197,94,0.05);
+  border: 0.5px solid rgba(34,197,94,0.15);
+  border-radius: 14px;
+  text-align: center;
+}
+
+.withdrawSaldoLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.withdrawSaldoBig {
+  font-size: 36px;
+  font-weight: 900;
+  color: #22C55E;
+  letter-spacing: -1.5px;
+  line-height: 1;
+}
+
+/* ─── Withdraw amount row ────────────────────────────────────────────────────── */
+.withdrawAmountRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-2);
+  border-radius: 12px;
+  padding: 4px 4px 4px 14px;
+  transition: border-color 0.18s;
+}
+.withdrawAmountRow:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(34,197,94,0.1);
+}
+
+.withdrawAmountPrefix {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.withdrawAmountInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  padding: 8px 0;
+  min-width: 0;
+}
+.withdrawAmountInput::placeholder { color: var(--color-text-tertiary); font-weight: 400; font-size: 18px; }
+/* hide number spinner */
+.withdrawAmountInput::-webkit-outer-spin-button,
+.withdrawAmountInput::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.withdrawAmountInput[type=number] { -moz-appearance: textfield; }
+
+.withdrawMaxBtn {
+  padding: 8px 14px;
+  border-radius: 9px;
+  background: rgba(34,197,94,0.12);
+  color: #22C55E;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.withdrawMaxBtn:hover { background: rgba(34,197,94,0.2); }
+
+/* ─── Withdraw summary ───────────────────────────────────────────────────────── */
+.withdrawSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: var(--color-surface-2);
+  border: 0.5px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.withdrawSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 14px;
+  border-bottom: 0.5px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.withdrawSummaryRow:last-child { border-bottom: none; }
+
+.withdrawSummaryTotal {
+  background: rgba(34,197,94,0.04);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.withdrawSummaryTotal strong {
+  color: #22C55E;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+/* ─── Withdraw confirm button ────────────────────────────────────────────────── */
+.withdrawConfirmBtn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 14px;
+  background: #22C55E;
+  color: #000;
+  font-size: 15px;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s;
+  text-align: center;
+  border: none;
+}
+.withdrawConfirmBtn:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(34,197,94,0.4);
+  transform: translateY(-1px);
+}
+
+.withdrawConfirmBtnDisabled {
+  background: var(--color-surface-3);
+  color: var(--color-text-tertiary);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }

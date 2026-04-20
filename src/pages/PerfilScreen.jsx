@@ -406,18 +406,49 @@ export default function PerfilScreen() {
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
                 <span className={styles.sectionTitle}>💰 Carteira</span>
-                {wallet?.canWithdraw && (
-                  <button className={styles.sectionAction} onClick={() => setWithdrawOpen(true)}>
-                    Sacar
-                  </button>
-                )}
               </div>
               <div className={styles.walletCard}>
-                {/* Saldo */}
-                <div className={styles.walletBalance}>
-                  <span className={styles.walletBalanceLabel}>Saldo disponível</span>
-                  <span className={styles.walletBalanceValue}>{wallet?.balanceFormatted || 'R$ 0,00'}</span>
+
+                {/* Saldo + botão Sacar */}
+                <div className={styles.walletTopRow}>
+                  <div className={styles.walletBalance}>
+                    <span className={styles.walletBalanceLabel}>Saldo disponível</span>
+                    <span className={styles.walletBalanceValue}>{wallet?.balanceFormatted || 'R$ 0,00'}</span>
+                  </div>
+                  <button
+                    className={`${styles.withdrawPrimaryBtn} ${!wallet?.canWithdraw ? styles.withdrawPrimaryBtnDisabled : ''}`}
+                    onClick={() => wallet?.canWithdraw && setWithdrawOpen(true)}
+                    disabled={!wallet?.canWithdraw}
+                    title={!wallet?.canWithdraw ? `Mínimo R$ 50,00 para sacar` : 'Sacar saldo'}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M12 19V5M5 12l7-7 7 7"/>
+                    </svg>
+                    Sacar
+                  </button>
                 </div>
+
+                {/* Barra de progresso até R$ 50 */}
+                {!wallet?.canWithdraw && wallet !== null && (() => {
+                  const balance  = wallet?.balance || 0
+                  const minimum  = 5000 // R$ 50,00 em centavos
+                  const pct      = Math.min(100, Math.round((balance / minimum) * 100))
+                  const faltam   = minimum - balance
+                  return (
+                    <div className={styles.walletProgressBox}>
+                      <div className={styles.walletProgressHeader}>
+                        <span>Progresso para saque</span>
+                        <span className={styles.walletProgressPct}>{pct}%</span>
+                      </div>
+                      <div className={styles.walletProgressTrack}>
+                        <div className={styles.walletProgressFill} style={{ width: `${pct}%` }} />
+                      </div>
+                      <p className={styles.walletProgressHint}>
+                        Faltam <strong>R$ {(faltam / 100).toFixed(2).replace('.', ',')}</strong> para atingir o mínimo de R$ 50,00
+                      </p>
+                    </div>
+                  )
+                })()}
 
                 {/* Pills de aviso */}
                 <div className={styles.walletInfoRow}>
@@ -454,6 +485,12 @@ export default function PerfilScreen() {
                   <div className={styles.pixConfirmed}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     <span>Chave PIX cadastrada ({wallet.pixKeyType})</span>
+                    <button
+                      className={styles.pixChangeBtn}
+                      onClick={() => setWallet(w => ({ ...w, hasPixKey: false }))}
+                    >
+                      Alterar
+                    </button>
                   </div>
                 )}
 
@@ -461,10 +498,7 @@ export default function PerfilScreen() {
                 <div className={styles.walletSacRow}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                   <span>Problema com saque?</span>
-                  <a
-                    href="mailto:suporte@torcidamatch.com.br?subject=Problema%20com%20saque"
-                    className={styles.sacLink}
-                  >
+                  <a href="mailto:suporte@torcidamatch.com.br?subject=Problema%20com%20saque" className={styles.sacLink}>
                     Falar com SAC
                   </a>
                 </div>
@@ -596,70 +630,119 @@ export default function PerfilScreen() {
       {editOpen && <EditPanel user={{ name, age, bairro, zona }} onSave={handleSaveEdit} onClose={() => setEditOpen(false)} />}
 
       {/* Modal de saque */}
-      {withdrawOpen && (
-        <div className={styles.overlay} onClick={() => setWithdrawOpen(false)}>
-          <div className={styles.sheet} onClick={e => e.stopPropagation()}>
-            <div className={styles.sheetHandle}/>
-            <div className={styles.sheetHeader}>
-              <button className={styles.sheetCancelBtn} onClick={() => setWithdrawOpen(false)}>Cancelar</button>
-              <span className={styles.sheetTitle}>Sacar</span>
-              <button className={styles.sheetSaveBtn} onClick={handleWithdraw} disabled={withdrawing}>
-                {withdrawing ? '...' : 'Confirmar'}
-              </button>
-            </div>
-            <div className={styles.sheetBody}>
-              <p className={styles.withdrawBalanceInfo}>
-                Saldo disponível: <strong>{wallet?.balanceFormatted || 'R$ 0,00'}</strong>
-              </p>
-              <div className={styles.editField}>
-                <label className={styles.editLabel}>Valor do saque</label>
-                <div className={styles.withdrawRow}>
-                  <span className={styles.pricePrefix}>R$</span>
-                  <input
-                    type="number" min="50" step="1"
-                    value={withdrawAmount}
-                    onChange={e => setWithdrawAmount(e.target.value)}
-                    placeholder="50,00"
-                    className={styles.editInput}
-                  />
-                </div>
+      {withdrawOpen && (() => {
+        const cents       = Math.round(parseFloat((withdrawAmount || '0').replace(',', '.')) * 100)
+        const isValid     = cents >= 5000 && cents <= (wallet?.balance || 0)
+        const fmtValue    = cents > 0 ? `R$ ${(cents / 100).toFixed(2).replace('.', ',')}` : '—'
+        const destination = wallet?.pixKeyType
+          ? `Chave PIX (${wallet.pixKeyType})`
+          : 'Conta Stripe Connect'
+
+        return (
+          <div className={styles.overlay} onClick={() => setWithdrawOpen(false)}>
+            <div className={styles.sheet} onClick={e => e.stopPropagation()}>
+              <div className={styles.sheetHandle}/>
+              <div className={styles.sheetHeader}>
+                <button className={styles.sheetCancelBtn} onClick={() => setWithdrawOpen(false)}>Cancelar</button>
+                <span className={styles.sheetTitle}>💸 Sacar saldo</span>
+                <div style={{ width: 60 }}/>
               </div>
 
-              {/* Avisos importantes */}
-              <div className={styles.withdrawInfoBox}>
-                <div className={styles.withdrawInfoItem}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  <span>Valor mínimo: <strong>R$ 50,00</strong></span>
+              <div className={styles.sheetBody}>
+                {/* Saldo atual */}
+                <div className={styles.withdrawSaldoBox}>
+                  <span className={styles.withdrawSaldoLabel}>Saldo disponível</span>
+                  <span className={styles.withdrawSaldoBig}>{wallet?.balanceFormatted || 'R$ 0,00'}</span>
                 </div>
-                <div className={styles.withdrawInfoItem}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-                  <span>Aprovação e crédito em até <strong>1 dia útil</strong></span>
-                </div>
-                <div className={styles.withdrawInfoItem}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                  <span>Processado com segurança via <strong>Stripe</strong></span>
-                </div>
-                <div className={styles.withdrawInfoItem}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  <span>Limite de <strong>3 saques por dia</strong></span>
-                </div>
-              </div>
 
-              <div className={styles.walletSacRow} style={{ borderTop: 'none', paddingTop: 0 }}>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                <span>Problema com o saque?</span>
-                <a
-                  href="mailto:suporte@torcidamatch.com.br?subject=Problema%20com%20saque"
-                  className={styles.sacLink}
-                  onClick={() => setWithdrawOpen(false)}
+                {/* Input de valor */}
+                <div className={styles.editField}>
+                  <label className={styles.editLabel}>Quanto quer sacar?</label>
+                  <div className={styles.withdrawAmountRow}>
+                    <span className={styles.withdrawAmountPrefix}>R$</span>
+                    <input
+                      type="number" min="50" step="0.01"
+                      value={withdrawAmount}
+                      onChange={e => setWithdrawAmount(e.target.value)}
+                      placeholder="50,00"
+                      className={styles.withdrawAmountInput}
+                    />
+                    <button
+                      className={styles.withdrawMaxBtn}
+                      onClick={() => setWithdrawAmount(((wallet?.balance || 0) / 100).toFixed(2))}
+                    >
+                      Tudo
+                    </button>
+                  </div>
+                </div>
+
+                {/* Resumo da transação */}
+                {cents > 0 && (
+                  <div className={styles.withdrawSummary}>
+                    <div className={styles.withdrawSummaryRow}>
+                      <span>Valor solicitado</span>
+                      <span>{fmtValue}</span>
+                    </div>
+                    <div className={styles.withdrawSummaryRow}>
+                      <span>Destino</span>
+                      <span>{destination}</span>
+                    </div>
+                    <div className={styles.withdrawSummaryRow}>
+                      <span>Prazo</span>
+                      <span>Até 1 dia útil</span>
+                    </div>
+                    <div className={`${styles.withdrawSummaryRow} ${styles.withdrawSummaryTotal}`}>
+                      <span>Você recebe</span>
+                      <strong>{fmtValue}</strong>
+                    </div>
+                  </div>
+                )}
+
+                {/* Avisos */}
+                <div className={styles.withdrawInfoBox}>
+                  <div className={styles.withdrawInfoItem}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>Mínimo <strong>R$ 50,00</strong> por saque</span>
+                  </div>
+                  <div className={styles.withdrawInfoItem}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                    <span>Crédito em até <strong>1 dia útil</strong> no seu PIX</span>
+                  </div>
+                  <div className={styles.withdrawInfoItem}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <span>Limite de <strong>3 saques por dia</strong></span>
+                  </div>
+                </div>
+
+                {/* Botão confirmar */}
+                <button
+                  className={`${styles.withdrawConfirmBtn} ${!isValid || withdrawing ? styles.withdrawConfirmBtnDisabled : ''}`}
+                  onClick={handleWithdraw}
+                  disabled={!isValid || withdrawing}
                 >
-                  Falar com SAC
-                </a>
+                  {withdrawing
+                    ? 'Processando...'
+                    : isValid
+                    ? `Confirmar saque de ${fmtValue}`
+                    : cents > (wallet?.balance || 0)
+                    ? 'Valor maior que o saldo'
+                    : cents > 0 && cents < 5000
+                    ? 'Mínimo R$ 50,00'
+                    : 'Digite o valor'}
+                </button>
+
+                <div className={styles.walletSacRow} style={{ borderTop: 'none', paddingTop: 0 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                  <span>Dúvidas?</span>
+                  <a href="mailto:suporte@torcidamatch.com.br?subject=Problema%20com%20saque" className={styles.sacLink} onClick={() => setWithdrawOpen(false)}>
+                    Falar com SAC
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Settings panel (engrenagem) — com toggle de tema */}
       {settingsOpen && (
