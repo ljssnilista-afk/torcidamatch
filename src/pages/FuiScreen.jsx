@@ -62,10 +62,13 @@ function ValidateCodeSection({ ride, token, onValidated }) {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [lastResult, setLastResult] = useState(null) // { name, credited }
+  const [legacyPassengers, setLegacyPassengers] = useState([]) // passageiros sem código
   const toast = useToast()
 
-  // Passageiros aguardando validação
-  const waiting = ride.passengers?.filter(p => p.status === 'authorized') || []
+  // Passageiros aguardando validação (authorized = novo fluxo, paid = reservas antigas)
+  const waiting = ride.passengers?.filter(
+    p => (p.status === 'authorized' || p.status === 'paid') && p.validationCode
+  ) || []
   const confirmed = ride.passengers?.filter(p => p.status === 'confirmed') || []
 
   if (waiting.length === 0 && confirmed.length === 0) return null
@@ -86,10 +89,16 @@ function ValidateCodeSection({ ride, token, onValidated }) {
       if (res.ok) {
         setLastResult({ name: data.passengerName, credited: data.creditedFormatted })
         setCode('')
+        setLegacyPassengers([])
         toast.success(data.message)
         if (onValidated) onValidated()
       } else {
-        toast.error(data.error || 'Código inválido')
+        if (data.hasLegacyPassengers && data.legacyPassengers?.length) {
+          setLegacyPassengers(data.legacyPassengers)
+          toast.error('Passageiro sem código — confirme manualmente abaixo')
+        } else {
+          toast.error(data.error || 'Código inválido')
+        }
       }
     } catch {
       toast.error('Erro de conexão')
@@ -174,8 +183,103 @@ function ValidateCodeSection({ ride, token, onValidated }) {
               <span><strong>{lastResult.name}</strong> embarcou · {lastResult.credited} adicionado à carteira</span>
             </div>
           )}
+
+          {/* Passageiros legados (sem código) — confirmar manualmente */}
+          {legacyPassengers.length > 0 && (
+            <div className={styles.legacyBox}>
+              <p className={styles.legacyTitle}>Passageiro(s) sem código de validação:</p>
+              {legacyPassengers.map(p => (
+                <button
+                  key={p.id}
+                  className={styles.legacyConfirmBtn}
+                  onClick={async (e) => {
+                    e.stopPropagation()
+                    setLoading(true)
+                    try {
+                      const res = await fetch(`${API_URL}/rides/${ride._id}/confirm-legacy`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ passengerId: p.id }),
+                      })
+                      const data = await res.json()
+                      if (res.ok) {
+                        setLastResult({ name: data.passengerName, credited: data.creditedFormatted })
+                        setLegacyPassengers(prev => prev.filter(x => x.id !== p.id))
+                        toast.success(data.message)
+                        if (onValidated) onValidated()
+                      } else toast.error(data.error)
+                    } catch { toast.error('Erro de conexão') }
+                    finally { setLoading(false) }
+                  }}
+                  disabled={loading}
+                >
+                  ✅ Confirmar {p.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── Seção de código do passageiro ───────────────────────────────────────────
+function PassengerCodeSection({ myPassenger }) {
+  const [copied, setCopied] = useState(false)
+  const code = myPassenger?.validationCode
+
+  if (!code) return null
+
+  // Não mostrar após confirmado (já embarcou)
+  if (myPassenger.status === 'confirmed') {
+    return (
+      <div className={styles.paxCodeSection}>
+        <div className={styles.paxCodeConfirmed}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Embarque confirmado pelo motorista</span>
+        </div>
+      </div>
+    )
+  }
+
+  const handleCopy = async (e) => {
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(code)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {}
+  }
+
+  const statusLabel = myPassenger.status === 'authorized'
+    ? 'Aguardando embarque'
+    : myPassenger.status === 'paid'
+    ? 'Reservado'
+    : 'Reservado'
+
+  return (
+    <div className={styles.paxCodeSection}>
+      <div className={styles.paxCodeHeader}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+        <span>Meu código de embarque</span>
+        <span className={styles.paxStatusPill}>{statusLabel}</span>
+      </div>
+      <div className={styles.paxCodeRow}>
+        <span className={styles.paxCodeValue}>{code}</span>
+        <button className={`${styles.paxCopyBtn} ${copied ? styles.paxCopyBtnOk : ''}`} onClick={handleCopy}>
+          {copied
+            ? <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copiado</>
+            : <><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copiar</>
+          }
+        </button>
+      </div>
+      <p className={styles.paxCodeHint}>
+        Mostre este código ao motorista no local de embarque para confirmar sua vaga.
+      </p>
     </div>
   )
 }
@@ -184,17 +288,20 @@ function RideCard({ ride, role, onTap, userId, token, onValidated }) {
   const countdown = useCountdown(ride.departureTime)
   const st = STATUS_COLORS[ride.status] || '#22C55E'
 
-  // Encontra o status de volta do passageiro logado (se for passageiro)
-  const myPassenger = role === 'passageiro'
-    ? ride.passengers?.find(p => String(p.user) === String(userId))
-    : null
+  // Passageiro logado nesta viagem
+  const myPassenger = ride.passengers?.find(p => String(p.user) === String(userId))
 
-  // Mostra badge de volta apenas em viagens in_progress ou completed
+  // Badge de volta (passageiro, in_progress/completed)
   const showReturn = role === 'passageiro' &&
     myPassenger &&
     ['in_progress', 'completed'].includes(ride.status)
 
-  // Mostra validação de código para motoristas em viagens abertas/lotadas
+  // Código de embarque (passageiro, viagem não cancelada e com código)
+  const showPaxCode = role === 'passageiro' &&
+    myPassenger?.validationCode &&
+    !['cancelled', 'completed'].includes(ride.status)
+
+  // Validação de código (motorista, viagens ativas)
   const showValidate = role === 'motorista' &&
     ['open', 'full', 'in_progress'].includes(ride.status)
 
@@ -228,7 +335,12 @@ function RideCard({ ride, role, onTap, userId, token, onValidated }) {
         )}
       </button>
 
-      {/* Seção de validação abaixo do card (apenas motorista) */}
+      {/* Código do passageiro — sempre visível abaixo do card */}
+      {showPaxCode && (
+        <PassengerCodeSection myPassenger={myPassenger} />
+      )}
+
+      {/* Validação de código — apenas motorista */}
       {showValidate && (
         <ValidateCodeSection ride={ride} token={token} onValidated={onValidated} />
       )}

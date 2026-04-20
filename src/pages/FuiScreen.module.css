@@ -232,3 +232,125 @@
   border-radius: 8px;
   padding: 8px 12px;
 }
+
+/* ─── Passenger Code Section ─────────────────────────────────────────────────── */
+.paxCodeSection {
+  background: rgba(34,197,94,0.04);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-top: none;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  padding: 12px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.paxCodeHeader {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #22C55E;
+}
+
+.paxStatusPill {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(34,197,94,0.8);
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.2);
+  border-radius: 20px;
+  padding: 2px 9px;
+}
+
+.paxCodeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(34,197,94,0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.paxCodeValue {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 24px;
+  font-weight: 900;
+  color: #22C55E;
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba(34,197,94,0.4);
+}
+
+.paxCopyBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  background: rgba(34,197,94,0.1);
+  border: 0.5px solid rgba(34,197,94,0.25);
+  color: #22C55E;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.paxCopyBtn:hover { background: rgba(34,197,94,0.18); }
+.paxCopyBtnOk { background: rgba(34,197,94,0.18); border-color: rgba(34,197,94,0.4); }
+
+.paxCodeHint {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.paxCodeConfirmed {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #22C55E;
+}
+
+/* ─── Legacy passengers (no code) ───────────────────────────────────────────── */
+.legacyBox {
+  background: rgba(245,158,11,0.06);
+  border: 0.5px solid rgba(245,158,11,0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.legacyTitle {
+  font-size: 11px;
+  color: #F59E0B;
+  font-weight: 600;
+  margin: 0;
+}
+
+.legacyConfirmBtn {
+  width: 100%;
+  padding: 9px 14px;
+  border-radius: 8px;
+  background: rgba(245,158,11,0.1);
+  border: 0.5px solid rgba(245,158,11,0.3);
+  color: #F59E0B;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.legacyConfirmBtn:hover:not(:disabled) { background: rgba(245,158,11,0.18); }
+.legacyConfirmBtn:disabled { opacity: 0.5; cursor: not-allowed; }
