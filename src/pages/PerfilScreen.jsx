@@ -212,8 +212,35 @@ export default function PerfilScreen() {
   const [stats, setStats] = useState({ grupos: 0, viagensOferecidas: 0, viagensFeitas: 0 })
   const [atividades, setAtividades] = useState([])
 
+  // ── Stripe Connect & Carteira ─────────────────────────────────────────────
+  const [connectStatus, setConnectStatus] = useState(null)   // null | 'not_started' | 'pending' | 'active'
+  const [connectLoading, setConnectLoading] = useState(false)
+  const [wallet, setWallet] = useState(null)
+  const [walletOpen, setWalletOpen] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [pixKey, setPixKey] = useState('')
+  const [pixKeyType, setPixKeyType] = useState('cpf')
+  const [withdrawing, setWithdrawing] = useState(false)
+
   useEffect(() => { const t = setTimeout(() => setLoading(false), 500); return () => clearTimeout(t) }, [])
   useEffect(() => { if (user?.photo) setPhoto(user.photo) }, [user?.photo])
+
+  // Carregar status do Connect e carteira
+  useEffect(() => {
+    if (!user?.token) return
+    async function loadFinancial() {
+      try {
+        const [statusRes, walletRes] = await Promise.all([
+          fetch(`${API_URL}/connect/status`, { headers: { Authorization: `Bearer ${user.token}` } }),
+          fetch(`${API_URL}/wallet/balance`, { headers: { Authorization: `Bearer ${user.token}` } }),
+        ])
+        if (statusRes.ok) { const d = await statusRes.json(); setConnectStatus(d.status) }
+        if (walletRes.ok) { const d = await walletRes.json(); setWallet(d) }
+      } catch {}
+    }
+    loadFinancial()
+  }, [user?.token])
 
   useEffect(() => {
     async function loadStats() {
@@ -244,6 +271,73 @@ export default function PerfilScreen() {
 
   const handleSettingsAction = (itemId) => {
     if (itemId === 'logout') { logout(); navigate(ROUTES.LOGIN, { replace: true }) }
+  }
+
+  // ── Iniciar onboarding Connect ────────────────────────────────────────────
+  const handleConnectOnboard = async () => {
+    setConnectLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/connect/onboard`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      const data = await res.json()
+      if (res.ok) window.open(data.url, '_blank')
+      else toast.error(data.error || 'Erro ao iniciar cadastro')
+    } catch { toast.error('Erro de conexão') }
+    finally { setConnectLoading(false) }
+  }
+
+  // ── Abrir painel Express do Stripe ────────────────────────────────────────
+  const handleConnectDashboard = async () => {
+    setConnectLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/connect/dashboard`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${user.token}` },
+      })
+      const data = await res.json()
+      if (res.ok) window.open(data.url, '_blank')
+      else toast.error(data.error || 'Erro ao abrir painel')
+    } catch { toast.error('Erro de conexão') }
+    finally { setConnectLoading(false) }
+  }
+
+  // ── Salvar chave PIX ─────────────────────────────────────────────────────
+  const handleSavePix = async () => {
+    if (!pixKey.trim()) return toast.error('Informe a chave PIX')
+    try {
+      const res = await fetch(`${API_URL}/wallet/pix-key`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
+        body: JSON.stringify({ pixKey: pixKey.trim(), pixKeyType }),
+      })
+      const data = await res.json()
+      if (res.ok) { toast.success('Chave PIX salva!'); setWallet(w => ({ ...w, hasPixKey: true, pixKeyType })) }
+      else toast.error(data.error || 'Erro ao salvar PIX')
+    } catch { toast.error('Erro de conexão') }
+  }
+
+  // ── Solicitar saque ───────────────────────────────────────────────────────
+  const handleWithdraw = async () => {
+    const cents = Math.round(parseFloat(withdrawAmount.replace(',', '.')) * 100)
+    if (!cents || cents < 5000) return toast.error('Mínimo R$ 50,00')
+    setWithdrawing(true)
+    try {
+      const res = await fetch(`${API_URL}/wallet/withdraw`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${user.token}` },
+        body: JSON.stringify({ amount: cents }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        toast.success(data.message)
+        setWallet(w => ({ ...w, balance: data.newBalance, balanceFormatted: data.newBalanceFormatted }))
+        setWithdrawOpen(false)
+        setWithdrawAmount('')
+      } else toast.error(data.error || 'Erro ao sacar')
+    } catch { toast.error('Erro de conexão') }
+    finally { setWithdrawing(false) }
   }
 
   const handleSaveEdit = (fields) => {
@@ -367,6 +461,93 @@ export default function PerfilScreen() {
               )}
             </div>
 
+            {/* ── Carteira digital ── */}
+            {wallet && (
+              <div className={styles.section}>
+                <div className={styles.sectionHeader}>
+                  <span className={styles.sectionTitle}>💰 Carteira</span>
+                  {wallet.balance > 0 && (
+                    <button className={styles.sectionAction} onClick={() => setWithdrawOpen(true)}>
+                      Sacar
+                    </button>
+                  )}
+                </div>
+                <div className={styles.walletCard}>
+                  <div className={styles.walletBalance}>
+                    <span className={styles.walletBalanceLabel}>Saldo disponível</span>
+                    <span className={styles.walletBalanceValue}>{wallet.balanceFormatted || 'R$ 0,00'}</span>
+                    {!wallet.canWithdraw && wallet.balance > 0 && (
+                      <span className={styles.walletHint}>Mínimo R$ 50,00 para sacar</span>
+                    )}
+                  </div>
+                  {!wallet.hasPixKey && (
+                    <div className={styles.pixSetup}>
+                      <p className={styles.pixSetupLabel}>Cadastre sua chave PIX para sacar</p>
+                      <div className={styles.pixRow}>
+                        <select value={pixKeyType} onChange={e => setPixKeyType(e.target.value)} className={styles.pixSelect}>
+                          <option value="cpf">CPF</option>
+                          <option value="email">E-mail</option>
+                          <option value="phone">Telefone</option>
+                          <option value="random">Aleatória</option>
+                        </select>
+                        <input type="text" value={pixKey} onChange={e => setPixKey(e.target.value)} placeholder="Sua chave PIX" className={styles.pixInput} />
+                        <button className={styles.pixSaveBtn} onClick={handleSavePix}>Salvar</button>
+                      </div>
+                    </div>
+                  )}
+                  {wallet.hasPixKey && (
+                    <div className={styles.pixConfirmed}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Chave PIX cadastrada ({wallet.pixKeyType})</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ── Conta financeira (Stripe Connect) ── */}
+            <div className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionTitle}>🏦 Conta financeira</span>
+              </div>
+              <div className={styles.connectCard}>
+                {connectStatus === 'active' ? (
+                  <>
+                    <div className={styles.connectActive}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                      <span>Conta verificada · Recebimentos habilitados</span>
+                    </div>
+                    <p className={styles.connectText}>
+                      Você recebe os pagamentos das viagens diretamente na sua conta bancária via Stripe após a confirmação. 100% seguro.
+                    </p>
+                    <button className={styles.connectBtn} onClick={handleConnectDashboard} disabled={connectLoading}>
+                      {connectLoading ? 'Abrindo...' : 'Ver painel financeiro →'}
+                    </button>
+                  </>
+                ) : connectStatus === 'pending' ? (
+                  <>
+                    <div className={styles.connectPending}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      <span>Cadastro em andamento</span>
+                    </div>
+                    <p className={styles.connectText}>Conclua o cadastro para habilitar os recebimentos.</p>
+                    <button className={styles.connectBtn} onClick={handleConnectOnboard} disabled={connectLoading}>
+                      {connectLoading ? 'Aguarde...' : 'Continuar cadastro →'}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className={styles.connectText}>
+                      Ofereça viagens e receba os pagamentos diretamente na sua conta bancária. O cadastro é rápido e seguro, feito em parceria com a Stripe.
+                    </p>
+                    <button className={styles.connectBtn} onClick={handleConnectOnboard} disabled={connectLoading}>
+                      {connectLoading ? 'Aguarde...' : '🚀 Habilitar recebimentos'}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div style={{ height: 24 }}/>
           </>
         )}
@@ -377,6 +558,43 @@ export default function PerfilScreen() {
 
       {/* Edit panel */}
       {editOpen && <EditPanel user={{ name, age, bairro, zona }} onSave={handleSaveEdit} onClose={() => setEditOpen(false)} />}
+
+      {/* Modal de saque */}
+      {withdrawOpen && (
+        <div className={styles.overlay} onClick={() => setWithdrawOpen(false)}>
+          <div className={styles.sheet} onClick={e => e.stopPropagation()}>
+            <div className={styles.sheetHandle}/>
+            <div className={styles.sheetHeader}>
+              <button className={styles.sheetCancelBtn} onClick={() => setWithdrawOpen(false)}>Cancelar</button>
+              <span className={styles.sheetTitle}>Sacar</span>
+              <button className={styles.sheetSaveBtn} onClick={handleWithdraw} disabled={withdrawing}>
+                {withdrawing ? '...' : 'Confirmar'}
+              </button>
+            </div>
+            <div className={styles.sheetBody}>
+              <p className={styles.withdrawBalanceInfo}>
+                Saldo: <strong>{wallet?.balanceFormatted || 'R$ 0,00'}</strong>
+              </p>
+              <div className={styles.editField}>
+                <label className={styles.editLabel}>Valor do saque (mínimo R$ 50,00)</label>
+                <div className={styles.withdrawRow}>
+                  <span className={styles.pricePrefix}>R$</span>
+                  <input
+                    type="number" min="50" step="1"
+                    value={withdrawAmount}
+                    onChange={e => setWithdrawAmount(e.target.value)}
+                    placeholder="50,00"
+                    className={styles.editInput}
+                  />
+                </div>
+              </div>
+              <p className={styles.withdrawNote}>
+                O valor cairá em até 1 dia útil na sua conta bancária ou PIX cadastrado no Stripe.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Settings panel (engrenagem) — com toggle de tema */}
       {settingsOpen && (
