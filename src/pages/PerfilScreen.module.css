@@ -1532,3 +1532,74 @@
   line-height: 1.5;
   margin: 0;
 }
+
+/* ─── Wallet info pills ──────────────────────────────────────────────────────── */
+.walletInfoRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.walletInfoPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.18);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(34,197,94,0.85);
+  letter-spacing: 0.1px;
+}
+
+/* ─── Wallet SAC row ─────────────────────────────────────────────────────────── */
+.walletSacRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 0.5px solid rgba(255,255,255,0.06);
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.sacLink {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #22C55E;
+  text-decoration: none;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(34,197,94,0.08);
+  border: 0.5px solid rgba(34,197,94,0.18);
+  transition: background 0.15s;
+}
+.sacLink:hover { background: rgba(34,197,94,0.15); }
+
+/* ─── Withdraw info box (modal) ──────────────────────────────────────────────── */
+.withdrawInfoBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(34,197,94,0.04);
+  border: 0.5px solid rgba(34,197,94,0.14);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.withdrawInfoItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.withdrawInfoItem strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
