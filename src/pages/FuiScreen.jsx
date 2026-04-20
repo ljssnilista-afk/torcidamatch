@@ -56,7 +56,131 @@ function ReturnBadge({ returnApproved }) {
   return <span className={styles.returnBadgePending}>⏳ Volta pendente</span>
 }
 
-function RideCard({ ride, role, onTap, userId }) {
+// ─── Seção de validação de código (apenas motorista) ─────────────────────────
+function ValidateCodeSection({ ride, token, onValidated }) {
+  const [open, setOpen] = useState(false)
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [lastResult, setLastResult] = useState(null) // { name, credited }
+  const toast = useToast()
+
+  // Passageiros aguardando validação
+  const waiting = ride.passengers?.filter(p => p.status === 'authorized') || []
+  const confirmed = ride.passengers?.filter(p => p.status === 'confirmed') || []
+
+  if (waiting.length === 0 && confirmed.length === 0) return null
+
+  const handleValidate = async (e) => {
+    e.stopPropagation()
+    const trimmed = code.trim().toUpperCase()
+    if (!trimmed) return toast.error('Digite o código do passageiro')
+
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/rides/${ride._id}/validate-code`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ code: trimmed }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setLastResult({ name: data.passengerName, credited: data.creditedFormatted })
+        setCode('')
+        toast.success(data.message)
+        if (onValidated) onValidated()
+      } else {
+        toast.error(data.error || 'Código inválido')
+      }
+    } catch {
+      toast.error('Erro de conexão')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className={styles.validateSection} onClick={e => e.stopPropagation()}>
+      {/* Header clicável */}
+      <button
+        className={styles.validateToggle}
+        onClick={e => { e.stopPropagation(); setOpen(o => !o) }}
+      >
+        <span className={styles.validateToggleLeft}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+          <span>Receber código</span>
+          {waiting.length > 0 && (
+            <span className={styles.validateBadge}>{waiting.length} aguardando</span>
+          )}
+        </span>
+        <svg
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
+        >
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+
+      {/* Conteúdo expandido */}
+      {open && (
+        <div className={styles.validateBody}>
+          {/* Passageiros já confirmados */}
+          {confirmed.length > 0 && (
+            <div className={styles.confirmedList}>
+              {confirmed.map((p, i) => (
+                <div key={i} className={styles.confirmedItem}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>{p.name}</span>
+                  <span className={styles.confirmedLabel}>Confirmado</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Aguardando */}
+          {waiting.length > 0 && (
+            <>
+              <p className={styles.validateHint}>
+                Peça ao passageiro o código TM-XXXX exibido na tela dele.
+              </p>
+              <div className={styles.validateInputRow}>
+                <input
+                  className={styles.validateInput}
+                  type="text"
+                  value={code}
+                  onChange={e => setCode(e.target.value.toUpperCase())}
+                  onKeyDown={e => e.key === 'Enter' && handleValidate(e)}
+                  placeholder="TM-XXXX"
+                  maxLength={7}
+                  disabled={loading}
+                />
+                <button
+                  className={styles.validateBtn}
+                  onClick={handleValidate}
+                  disabled={loading || !code.trim()}
+                >
+                  {loading ? '...' : 'Validar'}
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Último resultado */}
+          {lastResult && (
+            <div className={styles.validateResult}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>{lastResult.name}</strong> embarcou · {lastResult.credited} adicionado à carteira</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RideCard({ ride, role, onTap, userId, token, onValidated }) {
   const countdown = useCountdown(ride.departureTime)
   const st = STATUS_COLORS[ride.status] || '#22C55E'
 
@@ -70,34 +194,45 @@ function RideCard({ ride, role, onTap, userId }) {
     myPassenger &&
     ['in_progress', 'completed'].includes(ride.status)
 
+  // Mostra validação de código para motoristas em viagens abertas/lotadas
+  const showValidate = role === 'motorista' &&
+    ['open', 'full', 'in_progress'].includes(ride.status)
+
   return (
-    <button className={styles.rideCard} onClick={() => onTap(ride)}>
-      <div className={styles.rideTop}>
-        <span className={styles.rideGame}>{ride.game?.homeTeam} × {ride.game?.awayTeam}</span>
-        <span className={styles.rideStatus} style={{ color: st, background: `${st}15`, borderColor: `${st}40` }}>
-          {STATUS_LABELS[ride.status]}
-        </span>
-      </div>
-      <div className={styles.rideMeta}>
-        <span>{VEHICLE_ICONS[ride.vehicle]} {formatDate(ride.departureTime)} • {formatTime(ride.departureTime)}</span>
-      </div>
-      <div className={styles.rideBottom}>
-        <span className={styles.rideLocation}>📍 {ride.meetPoint}</span>
-        {ride.shareCode && <span className={styles.rideCode}>{ride.shareCode}</span>}
-      </div>
-      <div className={styles.rideFooter}>
-        <span className={styles.rideRole}>{role === 'motorista' ? '🚗 Motorista' : '🧳 Passageiro'}</span>
-        <span className={styles.ridePrice}>R$ {formatPrice(ride.price)}</span>
-        {ride.status === 'open' || ride.status === 'full' ? (
-          <span className={styles.rideCountdown}>⏱ {countdown}</span>
-        ) : null}
-      </div>
-      {showReturn && (
-        <div className={styles.returnRow}>
-          <ReturnBadge returnApproved={myPassenger.returnApproved} />
+    <div className={styles.rideCardWrapper}>
+      <button className={styles.rideCard} onClick={() => onTap(ride)}>
+        <div className={styles.rideTop}>
+          <span className={styles.rideGame}>{ride.game?.homeTeam} × {ride.game?.awayTeam}</span>
+          <span className={styles.rideStatus} style={{ color: st, background: `${st}15`, borderColor: `${st}40` }}>
+            {STATUS_LABELS[ride.status]}
+          </span>
         </div>
+        <div className={styles.rideMeta}>
+          <span>{VEHICLE_ICONS[ride.vehicle]} {formatDate(ride.departureTime)} • {formatTime(ride.departureTime)}</span>
+        </div>
+        <div className={styles.rideBottom}>
+          <span className={styles.rideLocation}>📍 {ride.meetPoint}</span>
+          {ride.shareCode && <span className={styles.rideCode}>{ride.shareCode}</span>}
+        </div>
+        <div className={styles.rideFooter}>
+          <span className={styles.rideRole}>{role === 'motorista' ? '🚗 Motorista' : '🧳 Passageiro'}</span>
+          <span className={styles.ridePrice}>R$ {formatPrice(ride.price)}</span>
+          {ride.status === 'open' || ride.status === 'full' ? (
+            <span className={styles.rideCountdown}>⏱ {countdown}</span>
+          ) : null}
+        </div>
+        {showReturn && (
+          <div className={styles.returnRow}>
+            <ReturnBadge returnApproved={myPassenger.returnApproved} />
+          </div>
+        )}
+      </button>
+
+      {/* Seção de validação abaixo do card (apenas motorista) */}
+      {showValidate && (
+        <ValidateCodeSection ride={ride} token={token} onValidated={onValidated} />
       )}
-    </button>
+    </div>
   )
 }
 
@@ -288,7 +423,17 @@ export default function FuiScreen() {
             <EmptyTab icon="🎟️" title="Nenhuma viagem confirmada" sub="Explore o Vamos Comigo e reserve sua vaga!" btnLabel="Explorar viagens" onBtn={() => navigate(ROUTES.VAMOS_COMIGO)} />
           ) : (
             <div className={styles.list}>
-              {proximas.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} userId={user?.id} />)}
+              {proximas.map(r => (
+                <RideCard
+                  key={r._id}
+                  ride={r}
+                  role={r._role}
+                  onTap={goToRide}
+                  userId={user?.id}
+                  token={token}
+                  onValidated={loadData}
+                />
+              ))}
             </div>
           )
         )}
@@ -317,7 +462,9 @@ export default function FuiScreen() {
             <EmptyTab icon="📜" title="Nenhuma viagem no histórico" sub="Suas viagens concluídas aparecerão aqui." />
           ) : (
             <div className={styles.list}>
-              {historico.map(r => <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} userId={user?.id} />)}
+              {historico.map(r => (
+                <RideCard key={r._id} ride={r} role={r._role} onTap={goToRide} userId={user?.id} token={token} />
+              ))}
             </div>
           )
         )}
