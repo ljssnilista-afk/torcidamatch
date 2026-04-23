@@ -219,22 +219,22 @@ function MapPicker({ visible, onClose, onConfirm, initialLat, initialLng }) {
           </button>
         </div>
 
-        {/* Endereço detectado */}
-        {address && (
-          <div className={styles.mapAddress}>
-            <span className={styles.mapAddressIcon}>{Icons.mapPin}</span>
-            <span className={styles.mapAddressText}>{address}</span>
-          </div>
-        )}
-
-        {/* Confirmar */}
-        <button
-          className={`${styles.btnPrimary} ${styles.mapConfirmBtn}`}
-          onClick={() => pin && onConfirm(pin, address)}
-          disabled={!pin}
-        >
-          Confirmar localização
-        </button>
+        {/* Footer fixo — endereço + botão confirmar */}
+        <div className={styles.mapFooter}>
+          {address && (
+            <div className={styles.mapAddress}>
+              <span className={styles.mapAddressIcon}>{Icons.mapPin}</span>
+              <span className={styles.mapAddressText}>{address}</span>
+            </div>
+          )}
+          <button
+            className={`${styles.btnPrimary} ${styles.mapConfirmBtn}`}
+            onClick={() => pin && onConfirm(pin, address)}
+            disabled={!pin}
+          >
+            Confirmar localização
+          </button>
+        </div>
       </div>
     </div>
   )

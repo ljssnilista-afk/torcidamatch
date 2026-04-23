@@ -729,12 +729,18 @@
   flex: 1;
   background: var(--color-bg);
   max-height: 100dvh;
-  overflow: hidden;
+}
+
+.mapFooter {
+  flex-shrink: 0;
+  background: var(--color-bg);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .mapConfirmBtn {
   flex-shrink: 0;
-  margin: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  margin: 8px 16px 16px;
+  width: calc(100% - 32px);
 }
 
 .mapHeader {
@@ -766,6 +772,7 @@
   flex: 1;
   position: relative;
   min-height: 0;
+  overflow: hidden;
 }
 
 /* Leaflet overrides inside map */
