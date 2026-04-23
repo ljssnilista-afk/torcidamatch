@@ -180,6 +180,11 @@ export default memo(function NextGame({ game, onCta, loading, ridesCount, homePo
   // Extrai utcDate do evento bruto (_raw) ou do game
   const utcDate = game._raw?.event_date || game.utcDate || null
 
+  // Normaliza stadium: pode chegar como objeto {id, name, ...} ou string
+  const stadiumName = typeof game.stadium === 'object' && game.stadium !== null
+    ? game.stadium.name ?? 'A confirmar'
+    : game.stadium ?? 'A confirmar'
+
   // Formata data/hora de forma destacada
   const dateObj = utcDate ? new Date(utcDate) : null
   const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -203,8 +208,8 @@ export default memo(function NextGame({ game, onCta, loading, ridesCount, homePo
   }
 
   // ✅ Req 4 — Local exato do jogo
-  if (game.stadium && game.stadium !== 'A confirmar') {
-    dynamicPills.push({ icon: 'location', text: game.stadium })
+  if (stadiumName && stadiumName !== 'A confirmar') {
+    dynamicPills.push({ icon: 'location', text: stadiumName })
   }
 
   // Pill de duração removida — sem função útil no contexto
@@ -250,12 +255,12 @@ export default memo(function NextGame({ game, onCta, loading, ridesCount, homePo
         </div>
 
         {/* ✅ Req 4 — Local exato em destaque */}
-        {game.stadium && (
+        {stadiumName && stadiumName !== 'A confirmar' && (
           <div className={styles.venueRow}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" />
             </svg>
-            <span>{game.stadium}</span>
+            <span>{stadiumName}</span>
           </div>
         )}
 

@@ -165,7 +165,7 @@ export function bsdEventToNextGame(event) {
     },
     date,
     utcDate: event.event_date,
-    stadium: event.venue ?? 'A confirmar',
+    stadium: event.venue?.name ?? (typeof event.venue === 'string' ? event.venue : 'A confirmar'),
     homePosition: null,  // preenchido via standings
     awayPosition: null,  // preenchido via standings
     pills:   [],        // HomeScreen preenche com dados de caronas
