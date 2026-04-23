@@ -1,22 +1,22 @@
 import { lazy, Suspense, memo } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { ROUTES } from '../utils/constants'
+import { ROUTES } from '@shared/utils/constants'
 import styles from './AppRouter.module.css'
 
 // ─── Lazy-loaded screens ──────────────────────────────────────────────────────
-const LoginScreen          = lazy(() => import('../pages/LoginScreen'))
-const HomeScreen           = lazy(() => import('../pages/HomeScreen'))
-const GruposScreen         = lazy(() => import('../pages/GruposScreen'))
-const CriarGrupoScreen     = lazy(() => import('../pages/CriarGrupoScreen'))
-const GrupoScreen          = lazy(() => import('../pages/GrupoScreen'))
-const VamosComigoScreen    = lazy(() => import('../pages/VamosComigoScreen'))
-const CriarViagemScreen    = lazy(() => import('../pages/CriarViagemScreen'))
-const DetalhesViagemScreen = lazy(() => import('../pages/DetalhesViagemScreen'))
-const FuiScreen            = lazy(() => import('../pages/FuiScreen'))
-const PerfilScreen         = lazy(() => import('../pages/PerfilScreen'))
-const NotificationsScreen  = lazy(() => import('../pages/NotificationsScreen'))
-const AssinaturaScreen     = lazy(() => import('../pages/AssinaturaScreen'))
-const ReservaVagaScreen    = lazy(() => import('../pages/ReservaVagaScreen'))
+const LoginScreen          = lazy(() => import('@modules/auth/LoginScreen'))
+const HomeScreen           = lazy(() => import('@modules/home/HomeScreen'))
+const GruposScreen         = lazy(() => import('@modules/grupos/GruposScreen'))
+const CriarGrupoScreen     = lazy(() => import('@modules/criar-grupo/CriarGrupoScreen'))
+const GrupoScreen          = lazy(() => import('@modules/grupo-detalhe/GrupoScreen'))
+const VamosComigoScreen    = lazy(() => import('@modules/vamos-comigo/VamosComigoScreen'))
+const CriarViagemScreen    = lazy(() => import('@modules/criar-viagem/CriarViagemScreen'))
+const DetalhesViagemScreen = lazy(() => import('@modules/viagem-detalhe/DetalhesViagemScreen'))
+const FuiScreen            = lazy(() => import('@modules/fui/FuiScreen'))
+const PerfilScreen         = lazy(() => import('@modules/perfil/PerfilScreen'))
+const NotificationsScreen  = lazy(() => import('@modules/notificacoes/NotificationsScreen'))
+const AssinaturaScreen     = lazy(() => import('@modules/assinatura/AssinaturaScreen'))
+const ReservaVagaScreen    = lazy(() => import('@modules/reserva-vaga/ReservaVagaScreen'))
 
 // ─── Screen skeleton shown while lazy chunk loads ────────────────────────────
 function ScreenSkeleton() {

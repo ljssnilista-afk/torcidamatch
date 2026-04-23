@@ -1,8 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineConfig(({ mode }) => ({
+  // ─── Aliases de path para feature-based structure ──────────────────────────
+  resolve: {
+    alias: {
+      '@modules': fileURLToPath(new URL('./src/modules', import.meta.url)),
+      '@shared':  fileURLToPath(new URL('./src/shared',  import.meta.url)),
+    },
+  },
+
   // Remover console.log e debugger apenas em produção
   esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : {},
   build: {

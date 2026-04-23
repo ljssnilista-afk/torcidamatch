@@ -1,9 +1,9 @@
 import { memo, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { HEADER_SCREENS, ROUTES } from './utils/constants'
-import { useUser } from './context/UserContext'
-import Header from './ui/Header'
-import BottomNav from './ui/BottomNav'
+import { HEADER_SCREENS, ROUTES } from '@shared/utils/constants'
+import { useUser } from '@shared/contexts/UserContext'
+import Header from '@shared/ui/Header'
+import BottomNav from '@shared/ui/BottomNav'
 import AppRouter from './router/AppRouter'
 import styles from './App.module.css'
 
