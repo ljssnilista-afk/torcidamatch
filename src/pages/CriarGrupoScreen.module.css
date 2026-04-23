@@ -732,6 +732,11 @@
   overflow: hidden;
 }
 
+.mapConfirmBtn {
+  flex-shrink: 0;
+  margin: 12px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
 .mapHeader {
   display: flex;
   align-items: center;

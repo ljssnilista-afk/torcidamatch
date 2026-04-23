@@ -229,10 +229,9 @@ function MapPicker({ visible, onClose, onConfirm, initialLat, initialLng }) {
 
         {/* Confirmar */}
         <button
-          className={styles.btnPrimary}
+          className={`${styles.btnPrimary} ${styles.mapConfirmBtn}`}
           onClick={() => pin && onConfirm(pin, address)}
           disabled={!pin}
-          style={{ margin: '12px 16px 16px' }}
         >
           Confirmar localização
         </button>
