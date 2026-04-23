@@ -113,7 +113,7 @@ function GameCard({ game, selected, onSelect }) {
       </div>
       <div className={styles.gameBottom}>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <span>{game.stadium}</span>
+        <span>{typeof game.stadium === 'object' ? game.stadium?.name ?? 'A confirmar' : game.stadium}</span>
       </div>
       {isSelected && (
         <div className={styles.gameCheck}>
@@ -166,7 +166,7 @@ export default function CriarViagemScreen() {
         })
         const sorted = filtered.sort((a, b) => new Date(a.event_date) - new Date(b.event_date)).slice(0, 10).map(ev => ({
           homeTeam: ev.home_team, awayTeam: ev.away_team, date: formatGameDate(ev.event_date), time: formatGameTime(ev.event_date),
-          rawDate: ev.event_date, stadium: ev.venue || 'A confirmar', league: ev.league?.name || '', _raw: ev,
+          rawDate: ev.event_date, stadium: ev.venue?.name ?? (typeof ev.venue === 'string' ? ev.venue : 'A confirmar'), league: ev.league?.name || '', _raw: ev,
         }))
         setGames(sorted)
       } catch (err) { toast.error('Erro ao buscar jogos') } finally { setGamesLoading(false) }
