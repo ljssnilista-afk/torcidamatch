@@ -1,6 +1,7 @@
 import { useState, useEffect, memo } from 'react'
 import { useUser } from '@shared/contexts/UserContext'
 import styles from './NewsBanner.module.css'
+import { API_URL } from '@shared/services/api'
 
 // Mapa de times para queries de busca RSS
 const TEAM_QUERIES = {
@@ -16,10 +17,6 @@ const TEAM_QUERIES = {
 const RSS_FEEDS = [
   (q) => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' futebol')}&hl=pt-BR&gl=BR&ceid=BR:pt-419`,
 ]
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
 
 // Ícones por categoria da notícia
 function NewsIcon({ type }) {

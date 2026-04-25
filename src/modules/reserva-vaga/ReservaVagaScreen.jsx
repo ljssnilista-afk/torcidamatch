@@ -7,10 +7,7 @@ import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-
 import { getStripeConfig, createRidePaymentIntent, confirmRidePayment } from '@shared/services/paymentApi'
 import { ROUTES } from '@shared/utils/constants'
 import styles from './ReservaVagaScreen.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
+import { API_URL } from '@shared/services/api'
 
 let stripePromise = null
 function getStripe(key) {

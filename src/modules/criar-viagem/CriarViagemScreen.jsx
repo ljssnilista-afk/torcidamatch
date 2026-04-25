@@ -5,10 +5,7 @@ import { useToast } from '@shared/contexts/ToastContext'
 import { fetchEvents, teamLogoUrl, TEAM_API_IDS } from '@shared/utils/bsdApi'
 import { ROUTES } from '@shared/utils/constants'
 import styles from './CriarViagemScreen.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
+import { API_URL } from '@shared/services/api'
 
 function formatGameDate(iso) {
   const d = new Date(iso)

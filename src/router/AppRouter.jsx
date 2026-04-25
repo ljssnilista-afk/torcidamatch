@@ -14,7 +14,7 @@ const CriarViagemScreen    = lazy(() => import('@modules/criar-viagem/CriarViage
 const DetalhesViagemScreen = lazy(() => import('@modules/viagem-detalhe/DetalhesViagemScreen'))
 const FuiScreen            = lazy(() => import('@modules/fui/FuiScreen'))
 const PerfilScreen         = lazy(() => import('@modules/perfil/PerfilScreen'))
-const NotificationsScreen  = lazy(() => import('@modules/notificacoes/NotificationsScreen'))
+const NotificacoesScreen  = lazy(() => import('@modules/notificacoes/NotificacoesScreen'))
 const AssinaturaScreen     = lazy(() => import('@modules/assinatura/AssinaturaScreen'))
 const ReservaVagaScreen    = lazy(() => import('@modules/reserva-vaga/ReservaVagaScreen'))
 
@@ -60,7 +60,7 @@ export default function AppRouter() {
           <Route path={ROUTES.RESERVAR_VAGA} element={<ReservaVagaScreen />} />
           <Route path={ROUTES.FUI}            element={<FuiScreen />} />
           <Route path={ROUTES.PERFIL}         element={<PerfilScreen />} />
-          <Route path={ROUTES.NOTIFICATIONS}  element={<NotificationsScreen />} />
+          <Route path={ROUTES.NOTIFICATIONS}  element={<NotificacoesScreen />} />
           <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
         </Routes>
       </ScreenTransition>

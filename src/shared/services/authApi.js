@@ -2,10 +2,6 @@
 // Em dev:  usa proxy Vite /torcida-api → localhost:3001 (sem CORS)
 // Em prod: usa VITE_API_URL do .env
  
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
- 
 async function apiFetch(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     headers: { 'Content-Type': 'application/json', ...options.headers },

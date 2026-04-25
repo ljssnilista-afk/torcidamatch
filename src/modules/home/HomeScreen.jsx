@@ -21,10 +21,7 @@ import {
   FEMALE_ALERT,
 } from '@shared/data/homeData'
 import styles from './HomeScreen.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/api'
+import { API_URL } from '@shared/services/api'
 
 export default function HomeScreen() {
   const navigate = useNavigate()

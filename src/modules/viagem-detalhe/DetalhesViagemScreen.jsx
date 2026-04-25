@@ -8,6 +8,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import styles from './DetalhesViagemScreen.module.css'
+import { API_URL } from '@shared/services/api'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -19,10 +20,6 @@ const meetIcon = new L.DivIcon({
   html: `<div style="width:28px;height:28px;border-radius:50%;background:#22C55E;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 2px 8px rgba(0,0,0,0.4)">📍</div>`,
   className: '', iconSize: [28,28], iconAnchor: [14,14],
 })
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
 
 function formatPrice(c) { return (c / 100).toFixed(2).replace('.', ',') }
 function formatDate(iso) {

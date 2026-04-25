@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
   // Remover console.log e debugger apenas em produção
   esbuild: mode === 'production' ? { drop: ['console', 'debugger'] } : {},
   build: {
+    sourcemap: mode !== 'production',  // sourcemaps em dev/preview, não em produção
     // Code splitting manual — separa libs grandes em chunks dedicados
     rollupOptions: {
       output: {

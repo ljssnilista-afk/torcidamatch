@@ -34,18 +34,7 @@ async function apiFetch(path, params = {}) {
 
 // ─── Endpoints ────────────────────────────────────────────────────────────────
 
-/** Busca ligas — filtra por país se passado */
-export async function fetchLeagues(country) {
-  return apiFetch('/leagues/', country ? { country } : {})
-}
 
-/** Busca times — filtra por país ou liga */
-export async function fetchTeams({ country, league } = {}) {
-  const params = {}
-  if (country) params.country = country
-  if (league)  params.league  = league
-  return apiFetch('/teams/', params)
-}
 
 /**
  * Busca eventos (jogos)
@@ -108,29 +97,11 @@ export async function fetchNextGame(teamName) {
   return sorted[0] ?? null
 }
 
-/** Jogos ao vivo */
-export async function fetchLive() {
-  return apiFetch('/live/')
-}
 
-/** Predições para próximos jogos */
-export async function fetchPredictions() {
-  return apiFetch('/predictions/')
-}
 
-/** Jogadores */
-export async function fetchPlayers({ team, nationality, position } = {}) {
-  const params = {}
-  if (team)        params.team        = team
-  if (nationality) params.nationality = nationality
-  if (position)    params.position    = position
-  return apiFetch('/players/', params)
-}
 
 // ─── Image URLs (uso direto em <img src="..."> ) ───────────────────────────────
 export const teamLogoUrl   = (apiId) => `${IMG_BASE}/team/${apiId}/?token=${TOKEN}`
-export const leagueLogoUrl = (apiId) => `${IMG_BASE}/league/${apiId}/?token=${TOKEN}`
-export const playerPhotoUrl= (apiId) => `${IMG_BASE}/player/${apiId}/?token=${TOKEN}`
 
 // ─── Conversor: evento BSD → formato NextGame do app ─────────────────────────
 export function bsdEventToNextGame(event) {

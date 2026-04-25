@@ -1,11 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useUser } from './UserContext'
+import { API_URL } from '@shared/services/api'
 
 const NotificationsContext = createContext(null)
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
 
 export function NotificationsProvider({ children }) {
   const { user, isLoggedIn } = useUser()

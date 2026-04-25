@@ -68,7 +68,6 @@ export const ROUTES = {
   DETALHE_VIAGEM:'/vamos-comigo/:id',
   RESERVAR_VAGA: '/vamos-comigo/:id/reservar',
   FUI:           '/fui',
-  FAVORITOS:     '/fui',   // alias para compatibilidade
   PERFIL:        '/perfil',
   NOTIFICATIONS: '/notificacoes',
 }

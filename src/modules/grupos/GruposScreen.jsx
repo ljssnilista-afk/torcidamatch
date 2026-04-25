@@ -10,6 +10,7 @@ import styles from './GruposScreen.module.css'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { API_URL } from '@shared/services/api'
 
 // Fix ícones Leaflet
 delete L.Icon.Default.prototype._getIconUrl
@@ -27,10 +28,6 @@ const userIcon = new L.DivIcon({
   html: `<div style="width:20px;height:20px;border-radius:50%;background:#3B82F6;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,0.5)"></div>`,
   className: '', iconSize: [20,20], iconAnchor: [10,10],
 })
-
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
 
 // ─── Mapa real ────────────────────────────────────────────────────────────────
 function MapaReal({ grupos, userLocation, onClose }) {
@@ -415,5 +412,4 @@ export default function GruposScreen() {
     </div>
   )
 }
-
 

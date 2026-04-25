@@ -2,10 +2,6 @@
 // Todas as chamadas de pagamento ao backend.
 // NUNCA armazene client_secret em state persistente ou localStorage.
 
-const API_URL = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
-  : '/torcida-api/api'
-
 function authHeaders(token) {
   return {
     'Content-Type': 'application/json',
